@@ -9,8 +9,9 @@ jobs:
     steps:
       - checkout
       - run: cd frontend/ && flutter build apk --debug
+      - run: cp /build/app/outputs/flutter-apk/app-debug.apk /tmp/artifacts/app-debug.apk
       - store_artifacts:
-          path: /build/app/outputs/flutter-apk/
+          path: /tmp/artifacts
   test-frontend:
     docker:
       - image: cirrusci/flutter
