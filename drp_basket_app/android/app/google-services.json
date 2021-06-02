@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "300936768681",
+    "project_id": "drp-basket",
+    "storage_bucket": "drp-basket.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:300936768681:android:7dcd77dcb7e7fd8031cdb8",
+        "android_client_info": {
+          "package_name": "com.drp.basketapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "300936768681-e3r3vg9m2c6c50q1nbgasb2s9bo4ogb0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsx5Fej91evjw_oHMfjC9OsfSfMLju870"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "300936768681-e3r3vg9m2c6c50q1nbgasb2s9bo4ogb0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "300936768681-p06u0v77b6htqrh08icfjng5b37nn8au.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.drp.basketapp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
