@@ -8,13 +8,13 @@ jobs:
       - image: cirrusci/flutter
     steps:
       - checkout
-      - run: cd flutter/ && flutter build apk --debug
+      - run: cd frontend/ && flutter build apk --debug
   test-frontend:
     docker:
       - image: cirrusci/flutter
     steps:
       - checkout
-      - run: cd flutter/ && flutter test
+      - run: cd frontend/ && flutter test
 workflows:
   build-frontend:
     jobs:
