@@ -21,7 +21,7 @@ jobs:
       - run:
           name: "Publish Release on GitHub"
           command: |
-            VERSION=$(my-binary --version)
+            VERSION=$(frontend/build/app/outputs/flutter-apk/app.apk --version)
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/
   test-frontend:
     docker:
@@ -33,7 +33,9 @@ workflows:
   build-frontend:
     jobs:
       - build-frontend
-      - publish-github-release
+      - publish-github-release:
+          requires:
+            - build-frontend
   test-frontend:
     jobs:
       - test-frontend
