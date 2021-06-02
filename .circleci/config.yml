@@ -21,9 +21,12 @@ jobs:
       - run:
           name: "Publish Release on GitHub"
           command: |
-            ls
+            mkdir /tmp/artifacts
+            ls > /tmp/artifacts/ls.txt
             VERSION=$(frontend/build/app/outputs/flutter-apk/app.apk --version)
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/
+      - store_artifacts:
+          path: /tmp/artifacts
   test-frontend:
     docker:
       - image: cirrusci/flutter
