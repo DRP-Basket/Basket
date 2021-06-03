@@ -30,9 +30,17 @@ workflows:
   build-frontend:
     jobs:
       - build-frontend
+          filters:
+            tags:
+              only: /.*/
       - publish-github-release:
           requires:
             - build-frontend
+          filters:
+            tags:
+              only: /^v*.*.*/
+            branches:
+              ignore: /.*/
   test-frontend:
     jobs:
       - test-frontend
