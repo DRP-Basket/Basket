@@ -7,23 +7,23 @@ jobs:
     steps:
       - checkout
       - run: cd frontend/ && flutter build apk --debug
+      - run: mkdir workspace
+      - run: cp -r frontend/build/app/outputs/flutter-apk/. workspace
+      - run: ls
+      - run: ls workspace
       - persist_to_workspace:
-          root: frontend/
-          paths: build/app/outputs/flutter-apk
+          root: workspace
           
   publish-github-release:
     docker:
       - image: cibuilds/github:0.10
     steps:
-      - checkout
       - attach_workspace:
-          at: frontend/build/app/outputs/flutter-apk
+          at: tmp/workspace
       - run:
           name: "Publish Release on GitHub"
           command: |
-            ls
-            ls frontend/
-            ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -c $CIRCLE_SHA1 -delete $CIRCLE_TAG frontend/build/app/outputs/flutter-apk
+            ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -c $CIRCLE_SHA1 -delete $CIRCLE_TAG tmp/workspace
 
   test-frontend:
     docker:
