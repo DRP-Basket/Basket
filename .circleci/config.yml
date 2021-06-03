@@ -17,7 +17,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: frontend/build/app/outputs/flutter-apk
+          at: $CIRCLE_ARTIFACTS
       - run:
           name: "Publish Release on GitHub"
           command: |
