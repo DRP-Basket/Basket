@@ -17,12 +17,12 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: $CIRCLE_ARTIFACTS
+          at: frontend/build/app/outputs/flutter-apk
       - run:
           name: "Publish Release on GitHub"
           command: |
             VERSION="v0.0.1"
-            ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -c $CIRCLE_SHA1 -delete $VERSION $CIRCLE_ARTIFACTS/
+            ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -c $CIRCLE_SHA1 -delete $VERSION frontend/build/app/outputs/flutter-apk/
   test-frontend:
     docker:
       - image: cirrusci/flutter
@@ -41,7 +41,6 @@ workflows:
               only: master
             tags:
               only: /^v*.*.*/
-          artifacts: frontend/build/app/outputs/flutter-apk/
   test-frontend:
     jobs:
       - test-frontend
