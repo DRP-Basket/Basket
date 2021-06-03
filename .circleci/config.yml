@@ -9,20 +9,20 @@ jobs:
     steps:
       - checkout
       - run: cd frontend/ && flutter build apk --debug
-      - store_artifacts:
-          path: frontend/build/app/outputs/flutter-apk
+      # - store_artifacts:
+      #     path: frontend/build/app/outputs/flutter-apk
   publish-github-release:
     docker:
       - image: cibuilds/github:0.10
     steps:
       - checkout
-      - attach_workspace:
-          at: $CIRCLE_ARTIFACTS
+      # - attach_workspace:
+      #     at: $CIRCLE_ARTIFACTS
       - run:
           name: "Publish Release on GitHub"
           command: |
             VERSION="v0.0.1"
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c $CIRCLE_SHA1 -delete ${VERSION} $CIRCLE_ARTIFACTS/
+            ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -c $CIRCLE_SHA1 -delete $VERSION frontend/build/app/outputs/flutter-apk/
   test-frontend:
     docker:
       - image: cirrusci/flutter
