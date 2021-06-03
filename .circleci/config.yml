@@ -21,6 +21,8 @@ jobs:
       - run:
           name: "Publish Release on GitHub"
           command: |
+            ls
+            ls frontend/
             ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -c $CIRCLE_SHA1 -delete $CIRCLE_TAG ~/frontend/build/app/outputs/flutter-apk
 
   test-frontend:
