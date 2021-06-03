@@ -19,7 +19,11 @@ jobs:
       - run:
           name: "Publish Release on GitHub"
           command: |
+            ls > /tmp/ls.txt
+            ls /artifacts > /tmp/ls-art.txt
             ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -c $CIRCLE_SHA1 -delete $CIRCLE_TAG artifacts/
+      - store_artifacts:
+          path: /tmp
   test-frontend:
     docker:
       - image: cirrusci/flutter
@@ -45,5 +49,5 @@ workflows:
     jobs:
       - test-frontend:
           filters:
-            branches:
+            tags:
               only: /.*/
