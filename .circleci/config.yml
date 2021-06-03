@@ -8,8 +8,8 @@ jobs:
       - checkout
       - run: cd frontend/ && flutter build apk --debug
       - persist_to_workspace:
-          root: ~/
-          paths: frontend/build/app/outputs/flutter-apk
+          root: frontend/
+          paths: build/app/outputs/flutter-apk
           
   publish-github-release:
     docker:
@@ -17,7 +17,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ~/frontend/build/app/outputs/flutter-apk
+          at: frontend/build/app/outputs/flutter-apk
       - run:
           name: "Publish Release on GitHub"
           command: |
@@ -29,7 +29,7 @@ jobs:
     steps:
       - checkout
       - run: cd frontend/ && flutter test
-      
+
 workflows:
   build-test-deploy:
     jobs:
