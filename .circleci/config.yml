@@ -23,7 +23,7 @@ jobs:
           command: |
             ls
             ls tmp/workspace
-            ls frontend/build/app/outputs/flutter-apk
+            ls tmp/workspace/build/app/outputs/flutter-apk
             ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -c $CIRCLE_SHA1 -delete $CIRCLE_TAG tmp/workspace
 
   test-frontend:
