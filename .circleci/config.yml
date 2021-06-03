@@ -29,7 +29,7 @@ jobs:
 workflows:
   build-frontend:
     jobs:
-      - build-frontend
+      - build-frontend:
           filters:
             tags:
               only: /.*/
