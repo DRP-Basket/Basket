@@ -7,14 +7,10 @@ jobs:
     steps:
       - checkout
       - run: cd frontend/ && flutter build apk --debug
-      - run: mkdir workspace
-      - run: cp -r frontend/build/app/outputs/flutter-apk/. workspace
-      - run: ls
-      - run: ls workspace
       - persist_to_workspace:
-          root: workspace
+          root: frontend
           paths:
-            - *
+            - build/app/outputs/flutter-apk/*
           
   publish-github-release:
     docker:
