@@ -44,6 +44,6 @@ workflows:
   test-frontend:
     jobs:
       - test-frontend:
-          filter:
+          filters:
             branches:
               only: /.*/
