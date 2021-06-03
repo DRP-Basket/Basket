@@ -23,8 +23,6 @@ jobs:
           command: |
             VERSION="v0.0.1"
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c $CIRCLE_SHA1 -delete ${VERSION} ./frontend/build/app/outputs/flutter-apk
-      - store_artifacts:
-          path: /tmp/artifacts
   test-frontend:
     docker:
       - image: cirrusci/flutter
