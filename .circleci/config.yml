@@ -33,9 +33,6 @@ workflows:
       - publish-github-release:
           requires:
             - build-frontend
-          filters:
-            tags:
-              only: /^v*.*.*/
   test-frontend:
     jobs:
       - test-frontend
