@@ -7,49 +7,46 @@ jobs:
     steps:
       - checkout
       - run: cd frontend/ && flutter build apk --debug
-      - store_artifacts:
-          path: frontend/build/app/outputs/flutter-apk
+      - persist_to_workspace:
+          root: ~/
+          paths: frontend/build/app/outputs/flutter-apk
+          
   publish-github-release:
     docker:
       - image: cibuilds/github:0.10
     steps:
       - checkout
       - attach_workspace:
-          at: frontend/build/app/outputs/flutter-apk
+          at: ~/frontend/build/app/outputs/flutter-apk
       - run:
           name: "Publish Release on GitHub"
           command: |
-            ls > /tmp/ls.txt
-            ls frontend/build/app/outputs/flutter-apk > /tmp/ls-apk.txt
-            ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -c $CIRCLE_SHA1 -delete $CIRCLE_TAG frontend/build/app/outputs/flutter-apk
-      - store_artifacts:
-          path: frontend/build/app/outputs/flutter-apk
-      - store_artifacts:
-          path: /tmp/
+            ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -c $CIRCLE_SHA1 -delete $CIRCLE_TAG ~/frontend/build/app/outputs/flutter-apk
+
   test-frontend:
     docker:
       - image: cirrusci/flutter
     steps:
       - checkout
       - run: cd frontend/ && flutter test
+      
 workflows:
-  build-frontend:
+  build-test-deploy:
     jobs:
       - build-frontend:
+          filters:
+            tags:
+              only: /.*/
+      - test-frontend:
           filters:
             tags:
               only: /.*/
       - publish-github-release:
           requires:
             - build-frontend
+            - test-frontend
           filters:
             tags:
               only: /^v*.*.*/
             branches:
               ignore: /.*/
-  test-frontend:
-    jobs:
-      - test-frontend:
-          filters:
-            tags:
-              only: /.*/
