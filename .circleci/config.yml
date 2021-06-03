@@ -15,11 +15,11 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ./artifacts/
+          at: artifacts/
       - run:
           name: "Publish Release on GitHub"
           command: |
-            ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -c $CIRCLE_SHA1 -delete $CIRCLE_TAG ./artifacts/
+            ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -c $CIRCLE_SHA1 -delete $CIRCLE_TAG artifacts/
   test-frontend:
     docker:
       - image: cirrusci/flutter
@@ -43,4 +43,7 @@ workflows:
               ignore: /.*/
   test-frontend:
     jobs:
-      - test-frontend
+      - test-frontend:
+          filter:
+            branches:
+              only: /.*/
