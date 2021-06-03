@@ -11,6 +11,13 @@ jobs:
           root: frontend
           paths:
             - build/app/outputs/flutter-apk/*
+  
+  test-frontend:
+    docker:
+      - image: cirrusci/flutter
+    steps:
+      - checkout
+      - run: cd frontend/ && flutter test
           
   publish-github-release:
     docker:
@@ -22,13 +29,6 @@ jobs:
           name: "Publish Release on GitHub"
           command: |
             ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -c $CIRCLE_SHA1 -delete $CIRCLE_TAG tmp/workspace/build/app/outputs/flutter-apk
-
-  test-frontend:
-    docker:
-      - image: cirrusci/flutter
-    steps:
-      - checkout
-      - run: cd frontend/ && flutter test
 
 workflows:
   build-test-deploy:
@@ -49,4 +49,4 @@ workflows:
             tags:
               only: /^v*.*.*/
             branches:
-              ignore: /.*/
+              only: master
