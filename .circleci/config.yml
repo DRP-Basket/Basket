@@ -10,7 +10,7 @@ jobs:
       - persist_to_workspace:
           root: frontend
           paths:
-            - build/app/outputs/flutter-apk/*.apk
+            - build/app/outputs/flutter-apk/app.apk
   
   test-frontend:
     docker:
