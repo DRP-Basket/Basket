@@ -15,15 +15,15 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: artifacts/
+          at: frontend/build/app/outputs/flutter-apk
       - run:
           name: "Publish Release on GitHub"
           command: |
             ls > /tmp/ls.txt
-            ls /artifacts > /tmp/ls-art.txt
-            ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -c $CIRCLE_SHA1 -delete $CIRCLE_TAG artifacts/
+            ls ./artifacts > /tmp/ls-art.txt
+            ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -c $CIRCLE_SHA1 -delete $CIRCLE_TAG frontend/build/app/outputs/flutter-apk
       - store_artifacts:
-          path: /tmp
+          path: frontend/build/app/outputs/flutter-apk
   test-frontend:
     docker:
       - image: cirrusci/flutter
