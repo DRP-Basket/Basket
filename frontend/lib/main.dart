@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/screens/donor/donor_home_page.dart';
 import 'package:drp_basket_app/screens/home_page.dart';
+import 'package:drp_basket_app/screens/login_screen.dart';
 import 'package:drp_basket_app/screens/receivers/receiver_home_page.dart';
+import 'package:drp_basket_app/screens/register_screen.dart';
+import 'package:drp_basket_app/screens/welcome_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -20,8 +23,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: HomePage(),
+      home: WelcomeScreen(),
       routes: {
+        HomePage.id: (context) => HomePage(),
+        LoginScreen.id: (context) => LoginScreen(),
+        RegisterScreen.id: (context) => RegisterScreen(),
         DonorHomePage.id: (context) => DonorHomePage(),
         ReceiverHomePage.id: (context) => ReceiverHomePage(),
       },

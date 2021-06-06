@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/components/long_button.dart';
 import 'package:drp_basket_app/screens/donor/donor_home_page.dart';
 import 'package:drp_basket_app/screens/receivers/receiver_home_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
@@ -11,10 +12,15 @@ class HomePage extends StatelessWidget {
   HomePage({Key? key}): super(key: key);
 
   Future<void> getName() async {
+    FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
     DocumentSnapshot ds =
         await _fireStore.collection("testing").doc("testing").get();
     String name = (ds.data() as Map<String, dynamic>)["testing"];
     print(name);
+    // final user = _firebaseAuth.currentUser;
+    // if (user != null) {
+    //   print(user.email);
+    // }
   }
 
   @override
