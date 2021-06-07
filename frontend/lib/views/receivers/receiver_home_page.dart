@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:drp_basket_app/screens/receivers/restaurant_screen.dart';
+import 'package:drp_basket_app/views/receivers/restaurant_screen.dart';
 import 'package:flutter/material.dart';
 
 class ReceiverHomePage extends StatefulWidget {

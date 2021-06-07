@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/components/long_button.dart';
-import 'package:drp_basket_app/screens/donor/donor_home_page.dart';
-import 'package:drp_basket_app/screens/receivers/receiver_home_page.dart';
+import 'package:drp_basket_app/views/donor/donor_home_page.dart';
+import 'package:drp_basket_app/views/receivers/receiver_home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
