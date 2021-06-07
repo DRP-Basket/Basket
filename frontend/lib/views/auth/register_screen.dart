@@ -43,12 +43,19 @@ class _RegisterScreenState extends State<RegisterScreen>
 
   @override
   void updateUILoading() {
-    // TODO: implement updateUILoading
+    setState(() {
+      showSpinner = true;
+    });
   }
 
   @override
   void updateUINoUser() {
     // TODO: implement updateUINoUser
+  }
+
+  @override
+  void updateUITextNotFilled() {
+    // TODO: implement updateUITextNoFilled
   }
 
   @override
@@ -60,11 +67,6 @@ class _RegisterScreenState extends State<RegisterScreen>
   void updateUISuccess() {
     clearUIFields();
     Navigator.pushNamed(context, HomePage.id);
-  }
-
-  @override
-  void updateUITextNoFilled() {
-    // TODO: implement updateUITextNoFilled
   }
 
   @override

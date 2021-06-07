@@ -39,7 +39,9 @@ class _LoginScreenState extends State<LoginScreen>
 
   @override
   void updateUILoading() {
-    // TODO: implement updateUILoading
+    setState(() {
+      showSpinner = true;
+    });
   }
 
   @override
@@ -48,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   @override
-  void updateUITextNoFilled() {
+  void updateUITextNotFilled() {
     // TODO: implement updateUITextNoFilled
   }
 

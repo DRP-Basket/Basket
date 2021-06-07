@@ -1,6 +1,6 @@
 class AuthViewInterface {
   void updateUILoading () {}
-  void updateUITextNoFilled () {}
+  void updateUITextNotFilled () {}
   void updateUINoUser () {}
   void updateUISuccess () {}
   void updateUIPasswordsNotMatch () {}

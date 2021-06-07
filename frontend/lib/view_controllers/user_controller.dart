@@ -10,7 +10,7 @@ class UserController {
   Future<void> registerWithEmailAndPassword(AuthViewInterface loginScreen, String email, String password1, String password2) async {
     loginScreen.updateUILoading();
     if (email == "" || password1 == "" || password2 == "") {
-      loginScreen.updateUITextNoFilled();
+      loginScreen.updateUITextNotFilled();
     } else if (password1 != password2) {
       loginScreen.updateUIPasswordsNotMatch();
     } else {
@@ -28,7 +28,7 @@ class UserController {
   void logInWithEmailAndPassword(AuthViewInterface loginScreen, String email, String password) async {
     loginScreen.updateUILoading();
     if (email == "" || password == "") {
-      loginScreen.updateUITextNoFilled();
+      loginScreen.updateUITextNotFilled();
     } else {
       email = email.trim();
       try {
