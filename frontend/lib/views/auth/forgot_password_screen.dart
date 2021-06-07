@@ -1,83 +1,45 @@
 import 'package:drp_basket_app/components/input_textfield.dart';
 import 'package:drp_basket_app/components/long_button.dart';
+import 'package:drp_basket_app/locator.dart';
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:drp_basket_app/view_controllers/validator_controller.dart';
-import 'package:drp_basket_app/views/auth/auth_view_interface.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 import '../../constants.dart';
-import '../../locator.dart';
-import '../home_page.dart';
-import 'forgot_password_screen.dart';
 
-class LoginScreen extends StatefulWidget {
-  static const String id = "LoginScreen";
+
+
+class ForgotPasswordScreen extends StatefulWidget {
+  const ForgotPasswordScreen({Key? key}) : super(key: key);
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  _ForgotPasswordScreenState createState() => _ForgotPasswordScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen>
-    implements AuthViewInterface {
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
+  final String alertDescriptionMessage = "If your email is registered, you will get an email to reset your password.";
+  final String emailSent = "Email Sent";
+
   bool showSpinner = false;
   String email = "";
-  String password = "";
-
   TextEditingController emailController = new TextEditingController();
-  TextEditingController passwordController = new TextEditingController();
 
-  void login() {
+  void forgotPassword(context) {
     if (_formKey.currentState!.validate()) {
-      locator<UserController>()
-          .logInWithEmailAndPassword(this, email, password);
+      locator<UserController>().forgotPassword(email);
+      Alert(
+        context: context,
+        title: emailSent,
+        desc: alertDescriptionMessage,
+        type: AlertType.success,
+      ).show();
+      emailController.clear();
     }
   }
-
-  @override
-  void resetSpinner() {
-    setState(() {
-      showSpinner = false;
-    });
-  }
-
-  @override
-  void clearUIFields() {
-    email = "";
-    password = "";
-    emailController.clear();
-    passwordController.clear();
-  }
-
-  @override
-  void updateUILoading() {
-    setState(() {
-      showSpinner = true;
-    });
-  }
-
-  @override
-  void updateUINoUser() {
-    Alert(
-      context: context,
-      title: "User Not Found",
-      desc: "Please check your email and password.",
-      type: AlertType.error,
-    ).show();
-  }
-
-  @override
-  void updateUIPasswordsNotMatch() {}
-
-  @override
-  void updateUISuccess() {
-    Navigator.pushNamed(context, HomePage.id);
-  }
-
-  @override
-  void updateUICannotCreateUser() {}
 
   @override
   Widget build(BuildContext context) {
@@ -115,42 +77,15 @@ class _LoginScreenState extends State<LoginScreen>
                         borderColor: border_color,
                         textColor: text_color,
                       ),
-                      SizedBox(
-                        height: 10.0,
-                      ),
-                      InputTextField(
-                        text: PASSWORD_INPUT_TEXT,
-                        onChanged: (value) => password = value,
-                        controller: passwordController,
-                        validator: (value) =>
-                            ValidatorController.validatePassword(value),
-                        borderColor: border_color,
-                        textColor: text_color,
-                        obscureText: true,
-                      ),
                     ],
                   ),
                 ),
                 SizedBox(
-                  height: 20.0,
-                ),
-                GestureDetector(
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ForgotPasswordScreen(),
-                    ),
-                  ),
-                  child: Center(
-                    child: Text(FORGOT_PASSWORD_TEXT),
-                  ),
-                ),
-                SizedBox(
-                  height: 12.0,
+                  height: 24.0,
                 ),
                 LongButton(
-                  text: LOGIN_TEXT,
-                  onPressed: login,
+                  text: SEND_REQUEST_TEXT,
+                  onPressed: () => forgotPassword(context),
                   backgroundColor: primary_color,
                   textColor: text_color,
                 ),

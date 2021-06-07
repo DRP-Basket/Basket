@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 class InputTextField extends StatelessWidget {
   final TextEditingController controller;
+  final validator;
   final onChanged;
   final String text;
   final Color borderColor;
@@ -14,6 +15,7 @@ class InputTextField extends StatelessWidget {
     required this.text,
     required this.onChanged,
     required this.controller,
+    required this.validator,
     required this.borderColor,
     required this.textColor,
     this.obscureText = false,
@@ -21,10 +23,11 @@ class InputTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
       style: TextStyle(color: textColor),
       obscureText: obscureText,
       controller: controller,
+      validator: validator,
       onChanged: onChanged,
       decoration: InputDecoration(
         hintStyle: TextStyle(color: Colors.black54),

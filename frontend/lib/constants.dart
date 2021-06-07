@@ -15,6 +15,8 @@ const String LOGO_IMAGE_PATH = "images/logo.png";
 const String LOGO_HERO_TAG = "logo";
 
 const String LOGIN_TEXT = "Log In";
+const String FORGOT_PASSWORD_TEXT = "Forgot Password?";
+const String SEND_REQUEST_TEXT = "Send Request";
 const String REGISTER_TEXT = "Register";
 const String BACK_TEXT = "Back";
 const String EMAIL_INPUT_TEXT = "Enter your email";

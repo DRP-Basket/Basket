@@ -12,4 +12,8 @@ class FirebaseAuthController implements FirebaseAuthInterface {
   Future<UserCredential> createUserWithEmailAndPassword(String email, String password) {
     return _auth.createUserWithEmailAndPassword(email: email, password: password);
   }
+
+  Future<void> forgotPassword(String email) {
+    return _auth.sendPasswordResetEmail(email: email);
+  }
 }
