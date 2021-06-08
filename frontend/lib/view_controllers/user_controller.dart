@@ -52,4 +52,6 @@ class UserController {
     await firebaseAuthController.forgotPassword(email);
   }
 
+  String curUserEmail() => firebaseAuthController.curUserEmail();
+
 }

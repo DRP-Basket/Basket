@@ -1,4 +1,5 @@
 import 'package:drp_basket_app/views/donor/donor_home_page.dart';
+import 'package:drp_basket_app/views/donor/donor_profile_page.dart';
 import 'package:drp_basket_app/views/home_page.dart';
 import 'package:drp_basket_app/views/auth/login_screen.dart';
 import 'package:drp_basket_app/views/receivers/receiver_home_page.dart';
@@ -30,6 +31,7 @@ class Basket extends StatelessWidget {
         RegisterScreen.id: (context) => RegisterScreen(),
         DonorHomePage.id: (context) => DonorHomePage(),
         ReceiverHomePage.id: (context) => ReceiverHomePage(),
+        DonorProfilePage.id: (context) => DonorProfilePage(),
       },
     );
   }

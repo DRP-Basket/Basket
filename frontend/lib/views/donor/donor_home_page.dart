@@ -2,6 +2,8 @@ import 'package:drp_basket_app/components/long_button.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'donor_drawer.dart';
+
 class DonorHomePage extends StatefulWidget {
   static const String id = "DonorHomePage";
 
@@ -66,6 +68,7 @@ class _DonorHomePageState extends State<DonorHomePage> {
         title: Text("Donor Home Page"),
         backgroundColor: Colors.blueAccent,
       ),
+      drawer: DonorDrawer(),
       backgroundColor: Colors.white,
       body: Padding(
         padding: EdgeInsets.all(30.0),
