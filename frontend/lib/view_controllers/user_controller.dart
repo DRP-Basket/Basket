@@ -25,12 +25,15 @@ class UserController {
         // print(_currentUser.user!.email);
         loginScreen.updateUISuccess();
       } on FirebaseAuthException catch (e) {
-        if (e.code == 'weak-password') {
+        if (e.code == "weak-password") {
           loginScreen.updateUIAuthFail(_registrationFailed,
               "The password must be at least 6 characters.");
-        } else if (e.code == 'email-already-in-use') {
+        } else if (e.code == "email-already-in-use") {
           loginScreen.updateUIAuthFail(
               _registrationFailed, "An account already exists for that email.");
+        } else if (e.code == "invalid-email") {
+          loginScreen.updateUIAuthFail(
+              _registrationFailed, "Please enter a valid email address.");
         }
       } finally {
         loginScreen.resetSpinner();
