@@ -1,9 +1,6 @@
 class AuthViewInterface {
-  void updateUILoading () {}
-  void updateUINoUser () {}
-  void updateUISuccess () {}
-  void updateUIPasswordsNotMatch () {}
-  void updateUICannotCreateUser () {}
-  void clearUIFields () {}
-  void resetSpinner () {}
+  void updateUILoading() {}
+  void resetSpinner() {}
+  void updateUISuccess() {}
+  void updateUIAuthFail(String title, String errmsg) {}
 }

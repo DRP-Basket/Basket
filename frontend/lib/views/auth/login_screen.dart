@@ -37,21 +37,6 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   @override
-  void resetSpinner() {
-    setState(() {
-      showSpinner = false;
-    });
-  }
-
-  @override
-  void clearUIFields() {
-    email = "";
-    password = "";
-    emailController.clear();
-    passwordController.clear();
-  }
-
-  @override
   void updateUILoading() {
     setState(() {
       showSpinner = true;
@@ -59,25 +44,38 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   @override
-  void updateUINoUser() {
-    Alert(
-      context: context,
-      title: "User Not Found",
-      desc: "Please check your email and password.",
-      type: AlertType.error,
-    ).show();
+  void resetSpinner() {
+    setState(() {
+      showSpinner = false;
+    });
   }
 
   @override
-  void updateUIPasswordsNotMatch() {}
-
-  @override
   void updateUISuccess() {
+    email = "";
+    password = "";
+    emailController.clear();
+    passwordController.clear();
     Navigator.pushNamed(context, HomePage.id);
   }
 
   @override
-  void updateUICannotCreateUser() {}
+  void updateUIAuthFail(String title, String errmsg) {
+    Alert(
+        context: context,
+        title: title,
+        desc: errmsg,
+        type: AlertType.warning,
+        buttons: [
+          DialogButton(
+            child: Text(
+              "Try Again",
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ]).show();
+  }
 
   @override
   Widget build(BuildContext context) {
