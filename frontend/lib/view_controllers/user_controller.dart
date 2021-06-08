@@ -1,42 +1,50 @@
-import 'package:drp_basket_app/firebase_controllers/firebase_auth_controller.dart';
+import 'package:drp_basket_app/firebase_controllers/firebase_auth_interface.dart';
+import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
+import 'package:drp_basket_app/firebase_controllers/firebase_storage_interface.dart';
+import 'package:drp_basket_app/locator.dart';
+import 'package:drp_basket_app/user_type.dart';
+import 'package:drp_basket_app/view_controllers/image_picker_controller.dart';
 import 'package:drp_basket_app/views/auth/auth_view_interface.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:io';
 
 class UserController {
   late UserCredential _currentUser;
-  FirebaseAuthController firebaseAuthController;
+  FirebaseAuthInterface _firebaseAuthController;
+  FirebaseStorageInterface _firebaseStorageController;
+  FirebaseFirestoreInterface _firebaseFirestoreController;
 
-  UserController(this.firebaseAuthController);
+  UserController(this._firebaseAuthController, this._firebaseStorageController, this._firebaseFirestoreController);
 
   final String _registrationFailed = "Registration failed";
 
-  Future<void> registerWithEmailAndPassword(AuthViewInterface loginScreen,
+  Future<void> registerWithEmailAndPassword(AuthViewInterface registerScreen,
       String email, String password1, String password2) async {
-    loginScreen.updateUILoading();
+    registerScreen.updateUILoading();
     if (password1 != password2) {
-      loginScreen.updateUIAuthFail(
+      registerScreen.updateUIAuthFail(
           "Mismatched passwords", "Please retype your passwords.");
-      loginScreen.resetSpinner();
+      registerScreen.resetSpinner();
     } else {
       email = email.trim();
       try {
-        _currentUser = await firebaseAuthController
+        _currentUser = await _firebaseAuthController
             .createUserWithEmailAndPassword(email, password1);
         // print(_currentUser.user!.email);
-        loginScreen.updateUISuccess();
+        registerScreen.updateUISuccess();
       } on FirebaseAuthException catch (e) {
         if (e.code == "weak-password") {
-          loginScreen.updateUIAuthFail(_registrationFailed,
+          registerScreen.updateUIAuthFail(_registrationFailed,
               "The password must be at least 6 characters.");
         } else if (e.code == "email-already-in-use") {
-          loginScreen.updateUIAuthFail(
+          registerScreen.updateUIAuthFail(
               _registrationFailed, "An account already exists for that email.");
         } else if (e.code == "invalid-email") {
-          loginScreen.updateUIAuthFail(
+          registerScreen.updateUIAuthFail(
               _registrationFailed, "Please enter a valid email address.");
         }
       } finally {
-        loginScreen.resetSpinner();
+        registerScreen.resetSpinner();
       }
     }
   }
@@ -48,9 +56,8 @@ class UserController {
     loginScreen.updateUILoading();
     email = email.trim();
     try {
-      _currentUser = await firebaseAuthController.loginWithEmailAndPassword(
+      _currentUser = await _firebaseAuthController.loginWithEmailAndPassword(
           email, password);
-      // print(_currentUser.user!.email);
       loginScreen.updateUISuccess();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
@@ -66,6 +73,22 @@ class UserController {
   }
 
   void forgotPassword(email) async {
-    await firebaseAuthController.forgotPassword(email);
+    await _firebaseAuthController.forgotPassword(email);
+  }
+
+  void uploadUserInformation(AuthViewInterface registerScreen, UserType userType, String name, String contactNumber) async {
+    registerScreen.updateUILoading();
+    File image = locator<ImagePickerController>().getImage();
+    String destination = cloudFilePath[userType]! + "profile/${_currentUser.user!.uid}";
+
+    try {
+      await _firebaseFirestoreController.addNewUserInformation(_currentUser.user!.uid, name, contactNumber);
+      print(destination);
+      await _firebaseStorageController.uploadFile(destination, image);
+      registerScreen.updateUISuccess();
+    } catch (exception) {
+      registerScreen.resetSpinner();
+      print(exception);
+    }
   }
 }

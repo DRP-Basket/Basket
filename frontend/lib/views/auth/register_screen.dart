@@ -4,12 +4,12 @@ import 'package:drp_basket_app/locator.dart';
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:drp_basket_app/view_controllers/validator_controller.dart';
 import 'package:drp_basket_app/views/auth/auth_view_interface.dart';
+import 'package:drp_basket_app/views/auth/register_choice_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 import '../../constants.dart';
-import '../home_page.dart';
 
 class RegisterScreen extends StatefulWidget {
   static const String id = "RegisterScreen";
@@ -59,7 +59,7 @@ class _RegisterScreenState extends State<RegisterScreen>
     emailController.clear();
     passwordController1.clear();
     passwordController2.clear();
-    Navigator.pushNamed(context, HomePage.id);
+    Navigator.pushNamed(context, RegisterChoiceScreen.id);
   }
 
   @override

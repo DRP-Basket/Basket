@@ -13,6 +13,9 @@ const Color border_color = Colors.lightBlueAccent;
 const String LOGO_NAME = "Basket";
 const String LOGO_IMAGE_PATH = "images/logo.png";
 const String LOGO_HERO_TAG = "logo";
+const String RECEIVER_IMAGE_PATH = "images/receiver.png";
+const String FOOD_BANK_IMAGE_PATH = "images/food_bank.png";
+const String RESTAURANT_IMAGE_PATH = "images/restaurant.png";
 
 const String LOGIN_TEXT = "Log In";
 const String FORGOT_PASSWORD_TEXT = "Forgot Password?";
