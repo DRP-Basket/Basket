@@ -5,6 +5,7 @@ import 'package:drp_basket_app/view_controllers/image_picker_controller.dart';
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:get_it/get_it.dart';
+import 'gps_controllers/geocoding_controller.dart';
 
 final locator = GetIt.instance;
 
@@ -15,4 +16,5 @@ Future<void> setupServices() async {
       FirebaseStorageController(),
       FirebaseFirestoreController()));
   locator.registerSingleton<ImagePickerController>(ImagePickerController());
+  locator.registerSingleton<GeoCodingController>(GeoCodingController());
 }

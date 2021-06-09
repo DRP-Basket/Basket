@@ -25,3 +25,8 @@ const String BACK_TEXT = "Back";
 const String EMAIL_INPUT_TEXT = "Enter your email";
 const String PASSWORD_INPUT_TEXT = "Enter your password";
 const String PASSWORD_RE_INPUT_TEXT = "Re-enter your password";
+
+const String LONGITUDE = "Longitude";
+const String LATITUDE = "Latitude";
+const double IN_RANGE_THRESHOLD = 2000;  // 2 km
+const String ADDRESS = "Address";

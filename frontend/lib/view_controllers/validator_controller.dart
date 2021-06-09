@@ -33,4 +33,11 @@ class ValidatorController {
     }
     return null;
   }
+
+  static String? validateLocation(String value) {
+    if (value.isEmpty) {
+      return "Location can't be empty";
+    }
+    return null;
+  }
 }

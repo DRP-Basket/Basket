@@ -79,7 +79,7 @@ class UserController {
 
   void uploadUserInformation(AuthViewInterface registerScreen,
       UserType userType, String name, String contactNumber,
-      {containsImage = true}) async {
+      {containsImage = true, address = ""}) async {
     registerScreen.updateUILoading();
     if (containsImage) {
       File image = locator<ImagePickerController>().getImage();
@@ -98,7 +98,7 @@ class UserController {
 
     try {
       await _firebaseFirestoreController.addNewUserInformation(
-          userType, _currentUser.user!.uid, name, contactNumber);
+          userType, _currentUser.user!.uid, name, contactNumber, location: address);
       registerScreen.updateUISuccess();
     } catch (exception) {
       print(exception);

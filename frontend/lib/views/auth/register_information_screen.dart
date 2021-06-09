@@ -31,6 +31,7 @@ class _RegisterInformationScreenState extends State<RegisterInformationScreen>
   bool uploadedImage = false;
   late String name;
   late String contactNumber;
+  String address = "";
 
   void upload() async {
     uploadedImage = await locator<ImagePickerController>().pickImage();
@@ -40,7 +41,7 @@ class _RegisterInformationScreenState extends State<RegisterInformationScreen>
 
   void submit() {
     if (_formKey.currentState!.validate() && uploadedImage) {
-      locator<UserController>().uploadUserInformation(this, widget.userType, name, contactNumber);
+      locator<UserController>().uploadUserInformation(this, widget.userType, name, contactNumber, address: address);
     }
     else if (!uploadedImage) {
       if (widget.userType == UserType.RECEIVER) {
@@ -97,68 +98,76 @@ class _RegisterInformationScreenState extends State<RegisterInformationScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text("User Information"),
         backgroundColor: _colorTheme,
       ),
       body: ModalProgressHUD(
         inAsyncCall: showSpinner,
-        child: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.all(20.0),
-              child: Container(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Avatar(
-                      uploaded: uploadedImage,
-                      onTap: upload,
-                    ),
-                    SizedBox(
-                      height: 20.0,
-                    ),
-                    Form(
-                      key: _formKey,
-                      child: Column(
-                        children: [
-                          TextFormField(
-                            validator: (value) =>
-                                ValidatorController.validateName(value!),
-                            decoration: InputDecoration(
-                              labelText: 'Enter your name',
-                            ),
-                            onChanged: (value) => name = value,
-                          ),
-                          SizedBox(
-                            height: 10.0,
-                          ),
-                          TextFormField(
-                            validator: (value) =>
-                                ValidatorController.validateContactNumber(value!),
-                            decoration: InputDecoration(
-                              labelText: 'Enter your contact number',
-                            ),
-                            onChanged: (value) => contactNumber = value,
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: 30.0,
-                    ),
-                    LongButton(
-                      text: "Submit",
-                      onPressed: submit,
-                      backgroundColor: _colorTheme,
-                      textColor: Colors.white,
-                    ),
-                  ],
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 50.0),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Avatar(
+                  uploaded: uploadedImage,
+                  onTap: upload,
                 ),
-              ),
+                SizedBox(
+                  height: 20.0,
+                ),
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        validator: (value) =>
+                            ValidatorController.validateName(value!),
+                        decoration: InputDecoration(
+                          labelText: 'Enter your name',
+                        ),
+                        onChanged: (value) => name = value,
+                      ),
+                      SizedBox(
+                        height: 10.0,
+                      ),
+                      TextFormField(
+                        validator: (value) =>
+                            ValidatorController.validateContactNumber(value!),
+                        decoration: InputDecoration(
+                          labelText: 'Enter your contact number',
+                        ),
+                        onChanged: (value) => contactNumber = value,
+                      ),
+                      SizedBox(
+                        height: 10.0,
+                      ),
+                      widget.userType != UserType.RECEIVER ? TextFormField(
+                        validator: (value) =>
+                            ValidatorController.validateLocation(value!),
+                        decoration: InputDecoration(
+                          labelText: 'Enter your donor address',
+                        ),
+                        onChanged: (value) => address = value,
+                      ) : SizedBox(
+                        height: 10.0,
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 30.0,
+                ),
+                LongButton(
+                  text: "Submit",
+                  onPressed: submit,
+                  backgroundColor: _colorTheme,
+                  textColor: Colors.white,
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
