@@ -4,12 +4,12 @@ import 'package:drp_basket_app/locator.dart';
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:drp_basket_app/view_controllers/validator_controller.dart';
 import 'package:drp_basket_app/views/auth/auth_view_interface.dart';
+import 'package:drp_basket_app/views/auth/register_choice_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 import '../../constants.dart';
-import '../home_page.dart';
 
 class RegisterScreen extends StatefulWidget {
   static const String id = "RegisterScreen";
@@ -38,23 +38,6 @@ class _RegisterScreenState extends State<RegisterScreen>
   }
 
   @override
-  void resetSpinner () {
-    setState(() {
-      showSpinner = false;
-    });
-  }
-
-  @override
-  void clearUIFields() {
-    email = "";
-    password1 = "";
-    password2 = "";
-    emailController.clear();
-    passwordController1.clear();
-    passwordController2.clear();
-  }
-
-  @override
   void updateUILoading() {
     setState(() {
       showSpinner = true;
@@ -62,31 +45,39 @@ class _RegisterScreenState extends State<RegisterScreen>
   }
 
   @override
-  void updateUINoUser() {}
-
-  @override
-  void updateUIPasswordsNotMatch() {
-    Alert(
-      context: context,
-      title: "Mismatched password",
-      desc: "Please retype your passwords.",
-      type: AlertType.error,
-    ).show();
+  void resetSpinner() {
+    setState(() {
+      showSpinner = false;
+    });
   }
 
   @override
   void updateUISuccess() {
-    Navigator.pushNamed(context, HomePage.id);
+    email = "";
+    password1 = "";
+    password2 = "";
+    emailController.clear();
+    passwordController1.clear();
+    passwordController2.clear();
+    Navigator.pushNamed(context, RegisterChoiceScreen.id);
   }
 
   @override
-  void updateUICannotCreateUser() {
+  void updateUIAuthFail(String title, String errmsg) {
     Alert(
-      context: context,
-      title: "Email already used",
-      desc: "Please try to login with the email.",
-      type: AlertType.error,
-    ).show();
+        context: context,
+        title: title,
+        desc: errmsg,
+        type: AlertType.warning,
+        buttons: [
+          DialogButton(
+            child: Text(
+              "Try Again",
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ]).show();
   }
 
   @override

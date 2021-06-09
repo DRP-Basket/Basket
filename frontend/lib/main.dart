@@ -1,3 +1,4 @@
+import 'package:drp_basket_app/views/auth/register_choice_screen.dart';
 import 'package:drp_basket_app/views/donor/donor_home_page.dart';
 import 'package:drp_basket_app/views/donor/donor_profile_page.dart';
 import 'package:drp_basket_app/views/home_page.dart';
@@ -26,12 +27,16 @@ class Basket extends StatelessWidget {
       ),
       home: WelcomeScreen(),
       routes: {
+        // General
         HomePage.id: (context) => HomePage(),
         LoginScreen.id: (context) => LoginScreen(),
         RegisterScreen.id: (context) => RegisterScreen(),
+        RegisterChoiceScreen.id: (context) => RegisterChoiceScreen(),
+        // Donor
         DonorHomePage.id: (context) => DonorHomePage(),
-        ReceiverHomePage.id: (context) => ReceiverHomePage(),
         DonorProfilePage.id: (context) => DonorProfilePage(),
+        // Receiver
+        ReceiverHomePage.id: (context) => ReceiverHomePage(),
       },
     );
   }
