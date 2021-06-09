@@ -14,7 +14,8 @@ class UserController {
   FirebaseStorageInterface _firebaseStorageController;
   FirebaseFirestoreInterface _firebaseFirestoreController;
 
-  UserController(this._firebaseAuthController, this._firebaseStorageController, this._firebaseFirestoreController);
+  UserController(this._firebaseAuthController, this._firebaseStorageController,
+      this._firebaseFirestoreController);
 
   final String _registrationFailed = "Registration failed";
 
@@ -76,19 +77,33 @@ class UserController {
     await _firebaseAuthController.forgotPassword(email);
   }
 
-  void uploadUserInformation(AuthViewInterface registerScreen, UserType userType, String name, String contactNumber) async {
+  void uploadUserInformation(AuthViewInterface registerScreen,
+      UserType userType, String name, String contactNumber,
+      {containsImage = true}) async {
     registerScreen.updateUILoading();
-    File image = locator<ImagePickerController>().getImage();
-    String destination = cloudFilePath[userType]! + "profile/${_currentUser.user!.uid}";
+    if (containsImage) {
+      File image = locator<ImagePickerController>().getImage();
+      String destination =
+          cloudProfileFilePath[userType]! + "${_currentUser.user!.uid}";
+      try {
+        await _firebaseStorageController.uploadFile(destination, image);
+      } catch (exception) {
+        print(exception);
+      } finally {
+        registerScreen.resetSpinner();
+      }
+    } else {
+      assert(userType == UserType.RECEIVER);
+    }
 
     try {
-      await _firebaseFirestoreController.addNewUserInformation(_currentUser.user!.uid, name, contactNumber);
-      print(destination);
-      await _firebaseStorageController.uploadFile(destination, image);
+      await _firebaseFirestoreController.addNewUserInformation(
+          userType, _currentUser.user!.uid, name, contactNumber);
       registerScreen.updateUISuccess();
     } catch (exception) {
-      registerScreen.resetSpinner();
       print(exception);
+    } finally {
+      registerScreen.resetSpinner();
     }
   }
 }

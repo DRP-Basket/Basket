@@ -13,8 +13,14 @@ const Map<UserType, Color> userColorTheme = {
   UserType.FOOD_BANK: Colors.purpleAccent,
 };
 
-const Map<UserType, String> cloudFilePath = {
-  UserType.DONOR: "donors/",
-  UserType.RECEIVER: "",
-  UserType.FOOD_BANK: "foodbank/",
+const Map<UserType, String> cloudCollection = {
+  UserType.DONOR: "donors",
+  UserType.RECEIVER: "receivers",
+  UserType.FOOD_BANK: "foodbank",
+};
+
+const Map<UserType, String> cloudProfileFilePath = {
+  UserType.DONOR: "donors/profile/",
+  UserType.RECEIVER: "receivers/profile/",
+  UserType.FOOD_BANK: "foodbank/profile/",
 };

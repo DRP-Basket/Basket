@@ -43,6 +43,9 @@ class _RegisterInformationScreenState extends State<RegisterInformationScreen>
       locator<UserController>().uploadUserInformation(this, widget.userType, name, contactNumber);
     }
     else if (!uploadedImage) {
+      if (widget.userType == UserType.RECEIVER) {
+        locator<UserController>().uploadUserInformation(this, widget.userType, name, contactNumber, containsImage: false);
+      }
       updateUIAuthFail("Image not uploaded", "Please upload an image");
     }
   }

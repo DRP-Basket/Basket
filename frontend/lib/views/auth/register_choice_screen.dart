@@ -51,21 +51,21 @@ class _RegisterChoiceScreenState extends State<RegisterChoiceScreen> {
                 ),
               ],
             ),
-            SizedBox(
-              height: 100.0,
-            ),
-            ChoiceButton(
-              icon: FOOD_BANK_IMAGE_PATH,
-              text: "Food Bank",
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => RegisterInformationScreen(
-                    userType: UserType.FOOD_BANK,
-                  ),
-                ),
-              ),
-            ),
+            // SizedBox(
+            //   height: 100.0,
+            // ),
+            // ChoiceButton(
+            //   icon: FOOD_BANK_IMAGE_PATH,
+            //   text: "Food Bank",
+            //   onTap: () => Navigator.push(
+            //     context,
+            //     MaterialPageRoute(
+            //       builder: (context) => RegisterInformationScreen(
+            //         userType: UserType.FOOD_BANK,
+            //       ),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),
