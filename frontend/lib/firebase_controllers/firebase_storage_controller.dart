@@ -1,3 +1,4 @@
+import 'package:drp_basket_app/user_type.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'firebase_storage_interface.dart';
 import 'dart:io';
@@ -12,5 +13,12 @@ class FirebaseStorageController implements FirebaseStorageInterface {
     } catch (exception) {
       print(exception);
     }
+  }
+
+  Future<String> getImageUrl(UserType userType, String uid) async {
+    String path = cloudProfileFilePath[userType]! + uid;
+    var storageRef = _storage.ref().child(path);
+    String url = await storageRef.getDownloadURL();
+    return url;
   }
 }

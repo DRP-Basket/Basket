@@ -3,12 +3,14 @@ import 'package:drp_basket_app/components/long_button.dart';
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:drp_basket_app/view_controllers/validator_controller.dart';
 import 'package:drp_basket_app/views/auth/auth_view_interface.dart';
+import 'package:drp_basket_app/views/receivers/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 import '../../constants.dart';
 import '../../locator.dart';
+import '../../user_type.dart';
 import '../home_page.dart';
 import 'forgot_password_screen.dart';
 
@@ -51,12 +53,13 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   @override
-  void updateUISuccess() {
+  void updateUISuccess() async {
     email = "";
     password = "";
     emailController.clear();
     passwordController.clear();
-    Navigator.pushNamed(context, HomePage.id);
+    UserType userType = await locator<UserController>().checkUserType();
+    userType == UserType.RECEIVER ? Navigator.pushNamed(context, ReceiverHomeScreen.id) : Navigator.pushNamed(context, HomePage.id);
   }
 
   @override

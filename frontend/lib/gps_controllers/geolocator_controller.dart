@@ -6,7 +6,9 @@ class GeoLocatorController {
   late LocationPermission _permission;
   late Position _currentPosition;
 
-  GeoLocatorController();
+  GeoLocatorController() {
+    determinePosition();
+  }
 
   Future<void> enableLocationService() async {
     // Test if location services are enabled.
@@ -49,6 +51,10 @@ class GeoLocatorController {
 
     // When we reach here, permissions are granted and we can
     // continue accessing the position of the device.
+    return _currentPosition;
+  }
+
+  Position getPosition() {
     return _currentPosition;
   }
 }

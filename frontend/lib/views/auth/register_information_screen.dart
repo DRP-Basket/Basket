@@ -6,6 +6,7 @@ import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:drp_basket_app/view_controllers/validator_controller.dart';
 import 'package:drp_basket_app/views/auth/auth_view_interface.dart';
 import 'package:drp_basket_app/views/home_page.dart';
+import 'package:drp_basket_app/views/receivers/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -46,8 +47,9 @@ class _RegisterInformationScreenState extends State<RegisterInformationScreen>
     else if (!uploadedImage) {
       if (widget.userType == UserType.RECEIVER) {
         locator<UserController>().uploadUserInformation(this, widget.userType, name, contactNumber, containsImage: false);
+      } else {
+        updateUIAuthFail("Image not uploaded", "Please upload an image");
       }
-      updateUIAuthFail("Image not uploaded", "Please upload an image");
     }
   }
 
@@ -85,7 +87,7 @@ class _RegisterInformationScreenState extends State<RegisterInformationScreen>
 
   @override
   void updateUISuccess() {
-    Navigator.pushNamed(context, HomePage.id);
+    widget.userType == UserType.RECEIVER ? Navigator.pushNamed(context, ReceiverHomeScreen.id) : Navigator.pushNamed(context, HomePage.id);
   }
 
   @override

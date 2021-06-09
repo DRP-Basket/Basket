@@ -10,12 +10,11 @@ import 'dart:io';
 
 class UserController {
   late UserCredential _currentUser;
-  FirebaseAuthInterface _firebaseAuthController;
-  FirebaseStorageInterface _firebaseStorageController;
-  FirebaseFirestoreInterface _firebaseFirestoreController;
+  FirebaseAuthInterface _firebaseAuthController = locator<FirebaseAuthInterface>();
+  FirebaseStorageInterface _firebaseStorageController = locator<FirebaseStorageInterface>();
+  FirebaseFirestoreInterface _firebaseFirestoreController = locator<FirebaseFirestoreInterface>();
 
-  UserController(this._firebaseAuthController, this._firebaseStorageController,
-      this._firebaseFirestoreController);
+  UserController();
 
   final String _registrationFailed = "Registration failed";
 
@@ -105,5 +104,17 @@ class UserController {
     } finally {
       registerScreen.resetSpinner();
     }
+  }
+
+  Future<UserType> checkUserType() async {
+    return _firebaseFirestoreController.getUserType(_currentUser.user!.uid);
+  }
+
+  Future<List<Map<String, dynamic>>> getUserOrderAgainList() async {
+    return await _firebaseFirestoreController.getOrderAgainList(_currentUser.user!.uid);
+  }
+
+  Future<void> userSignOut() {
+    return _firebaseAuthController.signOut();
   }
 }

@@ -26,7 +26,14 @@ const String EMAIL_INPUT_TEXT = "Enter your email";
 const String PASSWORD_INPUT_TEXT = "Enter your password";
 const String PASSWORD_RE_INPUT_TEXT = "Re-enter your password";
 
-const String LONGITUDE = "Longitude";
-const String LATITUDE = "Latitude";
+const String LONGITUDE = "longitude";
+const String LATITUDE = "latitude";
 const double IN_RANGE_THRESHOLD = 2000;  // 2 km
-const String ADDRESS = "Address";
+const String ADDRESS = "address";
+
+const String DONORS = "donors";
+const String RECEIVERS = "receivers";
+const String NAME = "name";
+const String CONTACT_NUMBER = "contact_number";
+const String ORDER_AGAIN_LIST = "order_again_list";
+const String ID = "ID";
