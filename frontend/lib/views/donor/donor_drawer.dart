@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:drp_basket_app/views/donor/donor_requests.dart';
+import 'package:drp_basket_app/views/home_page.dart';
 import 'package:flutter/material.dart';
 
 import '../../locator.dart';
@@ -38,14 +40,20 @@ class DonorDrawer extends StatelessWidget {
         children: [
           drawerHeader(donor),
           ListTile(
-            title: Text('Home'),
-            onTap: () =>
-                {Navigator.popAndPushNamed(context, DonorHomePage.id)},
+            title: Text('Donation'),
+            onTap: () => {Navigator.popAndPushNamed(context, DonorHomePage.id)},
           ),
           ListTile(
             title: Text('Profile'),
             onTap: () =>
                 {Navigator.popAndPushNamed(context, DonorProfilePage.id)},
+          ),
+          ListTile(
+            title: Text('Sign out'),
+            onTap: () {
+              locator<UserController>().logout();
+              Navigator.popAndPushNamed(context, HomePage.id);
+            },
           )
         ],
       ),
