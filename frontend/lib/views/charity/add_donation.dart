@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:drp_basket_app/views/charity/utilities.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 
 class AddDonation extends StatefulWidget {
   const AddDonation({Key? key}) : super(key: key);
@@ -11,7 +11,8 @@ class AddDonation extends StatefulWidget {
 
 class _AddDonationState extends State<AddDonation> {
   final _titleController = TextEditingController();
-  final _descController = TextEditingController();
+  final _locationController = TextEditingController();
+  final _dateController = TextEditingController(text: 'Choose Event Date');
 
   @override
   Widget build(BuildContext context) {
@@ -30,25 +31,25 @@ class _AddDonationState extends State<AddDonation> {
                 hintText: 'Event Title',
               ),
             ),
-            // Description
+            // Location
             TextField(
-              controller: _descController,
+              controller: _locationController,
               decoration: InputDecoration(
-                hintText: 'Event Description',
+                hintText: 'Event Location',
               ),
             ),
             SizedBox(
               height: 20,
             ),
-            DateTimePicker(),
+            // Date
+            DateTimePicker(_dateController),
             SizedBox(
               height: 20,
             ),
             ElevatedButton(
-              child: Text("Add Donation"),
+              child: Text("Add Event"),
               onPressed: () {
                 _addToFireBase();
-                _notifyReceivers();
                 Navigator.pop(context);
               },
             ),
@@ -68,53 +69,12 @@ class _AddDonationState extends State<AddDonation> {
     return donations
         .add({
           'title': _titleController.text,
-          'desc': _descController.text,
+          'location': _locationController.text,
+          'date': _dateController.text,
         })
         .then((value) => print('Donation Added'))
         .catchError((err) => print("Failed to add donation: $err"));
   }
 
-  void _notifyReceivers() {}
 }
 
-class DateTimePicker extends StatefulWidget {
-  const DateTimePicker({Key? key}) : super(key: key);
-
-  @override
-  _DateTimePickerState createState() => _DateTimePickerState();
-}
-
-class _DateTimePickerState extends State<DateTimePicker> {
-  String _date = "Choose Event Date";
-  String _time = "Choose Event Time";
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        children: [
-          ElevatedButton(
-              child: Container(
-                padding: EdgeInsets.all(10),
-                child: Row(
-                  children: [
-                    Icon(Icons.date_range),
-                    SizedBox(width: 20),
-                    Text('$_date'),
-                  ],
-                ),
-              ),
-              onPressed: () {
-                DatePicker.showDatePicker(
-                  context,
-                  onConfirm: (date) {
-                    _date = '${date.year} - ${date.month} - ${date.day}';
-                    setState(() {});
-                  },
-                );
-              }),
-        ],
-      ),
-    );
-  }
-}

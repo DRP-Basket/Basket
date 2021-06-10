@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'add_donation.dart';
 import 'charity_drawer.dart';
+import 'utilities.dart';
 
 class CharityDonationPage extends StatefulWidget {
   static const String id = "CharityDonationPage";
@@ -44,17 +45,46 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
             var donations = snapshot.data!.docs;
             return ListView(
               children: donations.map((DocumentSnapshot ds) {
+                var donationID = ds.reference.id;
                 var donation = ds.data() as Map<String, dynamic>;
                 var title = donation['title'];
                 return Card(
                   child: Container(
                     padding: EdgeInsets.all(20),
-                    child: Text(title),
+                    child: Column(
+                      children: [
+                        Text(
+                          title,
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        ListTile(
+                          title: Text('Date'),
+                          subtitle: Text(donation['date']),
+                        ),
+                        ListTile(
+                          title: Text('Location'),
+                          subtitle: Text(donation['location']),
+                        ),
+                        ElevatedButton(
+                          child: Text('Notify Receivers'),
+                          onPressed: () {
+                            SMSSender().sendSMS(context, donationID, msgContent: donationEventMsg(donation),);
+                          }
+                        ),
+                      ],
+                    ),
                   ),
                 );
               }).toList(),
             );
           }),
     );
+  }
+
+  String donationEventMsg(Map<String, dynamic> donation) {
+    return 'Donation Event Happening!\n\'Event Name: ${donation['title']}\nEvent Location: ${donation['location']}\nEvent Time: ${donation['date']}';
   }
 }
