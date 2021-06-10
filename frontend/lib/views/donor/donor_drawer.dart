@@ -29,7 +29,7 @@ class DonorDrawer extends StatelessWidget {
                 curUID, data['name'], curUserEmail, data['contact_number']);
             return donorDrawer(context, donor);
           }
-          return Text('Error');
+          return Drawer();
         });
   }
 
@@ -42,6 +42,16 @@ class DonorDrawer extends StatelessWidget {
           ListTile(
             title: Text('Donation'),
             onTap: () => {Navigator.popAndPushNamed(context, DonorHomePage.id)},
+          ),
+          ListTile(
+            title: Text('Requests'),
+            onTap: () => {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext context) =>
+                          DonorRequests(donor.uid)))
+            },
           ),
           ListTile(
             title: Text('Profile'),

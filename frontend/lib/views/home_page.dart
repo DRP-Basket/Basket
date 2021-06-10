@@ -45,9 +45,12 @@ class HomePage extends StatelessWidget {
           LongButton(
             text: "Donor",
             onPressed: () async {
-              await _firebaseAuthController.loginWithEmailAndPassword(
-                  "donor@basket.com", "basket123");
-              Navigator.pushNamed(context, DonorHomePage.id);
+              UserCredential userCredential = await _firebaseAuthController
+                  .loginWithEmailAndPassword("donor@basket.com", "basket123");
+              User? user = userCredential.user;
+              if (user != null) {
+                Navigator.pushNamed(context, DonorHomePage.id);
+              }
             },
             backgroundColor: Colors.blueAccent,
             textColor: Colors.white,
