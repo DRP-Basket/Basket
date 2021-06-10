@@ -1,3 +1,4 @@
+import 'package:drp_basket_app/views/charity/contact_list_page.dart';
 import 'package:flutter/material.dart';
 
 import 'charity_donation_page.dart';
@@ -25,6 +26,7 @@ class CharityDrawer extends StatelessWidget {
           ),
           ListTile(
             title: Text('Receivers'),
+            onTap: () => Navigator.popAndPushNamed(context, ContactListPage.id),
           ),
         ],
       ),

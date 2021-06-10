@@ -1,5 +1,6 @@
 import 'package:drp_basket_app/views/auth/register_choice_screen.dart';
 import 'package:drp_basket_app/views/charity/charity_donation_page.dart';
+import 'package:drp_basket_app/views/charity/contact_list_page.dart';
 import 'package:drp_basket_app/views/donor/donor_home_page.dart';
 import 'package:drp_basket_app/views/donor/donor_profile_page.dart';
 import 'package:drp_basket_app/views/home_page.dart';
@@ -42,6 +43,7 @@ class Basket extends StatelessWidget {
         // Charity 
         CharityHomePage.id: (context) => CharityHomePage(),
         CharityDonationPage.id: (context) => CharityDonationPage(),
+        ContactListPage.id: (context) => ContactListPage(),
       },
     );
   }
