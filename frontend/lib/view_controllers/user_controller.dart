@@ -10,9 +10,12 @@ import 'dart:io';
 
 class UserController {
   late UserCredential _currentUser;
-  FirebaseAuthInterface _firebaseAuthController = locator<FirebaseAuthInterface>();
-  FirebaseStorageInterface _firebaseStorageController = locator<FirebaseStorageInterface>();
-  FirebaseFirestoreInterface _firebaseFirestoreController = locator<FirebaseFirestoreInterface>();
+  FirebaseAuthInterface _firebaseAuthController =
+      locator<FirebaseAuthInterface>();
+  FirebaseStorageInterface _firebaseStorageController =
+      locator<FirebaseStorageInterface>();
+  FirebaseFirestoreInterface _firebaseFirestoreController =
+      locator<FirebaseFirestoreInterface>();
 
   UserController();
 
@@ -34,7 +37,7 @@ class UserController {
         registerScreen.updateUISuccess();
       } on FirebaseAuthException catch (e) {
         if (e.code == "email-already-in-use") {
-          loginScreen.updateUIAuthFail(
+          registerScreen.updateUIAuthFail(
               _registrationFailed, "An account already exists for that email.");
         } else if (e.code == "invalid-email") {
           registerScreen.updateUIAuthFail(
@@ -94,7 +97,8 @@ class UserController {
 
     try {
       await _firebaseFirestoreController.addNewUserInformation(
-          userType, _currentUser.user!.uid, name, contactNumber, location: address);
+          userType, _currentUser.user!.uid, name, contactNumber,
+          location: address);
       registerScreen.updateUISuccess();
     } catch (exception) {
       print(exception);
@@ -108,7 +112,8 @@ class UserController {
   }
 
   Future<List<Map<String, dynamic>>> getUserOrderAgainList() async {
-    return await _firebaseFirestoreController.getOrderAgainList(_currentUser.user!.uid);
+    return await _firebaseFirestoreController
+        .getOrderAgainList(_currentUser.user!.uid);
   }
 
   Future<void> userSignOut() {
