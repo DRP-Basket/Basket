@@ -5,6 +5,8 @@ import 'package:drp_basket_app/views/receivers/receiver_home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import 'charity/charity_home_page.dart';
+
 class HomePage extends StatelessWidget {
   static const String id = "HomePage";
   final _fireStore = FirebaseFirestore.instance;
@@ -48,6 +50,12 @@ class HomePage extends StatelessWidget {
             text: "Receiver",
             onPressed: () => {Navigator.pushNamed(context, ReceiverHomePage.id)},
             backgroundColor: Colors.greenAccent,
+            textColor: Colors.white,
+          ),
+          LongButton(
+            text: "Charity", 
+            onPressed: () => {Navigator.pushNamed(context, CharityHomePage.id)},
+            backgroundColor: Colors.purpleAccent,
             textColor: Colors.white,
           ),
         ],

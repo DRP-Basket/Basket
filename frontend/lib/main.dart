@@ -1,4 +1,5 @@
 import 'package:drp_basket_app/views/auth/register_choice_screen.dart';
+import 'package:drp_basket_app/views/charity/charity_donation_page.dart';
 import 'package:drp_basket_app/views/donor/donor_home_page.dart';
 import 'package:drp_basket_app/views/donor/donor_profile_page.dart';
 import 'package:drp_basket_app/views/home_page.dart';
@@ -10,6 +11,7 @@ import 'package:flutter/material.dart';
 
 import 'constants.dart';
 import 'locator.dart';
+import 'views/charity/charity_home_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,6 +39,9 @@ class Basket extends StatelessWidget {
         DonorProfilePage.id: (context) => DonorProfilePage(),
         // Receiver
         ReceiverHomePage.id: (context) => ReceiverHomePage(),
+        // Charity 
+        CharityHomePage.id: (context) => CharityHomePage(),
+        CharityDonationPage.id: (context) => CharityDonationPage(),
       },
     );
   }
