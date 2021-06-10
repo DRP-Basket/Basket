@@ -10,9 +10,12 @@ import 'dart:io';
 
 class UserController {
   late UserCredential _currentUser;
-  FirebaseAuthInterface _firebaseAuthController = locator<FirebaseAuthInterface>();
-  FirebaseStorageInterface _firebaseStorageController = locator<FirebaseStorageInterface>();
-  FirebaseFirestoreInterface _firebaseFirestoreController = locator<FirebaseFirestoreInterface>();
+  FirebaseAuthInterface _firebaseAuthController =
+      locator<FirebaseAuthInterface>();
+  FirebaseStorageInterface _firebaseStorageController =
+      locator<FirebaseStorageInterface>();
+  FirebaseFirestoreInterface _firebaseFirestoreController =
+      locator<FirebaseFirestoreInterface>();
 
   UserController();
 
@@ -33,10 +36,7 @@ class UserController {
         // print(_currentUser.user!.email);
         registerScreen.updateUISuccess();
       } on FirebaseAuthException catch (e) {
-        if (e.code == "weak-password") {
-          registerScreen.updateUIAuthFail(_registrationFailed,
-              "The password must be at least 6 characters.");
-        } else if (e.code == "email-already-in-use") {
+        if (e.code == "email-already-in-use") {
           registerScreen.updateUIAuthFail(
               _registrationFailed, "An account already exists for that email.");
         } else if (e.code == "invalid-email") {
@@ -97,7 +97,8 @@ class UserController {
 
     try {
       await _firebaseFirestoreController.addNewUserInformation(
-          userType, _currentUser.user!.uid, name, contactNumber, location: address);
+          userType, _currentUser.user!.uid, name, contactNumber,
+          location: address);
       registerScreen.updateUISuccess();
     } catch (exception) {
       print(exception);
@@ -111,7 +112,8 @@ class UserController {
   }
 
   Future<List<Map<String, dynamic>>> getUserOrderAgainList() async {
-    return await _firebaseFirestoreController.getOrderAgainList(_currentUser.user!.uid);
+    return await _firebaseFirestoreController
+        .getOrderAgainList(_currentUser.user!.uid);
   }
 
   Future<void> userSignOut() {
