@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:drp_basket_app/views/charity/add_contact.dart';
 import 'package:flutter/material.dart';
 
 class ContactListPage extends StatefulWidget {
@@ -20,6 +21,11 @@ class _ContactListPageState extends State<ContactListPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Receiver List"),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () => Navigator.push(
+            context, MaterialPageRoute(builder: (context) => AddContact())),
       ),
       body: StreamBuilder(
           stream:
