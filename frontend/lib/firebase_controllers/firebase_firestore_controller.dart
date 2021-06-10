@@ -8,17 +8,17 @@ import '../user_type.dart';
 class FirebaseFirestoreController implements FirebaseFirestoreInterface {
   final _fireStore = FirebaseFirestore.instance;
 
-  Future<void> addNewUserInformation(UserType userType, String user,
-      String name, String contactNumber, {String location = ""}) async {
-
+  Future<void> addNewUserInformation(
+      UserType userType, String user, String name, String contactNumber,
+      {String location = ""}) async {
     if (userType == UserType.RECEIVER) {
       await _fireStore.collection(cloudCollection[userType]!).doc(user).set({
         NAME: name,
         CONTACT_NUMBER: contactNumber,
       });
     } else {
-      Map<String, double> results = await locator<GeoCodingController>()
-          .getLatitudeLongitude(location);
+      Map<String, double> results =
+          await locator<GeoCodingController>().getLatitudeLongitude(location);
 
       await _fireStore.collection(cloudCollection[userType]!).doc(user).set({
         NAME: name,
@@ -36,16 +36,22 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
 
   Future<List<Map<String, dynamic>>> getOrderAgainList(String uid) async {
     DocumentSnapshot ds = await _fireStore.collection(RECEIVERS).doc(uid).get();
-    List<dynamic> orderAgainList = ((ds.data() as Map<String, dynamic>)[ORDER_AGAIN_LIST]);
-    orderAgainList = orderAgainList.map((e) => e as String).toList();
-    List<Map<String, dynamic>> donorInformation = [];
+    List<dynamic>? orderAgainList =
+        ((ds.data() as Map<String, dynamic>)[ORDER_AGAIN_LIST]);
 
-    for (var donorID in orderAgainList) {
-      DocumentSnapshot tempDs = await _fireStore.collection(DONORS).doc(donorID).get();
-      Map<String, dynamic> donorInfo = (tempDs.data() as Map<String, dynamic>);
-      donorInfo[ID] = donorID;
-      donorInformation.add(donorInfo);
+    List<Map<String, dynamic>> donorInformation = [];
+    if (orderAgainList != null) {
+      orderAgainList = orderAgainList.map((e) => e as String).toList();
+      for (var donorID in orderAgainList) {
+        DocumentSnapshot tempDs =
+            await _fireStore.collection(DONORS).doc(donorID).get();
+        Map<String, dynamic> donorInfo =
+            (tempDs.data() as Map<String, dynamic>);
+        donorInfo[ID] = donorID;
+        donorInformation.add(donorInfo);
+      }
     }
+
     return donorInformation;
   }
 
