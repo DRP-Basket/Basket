@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class AddDonation extends StatefulWidget {
@@ -52,7 +53,19 @@ class _AddDonationState extends State<AddDonation> {
     );
   }
 
+  final _fireStore = FirebaseFirestore.instance;
+
+  Future<void> _addToFireBase() async {
+    CollectionReference donations = await _fireStore.collection("charities").doc("ex-charity").collection("donations");
+    return donations.add({
+      'title': _titleController.text, 
+      'desc': _descController.text,
+    })
+    .then((value) => print('Donation Added'))
+    .catchError((err) => print("Failed to add donation: $err"));
+  }
+
   void _notifyReceivers() {}
 
-  void _addToFireBase() {}
+  
 }
