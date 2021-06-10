@@ -42,6 +42,13 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Text('Loading');
             }
+            if (!snapshot.hasData) {
+              return Center(
+                  child: CircularProgressIndicator(
+                    backgroundColor: Colors.lightBlueAccent,
+                  ),
+              );
+            }
             var donations = snapshot.data!.docs;
             return ListView(
               children: donations.map((DocumentSnapshot ds) {
