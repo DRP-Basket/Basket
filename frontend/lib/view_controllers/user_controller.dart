@@ -1,39 +1,47 @@
-import 'package:drp_basket_app/firebase_controllers/firebase_auth_controller.dart';
+import 'package:drp_basket_app/firebase_controllers/firebase_auth_interface.dart';
+import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
+import 'package:drp_basket_app/firebase_controllers/firebase_storage_interface.dart';
+import 'package:drp_basket_app/locator.dart';
+import 'package:drp_basket_app/user_type.dart';
+import 'package:drp_basket_app/view_controllers/image_picker_controller.dart';
 import 'package:drp_basket_app/views/auth/auth_view_interface.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:io';
 
 class UserController {
   late UserCredential _currentUser;
-  FirebaseAuthController firebaseAuthController;
+  FirebaseAuthInterface _firebaseAuthController = locator<FirebaseAuthInterface>();
+  FirebaseStorageInterface _firebaseStorageController = locator<FirebaseStorageInterface>();
+  FirebaseFirestoreInterface _firebaseFirestoreController = locator<FirebaseFirestoreInterface>();
 
-  UserController(this.firebaseAuthController);
+  UserController();
 
   final String _registrationFailed = "Registration failed";
 
-  Future<void> registerWithEmailAndPassword(AuthViewInterface loginScreen,
+  Future<void> registerWithEmailAndPassword(AuthViewInterface registerScreen,
       String email, String password1, String password2) async {
-    loginScreen.updateUILoading();
+    registerScreen.updateUILoading();
     if (password1 != password2) {
-      loginScreen.updateUIAuthFail(
+      registerScreen.updateUIAuthFail(
           "Mismatched passwords", "Please retype your passwords.");
-      loginScreen.resetSpinner();
+      registerScreen.resetSpinner();
     } else {
       email = email.trim();
       try {
-        _currentUser = await firebaseAuthController
+        _currentUser = await _firebaseAuthController
             .createUserWithEmailAndPassword(email, password1);
         // print(_currentUser.user!.email);
-        loginScreen.updateUISuccess();
+        registerScreen.updateUISuccess();
       } on FirebaseAuthException catch (e) {
         if (e.code == "email-already-in-use") {
           loginScreen.updateUIAuthFail(
               _registrationFailed, "An account already exists for that email.");
         } else if (e.code == "invalid-email") {
-          loginScreen.updateUIAuthFail(
+          registerScreen.updateUIAuthFail(
               _registrationFailed, "Please enter a valid email address.");
         }
       } finally {
-        loginScreen.resetSpinner();
+        registerScreen.resetSpinner();
       }
     }
   }
@@ -45,9 +53,8 @@ class UserController {
     loginScreen.updateUILoading();
     email = email.trim();
     try {
-      _currentUser = await firebaseAuthController.loginWithEmailAndPassword(
+      _currentUser = await _firebaseAuthController.loginWithEmailAndPassword(
           email, password);
-      // print(_currentUser.user!.email);
       loginScreen.updateUISuccess();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
@@ -63,6 +70,48 @@ class UserController {
   }
 
   void forgotPassword(email) async {
-    await firebaseAuthController.forgotPassword(email);
+    await _firebaseAuthController.forgotPassword(email);
+  }
+
+  void uploadUserInformation(AuthViewInterface registerScreen,
+      UserType userType, String name, String contactNumber,
+      {containsImage = true, address = ""}) async {
+    registerScreen.updateUILoading();
+    if (containsImage) {
+      File image = locator<ImagePickerController>().getImage();
+      String destination =
+          cloudProfileFilePath[userType]! + "${_currentUser.user!.uid}";
+      try {
+        await _firebaseStorageController.uploadFile(destination, image);
+      } catch (exception) {
+        print(exception);
+      } finally {
+        registerScreen.resetSpinner();
+      }
+    } else {
+      assert(userType == UserType.RECEIVER);
+    }
+
+    try {
+      await _firebaseFirestoreController.addNewUserInformation(
+          userType, _currentUser.user!.uid, name, contactNumber, location: address);
+      registerScreen.updateUISuccess();
+    } catch (exception) {
+      print(exception);
+    } finally {
+      registerScreen.resetSpinner();
+    }
+  }
+
+  Future<UserType> checkUserType() async {
+    return _firebaseFirestoreController.getUserType(_currentUser.user!.uid);
+  }
+
+  Future<List<Map<String, dynamic>>> getUserOrderAgainList() async {
+    return await _firebaseFirestoreController.getOrderAgainList(_currentUser.user!.uid);
+  }
+
+  Future<void> userSignOut() {
+    return _firebaseAuthController.signOut();
   }
 }

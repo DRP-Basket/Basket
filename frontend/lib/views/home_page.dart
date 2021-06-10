@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/components/long_button.dart';
 import 'package:drp_basket_app/views/donor/donor_home_page.dart';
-import 'package:drp_basket_app/views/receivers/receiver_home_page.dart';
+import 'package:drp_basket_app/views/receivers/home_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -46,7 +46,7 @@ class HomePage extends StatelessWidget {
           ),
           LongButton(
             text: "Receiver",
-            onPressed: () => {Navigator.pushNamed(context, ReceiverHomePage.id)},
+            onPressed: () => {Navigator.pushNamed(context, ReceiverHomeScreen.id)},
             backgroundColor: Colors.greenAccent,
             textColor: Colors.white,
           ),
