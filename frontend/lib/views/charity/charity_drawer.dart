@@ -16,10 +16,10 @@ class CharityDrawer extends StatelessWidget {
           DrawerHeader(
             child: Text("Charity"),
           ),
-          ListTile(
-            title: Text('Home'),
-            onTap: () => {Navigator.popAndPushNamed(context, CharityHomePage.id)},
-          ),
+          // ListTile(
+          //   title: Text('Home'),
+          //   onTap: () => {Navigator.popAndPushNamed(context, CharityHomePage.id)},
+          // ),
           ListTile(
             title: Text('Donation'),
             onTap: () => {Navigator.popAndPushNamed(context, CharityDonationPage.id)}, 

@@ -22,7 +22,7 @@ class CharityHomePage extends StatelessWidget {
               color: Colors.white,
               size: 30.0,
             ),
-            onPressed: () => SMSSender().sendSMS(context),
+            onPressed: (){},// () => {SMSSender().sendSMS(context),}
           ),
         ),
       ),

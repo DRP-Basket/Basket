@@ -5,7 +5,7 @@ import 'package:drp_basket_app/views/receivers/receiver_home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import 'charity/charity_home_page.dart';
+import 'charity/charity_donation_page.dart';
 
 class HomePage extends StatelessWidget {
   static const String id = "HomePage";
@@ -54,7 +54,7 @@ class HomePage extends StatelessWidget {
           ),
           LongButton(
             text: "Charity", 
-            onPressed: () => {Navigator.pushNamed(context, CharityHomePage.id)},
+            onPressed: () => {Navigator.pushNamed(context, CharityDonationPage.id)},
             backgroundColor: Colors.purpleAccent,
             textColor: Colors.white,
           ),
