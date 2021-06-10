@@ -17,7 +17,8 @@ class UserController {
   FirebaseStorageInterface _firebaseStorageController;
   FirebaseFirestoreInterface _firebaseFirestoreController;
 
-  UserController(this._firebaseAuthController, this._firebaseStorageController, this._firebaseFirestoreController);
+  UserController(this._firebaseAuthController, this._firebaseStorageController,
+      this._firebaseFirestoreController);
 
   final String _registrationFailed = "Registration failed";
 
@@ -79,12 +80,19 @@ class UserController {
     await _firebaseAuthController.forgotPassword(email);
   }
 
-  void uploadUserInformation(AuthViewInterface registerScreen, UserType userType, String name, String contactNumber) async {
+  void logout() async {
+    await _firebaseAuthController.logout();
+  }
+
+  void uploadUserInformation(AuthViewInterface registerScreen,
+      UserType userType, String name, String contactNumber) async {
     registerScreen.updateUILoading();
-    String destination = cloudFilePath[userType]! + "profile/${_currentUser.user!.uid}";
+    String destination =
+        cloudFilePath[userType]! + "profile/${_currentUser.user!.uid}";
 
     try {
-      await _firebaseFirestoreController.addNewUserInformation(_currentUser.user!.uid, name, contactNumber);
+      await _firebaseFirestoreController.addNewUserInformation(
+          _currentUser.user!.uid, name, contactNumber);
       print(destination);
       if (locator<ImagePickerController>().uploadedImage()) {
         File image = locator<ImagePickerController>().getImage();
@@ -99,8 +107,9 @@ class UserController {
 
   User? curUser() => _firebaseAuthController.curUser();
 
-  Future<DocumentSnapshot<Map<String, dynamic>>> donorFromID(String id) => _firebaseFirestoreController.donorFromID(id);
+  Future<DocumentSnapshot<Map<String, dynamic>>> donorFromID(String id) =>
+      _firebaseFirestoreController.donorFromID(id);
 
-  loadFromStorage(BuildContext context, String image) => _firebaseStorageController.loadFromStorage(image);
-
+  loadFromStorage(BuildContext context, String image) =>
+      _firebaseStorageController.loadFromStorage(image);
 }
