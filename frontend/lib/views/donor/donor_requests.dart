@@ -13,6 +13,8 @@ class DonorRequests extends StatefulWidget {
 }
 
 class _DonorRequestsState extends State<DonorRequests> {
+  List<String> statuses = [];
+
   @override
   Widget build(BuildContext context) {
     final Stream<QuerySnapshot> _requestStream = FirebaseFirestore.instance
@@ -38,10 +40,10 @@ class _DonorRequestsState extends State<DonorRequests> {
           }
           List<Widget> reqs = [];
           var data = snapshot.data!.docs;
-          for (var req in data) {
-            var info = req.data();
-            reqs.add(_buildCard(
-                info["name"], info["message"], info["status"], req.id));
+          for (var i = 0; i < data.length; i++) {
+            var info = data[i].data();
+            _changeStatus(info["status"], i);
+            reqs.add(_buildCard(info["name"], info["message"], data[i].id, i));
           }
           return ListView(children: reqs);
         },
@@ -49,10 +51,10 @@ class _DonorRequestsState extends State<DonorRequests> {
     );
   }
 
-  Widget _buildCard(String name, String message, String status, String reqID) {
+  Widget _buildCard(String name, String message, String reqID, int index) {
     return Card(
       child: ListTile(
-        leading: _getIconFromStatus(status),
+        leading: _getIconFromStatus(statuses[index]),
         title: Text(
           name,
           style: TextStyle(fontSize: 21),
@@ -66,13 +68,13 @@ class _DonorRequestsState extends State<DonorRequests> {
         ),
         trailing: IconButton(
           icon: Icon(Icons.more_horiz),
-          onPressed: () => {
+          onPressed: () {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      DonorRespond(name, message, status, widget.curUID, reqID),
-                ))
+                  builder: (context) => DonorRespond(
+                      name, message, index, _getStatus, widget.curUID, reqID),
+                ));
           },
         ),
         isThreeLine: true,
@@ -94,5 +96,17 @@ class _DonorRequestsState extends State<DonorRequests> {
         size: 40,
       );
     }
+  }
+
+  void _changeStatus(String status, int index) {
+    if (index >= statuses.length) {
+      statuses.add(status);
+    } else {
+      statuses[index] = status;
+    }
+  }
+
+  String _getStatus(int index) {
+    return statuses[index];
   }
 }

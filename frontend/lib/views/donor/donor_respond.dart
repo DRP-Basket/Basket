@@ -5,11 +5,12 @@ import 'package:flutter/material.dart';
 class DonorRespond extends StatefulWidget {
   final String name;
   final String message;
-  final String status;
+  final int index;
+  final Function getStatus;
   final String curUID;
   final String reqID;
-  const DonorRespond(
-      this.name, this.message, this.status, this.curUID, this.reqID,
+  const DonorRespond(this.name, this.message, this.index, this.getStatus,
+      this.curUID, this.reqID,
       {Key? key})
       : super(key: key);
 
@@ -19,10 +20,11 @@ class DonorRespond extends StatefulWidget {
 
 class _DonorRespondState extends State<DonorRespond> {
   late String status;
+
   @override
   void initState() {
     super.initState();
-    status = widget.status;
+    status = widget.getStatus(widget.index);
   }
 
   @override
@@ -80,10 +82,10 @@ class _DonorRespondState extends State<DonorRespond> {
   Widget _getButtonBar() {
     List<Widget> children = [];
     if (status == "pending") {
-      children.add(ElevatedButton(onPressed: null, child: Text("Cancel")));
+      children.add(ElevatedButton(onPressed: null, child: Text("Delete")));
       children.add(ElevatedButton(
-        onPressed: () async {
-          await _statusTap(true);
+        onPressed: () {
+          _statusTap(true);
         },
         child: Text("Confirm"),
         style: ButtonStyle(
@@ -91,10 +93,10 @@ class _DonorRespondState extends State<DonorRespond> {
       ));
     } else {
       children.add(ElevatedButton(
-        onPressed: () async {
-          await _statusTap(false);
+        onPressed: () {
+          _statusTap(false);
         },
-        child: Text("Cancel"),
+        child: Text("Delete"),
         style: ButtonStyle(
           backgroundColor: MaterialStateProperty.all<Color>(Colors.deepOrange),
         ),
@@ -107,23 +109,21 @@ class _DonorRespondState extends State<DonorRespond> {
     );
   }
 
-  Future<void> _statusTap(bool confirm) {
+  void _statusTap(bool confirm) async {
     final DocumentReference ref = FirebaseFirestore.instance
         .collection("donors")
         .doc(widget.curUID)
         .collection("requests")
         .doc(widget.reqID);
-    var res;
     if (confirm) {
-      res = ref.update({"status": "confirmed"}).catchError(
+      await ref.update({"status": "confirmed"}).catchError(
           (error) => print(error.toString()));
     } else {
-      res = ref.update({"status": "pending"}).catchError(
+      await ref.update({"status": "pending"}).catchError(
           (error) => print(error.toString()));
     }
     setState(() {
-      status = confirm ? "confirmed" : "pending";
+      status = widget.getStatus(widget.index);
     });
-    return res;
   }
 }
