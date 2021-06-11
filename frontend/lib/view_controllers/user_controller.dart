@@ -54,6 +54,11 @@ class UserController {
 
   final String _loginFailed = "Login failed";
 
+  void testLogInWithEmailAndPassword() async {
+    _currentUser = await _firebaseAuthController.loginWithEmailAndPassword(
+        "donor@basket.com", "basket123");
+  }
+
   void logInWithEmailAndPassword(
       AuthViewInterface loginScreen, String email, String password) async {
     loginScreen.updateUILoading();
@@ -123,7 +128,7 @@ class UserController {
     return _firebaseAuthController.signOut();
   }
 
-  User? curUser() => _firebaseAuthController.curUser();
+  User? curUser() => _currentUser.user;
 
   Future<DocumentSnapshot<Map<String, dynamic>>> donorFromID(String id) =>
       _firebaseFirestoreController.donorFromID(id);
