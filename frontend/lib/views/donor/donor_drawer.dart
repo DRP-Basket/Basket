@@ -17,20 +17,25 @@ class DonorDrawer extends StatelessWidget {
     var curUser = locator<UserController>().curUser()!;
     var curUID = curUser.uid;
     var curUserEmail = curUser.email!;
-    var snapshot = locator<UserController>().donorFromID(curUID);
-    return FutureBuilder<DocumentSnapshot>(
-        future: snapshot,
-        builder:
-            (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            Map<String, dynamic> data =
-                snapshot.data!.data()! as Map<String, dynamic>;
-            Donor donor = Donor(
-                curUID, data['name'], curUserEmail, data['contact_number']);
-            return donorDrawer(context, donor);
-          }
-          return Drawer();
-        });
+    var curUserName = "Donor"; // TEST USER NAME
+    var curUserPhoneNumber = "0123456789"; // TEST PHONE NUMBER
+    return donorDrawer(
+        context, Donor(curUID, curUserName, curUserEmail, curUserPhoneNumber));
+    // return FutureBuilder<DocumentSnapshot>(
+    //     future: snapshot,
+    //     builder:
+    //         (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+    //       if (snapshot.connectionState == ConnectionState.done) {
+    //         Map<String, dynamic> data =
+    //             snapshot.data!.data()! as Map<String, dynamic>;
+    //         print(data);
+    //         // TEST PHONE NUMBER
+    //         Donor donor =
+    //             Donor(curUID, data['name'], curUserEmail, "0123456789");
+    //         return donorDrawer(context, donor);
+    //       }
+    //       return Drawer();
+    //     });
   }
 
   Widget donorDrawer(BuildContext context, Donor donor) {
