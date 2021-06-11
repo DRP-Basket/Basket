@@ -125,8 +125,9 @@ class UserController {
 
   User? curUser() => _firebaseAuthController.curUser();
 
-  Future<DocumentSnapshot<Map<String, dynamic>>> donorFromID(String id) => _firebaseFirestoreController.donorFromID(id);
+  Future<DocumentSnapshot<Map<String, dynamic>>> donorFromID(String id) =>
+      _firebaseFirestoreController.donorFromID(id);
 
-  loadFromStorage(BuildContext context, String image) => _firebaseStorageController.loadFromStorage(image);
-
+  loadFromStorage(BuildContext context, String image) =>
+      _firebaseStorageController.loadFromStorage(image);
 }

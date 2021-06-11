@@ -26,9 +26,9 @@ class Basket extends StatelessWidget {
     return MaterialApp(
       title: LOGO_NAME,
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primaryColor: primary_color,
       ),
-      home: WelcomeScreen(),
+      home: HomePage(),
       routes: {
         // General
         HomePage.id: (context) => HomePage(),
@@ -50,4 +50,3 @@ class Basket extends StatelessWidget {
     );
   }
 }
-
