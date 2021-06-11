@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/constants.dart';
 import 'package:drp_basket_app/views/donor/donor_add_item.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,8 @@ class DonorHomePage extends StatefulWidget {
 }
 
 class _DonorHomePageState extends State<DonorHomePage> {
+  final _fireStore = FirebaseFirestore.instance;
+
   @override
   void initState() {
     super.initState();
@@ -32,7 +35,6 @@ class _DonorHomePageState extends State<DonorHomePage> {
         title: Text("Donations"),
       ),
       drawer: DonorDrawer(),
-      body: Text("Hello"),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
@@ -41,6 +43,39 @@ class _DonorHomePageState extends State<DonorHomePage> {
         child: Icon(Icons.add),
         backgroundColor: secondary_color,
       ),
+        body: StreamBuilder(
+            stream:
+            _fireStore.collection("restaurants").doc("vincent's store").snapshots(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return Center(
+                  child: CircularProgressIndicator(
+                    backgroundColor: Colors.lightBlueAccent,
+                  ),
+                );
+              } else {
+                final foodDS = (snapshot.data as DocumentSnapshot);
+                final foodMap = (foodDS.data() as Map<String, dynamic>);
+                List<Widget> foodItems = [];
+                for (var food in foodMap.keys) {
+                  foodItems.add(Card(
+                    child: Container(
+                      padding: EdgeInsets.all(20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(food),
+                          Text(foodMap[food].toString()),
+                        ],
+                      ),
+                    ),
+                  ));
+                }
+                return ListView(
+                  children: foodItems,
+                );
+              }
+            }),
     );
   }
 }
