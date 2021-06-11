@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_auth_interface.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_storage_interface.dart';
@@ -7,6 +8,8 @@ import 'package:drp_basket_app/view_controllers/image_picker_controller.dart';
 import 'package:drp_basket_app/views/auth/auth_view_interface.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
+
+import 'package:flutter/src/widgets/framework.dart';
 
 class UserController {
   late UserCredential _currentUser;
@@ -119,4 +122,11 @@ class UserController {
   Future<void> userSignOut() {
     return _firebaseAuthController.signOut();
   }
+
+  User? curUser() => _firebaseAuthController.curUser();
+
+  Future<DocumentSnapshot<Map<String, dynamic>>> donorFromID(String id) => _firebaseFirestoreController.donorFromID(id);
+
+  loadFromStorage(BuildContext context, String image) => _firebaseStorageController.loadFromStorage(image);
+
 }

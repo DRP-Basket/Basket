@@ -5,6 +5,7 @@ import 'package:drp_basket_app/gps_controllers/geocoding_controller.dart';
 import 'package:drp_basket_app/locator.dart';
 import '../user_type.dart';
 
+
 class FirebaseFirestoreController implements FirebaseFirestoreInterface {
   final _fireStore = FirebaseFirestore.instance;
 
@@ -73,4 +74,18 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
       return UserType.RECEIVER;
     }
   }
+
+  //     String user, String name, String contactNumber) async {
+  //   await _fireStore.collection("user").doc(user).set({
+  //     "name": name,
+  //     "contact_number": contactNumber,
+  //   });
+  //
+  // }
+
+
+  Future<DocumentSnapshot<Map<String, dynamic>>> donorFromID(String id) {
+    return _fireStore.collection('user').doc(id).get();
+  }
+
 }

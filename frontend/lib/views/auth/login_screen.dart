@@ -58,8 +58,9 @@ class _LoginScreenState extends State<LoginScreen>
     password = "";
     emailController.clear();
     passwordController.clear();
-    UserType userType = await locator<UserController>().checkUserType();
-    userType == UserType.RECEIVER ? Navigator.pushNamed(context, ReceiverHomeScreen.id) : Navigator.pushNamed(context, HomePage.id);
+    Navigator.pushNamed(context, HomePage.id);
+    // UserType userType = await locator<UserController>().checkUserType();
+    // userType == UserType.RECEIVER ? Navigator.pushNamed(context, ReceiverHomeScreen.id) : Navigator.pushNamed(context, HomePage.id);
   }
 
   @override

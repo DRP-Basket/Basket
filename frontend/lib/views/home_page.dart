@@ -5,6 +5,8 @@ import 'package:drp_basket_app/views/receivers/home_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import 'charity/charity_donation_page.dart';
+
 class HomePage extends StatelessWidget {
   static const String id = "HomePage";
   final _fireStore = FirebaseFirestore.instance;
@@ -44,10 +46,16 @@ class HomePage extends StatelessWidget {
             backgroundColor: Colors.blueAccent,
             textColor: Colors.white,
           ),
+          // LongButton(
+          //   text: "Receiver",
+          //   onPressed: () => {Navigator.pushNamed(context, ReceiverHomeScreen.id)},
+          //   backgroundColor: Colors.greenAccent,
+          //   textColor: Colors.white,
+          // ),
           LongButton(
-            text: "Receiver",
-            onPressed: () => {Navigator.pushNamed(context, ReceiverHomeScreen.id)},
-            backgroundColor: Colors.greenAccent,
+            text: "Charity",
+            onPressed: () => {Navigator.pushNamed(context, CharityDonationPage.id)},
+            backgroundColor: Colors.purpleAccent,
             textColor: Colors.white,
           ),
         ],

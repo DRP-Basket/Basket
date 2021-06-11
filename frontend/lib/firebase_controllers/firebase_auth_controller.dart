@@ -17,7 +17,11 @@ class FirebaseAuthController implements FirebaseAuthInterface {
     return _auth.sendPasswordResetEmail(email: email);
   }
 
+
   Future<void> signOut() {
     return _auth.signOut();
   }
+
+  User? curUser() => _auth.currentUser;
+
 }
