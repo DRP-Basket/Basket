@@ -9,10 +9,20 @@ class FirebaseFirestoreInterface {
 
   getUserType(String uid) async {}
 
-
   getOrderAgainList(String uid) async {}
 
   donorFromID(String id) {}
 
+  assignNewRedeemCode(String redeemCode, String uid, String donationID) {}
+
+  getContactList() {}
+
+  getContactMap() {}
+
+  getDonationList() {}
+
+  addDonation(String title, String location, String date) {}
+
+  addContact(String name, String contactNumber) {}
 }
 

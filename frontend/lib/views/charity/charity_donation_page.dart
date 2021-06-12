@@ -1,9 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
+import 'package:drp_basket_app/locator.dart';
+import 'package:drp_basket_app/sms_controller/sms_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 import 'add_donation.dart';
 import 'charity_drawer.dart';
-import 'utilities.dart';
 
 class CharityDonationPage extends StatefulWidget {
   static const String id = "CharityDonationPage";
@@ -15,11 +18,46 @@ class CharityDonationPage extends StatefulWidget {
 }
 
 class _CharityDonationPageState extends State<CharityDonationPage> {
-  final Stream<QuerySnapshot> _donationsStream = FirebaseFirestore.instance
-      .collection('charities')
-      .doc('ex-charity')
-      .collection('donations')
-      .snapshots();
+
+  String donationEventMsg(Map<String, dynamic> donation) {
+    return 'Donation Event Happening!\n\'Event Name: ${donation['title']}\nEvent Location: ${donation['location']}\nEvent Time: ${donation['date']}';
+  }
+
+  void sendSMS(donationID, donationMap) async {
+    String donationMessage = donationEventMsg(donationMap);
+    bool success = await locator<SMSController>().sendSMS(donationID, msgContent: donationMessage);
+    if (success) {
+      Alert(
+          context: context,
+          title: "Message Sent",
+          desc: "Messages have been sent out",
+          type: AlertType.success,
+          buttons: [
+            DialogButton(
+              child: Text(
+                "Exit",
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ]).show();
+    } else {
+      Alert(
+          context: context,
+          title: "Message Failed",
+          desc: "Messages have failed to send out",
+          type: AlertType.warning,
+          buttons: [
+            DialogButton(
+              child: Text(
+                "Exit",
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ]).show();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,13 +72,17 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
         child: Icon(Icons.add),
       ),
       body: StreamBuilder(
-          stream: _donationsStream,
+          stream: locator<FirebaseFirestoreInterface>().getDonationList(),
           builder: (BuildContext ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasError) {
               return Text('Something went wrong');
             }
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Text('Loading');
+              return Center(
+                child: CircularProgressIndicator(
+                  backgroundColor: Colors.lightBlueAccent,
+                ),
+              );
             }
             if (!snapshot.hasData) {
               return Center(
@@ -77,9 +119,7 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
                         ),
                         ElevatedButton(
                           child: Text('Notify Receivers'),
-                          onPressed: () {
-                            SMSSender().sendSMS(context, donationID, msgContent: donationEventMsg(donation),);
-                          }
+                          onPressed: () => sendSMS(donationID, donation)
                         ),
                       ],
                     ),
@@ -89,9 +129,5 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
             );
           }),
     );
-  }
-
-  String donationEventMsg(Map<String, dynamic> donation) {
-    return 'Donation Event Happening!\n\'Event Name: ${donation['title']}\nEvent Location: ${donation['location']}\nEvent Time: ${donation['date']}';
   }
 }

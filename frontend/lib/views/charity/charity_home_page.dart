@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'charity_drawer.dart';
-import 'utilities.dart';
 
 class CharityHomePage extends StatelessWidget {
   static const String id = "CharityHomePage";
