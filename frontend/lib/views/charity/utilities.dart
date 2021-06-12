@@ -7,7 +7,6 @@ import 'package:telephony/telephony.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 class DateTimePicker extends StatefulWidget {
-
   final TextEditingController _dateController;
 
   DateTimePicker(this._dateController);
@@ -17,12 +16,11 @@ class DateTimePicker extends StatefulWidget {
 }
 
 class _DateTimePickerState extends State<DateTimePicker> {
-
   String date = "Choose Event Date";
 
   final TextEditingController _dateController;
 
-  _DateTimePickerState(this._dateController); 
+  _DateTimePickerState(this._dateController);
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +42,8 @@ class _DateTimePickerState extends State<DateTimePicker> {
                 DatePicker.showDatePicker(
                   context,
                   onConfirm: (DateTime d) {
-                    date = '${d.year} - ${d.month} - ${d.day}';
+                    date =
+                        '${d.year}-${d.month < 10 ? "0${d.month}" : d.month}-${d.day < 10 ? "0${d.day}" : d.day}';
                     _dateController.text = date;
                     setState(() {});
                   },
@@ -56,13 +55,12 @@ class _DateTimePickerState extends State<DateTimePicker> {
   }
 }
 
-
 class SMSSender {
-
   final Telephony telephony = Telephony.instance;
   final _fireStore = FirebaseFirestore.instance;
 
-  final _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+  final _chars =
+      'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
   Random _rnd = Random();
   String getRandomString(int length) => String.fromCharCodes(Iterable.generate(
       length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
@@ -70,10 +68,10 @@ class SMSSender {
   String getRedeemURL(String uid, String did) {
     String redeemCode = getRandomString(5);
     String url = "www.xxxxxx.com/redeem$redeemCode";
-    _fireStore.collection("redeem").doc(redeemCode).set({
-      "user": uid,
-      "donation_event": did
-    });
+    _fireStore
+        .collection("redeem")
+        .doc(redeemCode)
+        .set({"user": uid, "donation_event": did});
     return url;
   }
 
@@ -82,11 +80,15 @@ class SMSSender {
     if (permissionsGranted!) {
       DocumentSnapshot ds =
           await _fireStore.collection("charities").doc("ex-charity").get();
-      List contacts = (ds.data() as Map<String, dynamic>)["contact_list"] as List;
+      List contacts =
+          (ds.data() as Map<String, dynamic>)["contact_list"] as List;
       for (Map<String, dynamic> contact in contacts) {
         print(contact["uid"]);
-        String redemption_link = "Please click on the link ${getRedeemURL(contact["uid"], donationID)} when you collect your food.";
-        telephony.sendSms(to: contact["Contact"], message: msgContent + '\n' + redemption_link);
+        String redemption_link =
+            "Please click on the link ${getRedeemURL(contact["uid"], donationID)} when you collect your food.";
+        telephony.sendSms(
+            to: contact["Contact"],
+            message: msgContent + '\n' + redemption_link);
       }
     }
     Alert(

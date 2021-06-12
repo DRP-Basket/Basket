@@ -44,12 +44,19 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
             }
             if (!snapshot.hasData) {
               return Center(
-                  child: CircularProgressIndicator(
-                    backgroundColor: Colors.lightBlueAccent,
-                  ),
+                child: CircularProgressIndicator(
+                  backgroundColor: Colors.lightBlueAccent,
+                ),
               );
             }
             var donations = snapshot.data!.docs;
+            donations.sort((a, b) {
+              var aData = a.data() as Map<String, dynamic>;
+              var bData = b.data() as Map<String, dynamic>;
+              DateTime aDate = DateTime.parse(aData["date"]);
+              DateTime bDate = DateTime.parse(bData["date"]);
+              return aDate.compareTo(bDate);
+            });
             return ListView(
               children: donations.map((DocumentSnapshot ds) {
                 var donationID = ds.reference.id;
@@ -76,11 +83,14 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
                           subtitle: Text(donation['location']),
                         ),
                         ElevatedButton(
-                          child: Text('Notify Receivers'),
-                          onPressed: () {
-                            SMSSender().sendSMS(context, donationID, msgContent: donationEventMsg(donation),);
-                          }
-                        ),
+                            child: Text('Notify Receivers'),
+                            onPressed: () {
+                              SMSSender().sendSMS(
+                                context,
+                                donationID,
+                                msgContent: donationEventMsg(donation),
+                              );
+                            }),
                       ],
                     ),
                   ),
