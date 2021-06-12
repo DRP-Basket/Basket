@@ -3,10 +3,10 @@ import 'package:drp_basket_app/components/long_button.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:drp_basket_app/locator.dart';
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
-import 'package:drp_basket_app/views/donor/donor_home_page.dart';
 import 'package:flutter/material.dart';
 
 import 'charity/charity_donation_page.dart';
+import 'donor/dart_stats_screen.dart';
 
 class HomePage extends StatelessWidget {
   static const String id = "HomePage";
@@ -44,7 +44,7 @@ class HomePage extends StatelessWidget {
             text: "Donor",
             onPressed: () async {
               locator<UserController>().testLogInWithEmailAndPassword();
-              Navigator.pushNamed(context, DonorHomePage.id);
+              Navigator.pushNamed(context, DonorStatsPage.id);
             },
             backgroundColor: Colors.blueAccent,
             textColor: Colors.white,
