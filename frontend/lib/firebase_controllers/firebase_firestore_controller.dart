@@ -144,7 +144,7 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
   }
 
   @override
-  getCollection(String collectionName) {
-    return _fireStore.collection("restaurants");
+  CollectionReference getCollection(String collectionName) {
+    return _fireStore.collection(collectionName);
   }
 }
