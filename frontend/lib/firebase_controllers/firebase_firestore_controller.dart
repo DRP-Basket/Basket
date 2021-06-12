@@ -5,14 +5,13 @@ import 'package:drp_basket_app/gps_controllers/geocoding_controller.dart';
 import 'package:drp_basket_app/locator.dart';
 import '../user_type.dart';
 
-
 class FirebaseFirestoreController implements FirebaseFirestoreInterface {
   final _fireStore = FirebaseFirestore.instance;
 
   Future<void> addNewUserInformation(
       UserType userType, String user, String name, String contactNumber,
       {String location = ""}) async {
-    if (userType == UserType.RECEIVER) {
+    if (userType == UserType.CHARITY) {
       await _fireStore.collection(cloudCollection[userType]!).doc(user).set({
         NAME: name,
         CONTACT_NUMBER: contactNumber,
@@ -59,7 +58,7 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
   Future<UserType> getUserType(String uid) async {
     late bool exists;
     try {
-      await _fireStore.doc("donors/$uid").get().then((doc) {
+      await _fireStore.doc("$DONORS/$uid").get().then((doc) {
         if (doc.exists)
           exists = true;
         else
@@ -68,24 +67,79 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
       if (exists) {
         return UserType.DONOR;
       } else {
-        return UserType.RECEIVER;
+        return UserType.CHARITY;
       }
     } catch (exception) {
-      return UserType.RECEIVER;
+      return UserType.CHARITY;
     }
   }
-
-  //     String user, String name, String contactNumber) async {
-  //   await _fireStore.collection("user").doc(user).set({
-  //     "name": name,
-  //     "contact_number": contactNumber,
-  //   });
-  //
-  // }
-
 
   Future<DocumentSnapshot<Map<String, dynamic>>> donorFromID(String id) {
     return _fireStore.collection('user').doc(id).get();
   }
 
+  Future<void> assignNewRedeemCode(
+      String redeemCode, String uid, String donationID) {
+    return _fireStore
+        .collection(REDEEM)
+        .doc(redeemCode)
+        .set({"user": uid, "donation_event": donationID});
+  }
+
+  Stream<Object> getContactList() {
+    return _fireStore.collection("charities").doc("ex-charity").snapshots();
+  }
+
+  Future<List> getContactMap() async {
+    DocumentSnapshot ds =
+        await _fireStore.collection(CHARITIES).doc("ex-charity").get();
+    return ((ds.data() as Map<String, dynamic>)[CONTACT_LIST] as List);
+  }
+
+  Stream<QuerySnapshot<Object?>> getDonationList() {
+    return _fireStore
+        .collection('charities')
+        .doc('ex-charity')
+        .collection('donations')
+        .snapshots();
+  }
+
+  Future<void> addDonation(String title, String location, String date) async {
+    CollectionReference donations = _fireStore
+        .collection("charities")
+        .doc("ex-charity")
+        .collection("donations");
+    return donations
+        .add({
+      'title': title,
+      'location': location,
+      'date': date,
+    })
+        .then((value) => print('Donation Added'))
+        .catchError((err) => print("Failed to add donation: $err"));
+  }
+
+  Future<void> addContact(String name, String contactNumber) async {
+    DocumentSnapshot ds = await _fireStore.collection("charities").doc(
+        "ex-charity").get();
+
+    List contactList = (ds.data() as Map<String,
+        dynamic>)["contact_list"] as List;
+
+    QuerySnapshot foo = await
+    _fireStore.collection("receivers").where('name', isEqualTo: name).where(
+        'contact_number', isEqualTo: contactNumber).get();
+
+    String uid = foo.docs.single.id;
+
+    contactList.add({
+      "Name": name.trim(),
+      "Contact": contactNumber.trim(),
+      "uid": uid
+    });
+
+    _fireStore.collection("charities").doc("ex-charity").update({
+      "contact_list": contactList
+    });
+  }
 }

@@ -1,5 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:flutter/material.dart';
+
+import '../../locator.dart';
 
 class AddContact extends StatefulWidget {
   const AddContact({Key? key}) : super(key: key);
@@ -42,7 +44,7 @@ class _AddContactState extends State<AddContact> {
             ElevatedButton(
               child: Text("Add Contact"),
               onPressed: () {
-                _addToFireBase();
+                locator<FirebaseFirestoreInterface>().addContact(_titleController.text, _descController.text);
                 Navigator.pop(context);
               },
             ),
@@ -50,39 +52,6 @@ class _AddContactState extends State<AddContact> {
         ),
       ),
     );
-  }
-
-  final _fireStore = FirebaseFirestore.instance;
-
-  Future<void> _addToFireBase() async {
-    DocumentSnapshot ds = await _fireStore.collection("charities").doc(
-        "ex-charity").get();
-
-    List contactList = (ds.data() as Map<String,
-        dynamic>)["contact_list"] as List;
-
-    String name = _titleController.text;
-    String contactNumber = _descController.text;
-
-    print(name);
-    print(contactNumber);
-    print(contactList);
-
-    QuerySnapshot foo = await
-    _fireStore.collection("receivers").where('name', isEqualTo: name).where(
-        'contact_number', isEqualTo: contactNumber).get();
-
-    String uid = foo.docs.single.id;
-
-    contactList.add({
-      "Name": name.trim(),
-      "Contact": contactNumber.trim(),
-      "uid": uid
-    });
-    
-    _fireStore.collection("charities").doc("ex-charity").update({
-      "contact_list": contactList
-    });
   }
 
 }

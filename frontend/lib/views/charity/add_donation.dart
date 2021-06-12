@@ -1,4 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
+import 'package:drp_basket_app/locator.dart';
 import 'package:drp_basket_app/views/charity/utilities.dart';
 import 'package:flutter/material.dart';
 
@@ -49,7 +50,7 @@ class _AddDonationState extends State<AddDonation> {
             ElevatedButton(
               child: Text("Add Event"),
               onPressed: () {
-                _addToFireBase();
+                locator<FirebaseFirestoreInterface>().addDonation(_titleController.text, _locationController.text, _dateController.text);
                 Navigator.pop(context);
               },
             ),
@@ -58,23 +59,5 @@ class _AddDonationState extends State<AddDonation> {
       ),
     );
   }
-
-  final _fireStore = FirebaseFirestore.instance;
-
-  Future<void> _addToFireBase() async {
-    CollectionReference donations = await _fireStore
-        .collection("charities")
-        .doc("ex-charity")
-        .collection("donations");
-    return donations
-        .add({
-          'title': _titleController.text,
-          'location': _locationController.text,
-          'date': _dateController.text,
-        })
-        .then((value) => print('Donation Added'))
-        .catchError((err) => print("Failed to add donation: $err"));
-  }
-
 }
 
