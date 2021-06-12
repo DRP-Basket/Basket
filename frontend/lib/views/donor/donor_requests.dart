@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
+import 'package:drp_basket_app/locator.dart';
 import 'package:drp_basket_app/views/donor/donor_drawer.dart';
 import 'package:drp_basket_app/views/donor/donor_respond.dart';
 import "package:flutter/material.dart";
@@ -17,11 +19,12 @@ class _DonorRequestsState extends State<DonorRequests> {
 
   @override
   Widget build(BuildContext context) {
-    final Stream<QuerySnapshot> _requestStream = FirebaseFirestore.instance
-        .collection("donors")
-        .doc(widget.curUID)
-        .collection("requests")
-        .snapshots();
+    final Stream<QuerySnapshot> _requestStream =
+        locator<FirebaseFirestoreInterface>()
+            .getCollection("donors")
+            .doc(widget.curUID)
+            .collection("requests")
+            .snapshots();
 
     return Scaffold(
       appBar: AppBar(
