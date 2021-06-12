@@ -111,35 +111,40 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
         .collection("donations");
     return donations
         .add({
-      'title': title,
-      'location': location,
-      'date': date,
-    })
+          'title': title,
+          'location': location,
+          'date': date,
+        })
         .then((value) => print('Donation Added'))
         .catchError((err) => print("Failed to add donation: $err"));
   }
 
   Future<void> addContact(String name, String contactNumber) async {
-    DocumentSnapshot ds = await _fireStore.collection("charities").doc(
-        "ex-charity").get();
+    DocumentSnapshot ds =
+        await _fireStore.collection("charities").doc("ex-charity").get();
 
-    List contactList = (ds.data() as Map<String,
-        dynamic>)["contact_list"] as List;
+    List contactList =
+        (ds.data() as Map<String, dynamic>)["contact_list"] as List;
 
-    QuerySnapshot foo = await
-    _fireStore.collection("receivers").where('name', isEqualTo: name).where(
-        'contact_number', isEqualTo: contactNumber).get();
+    QuerySnapshot foo = await _fireStore
+        .collection("receivers")
+        .where('name', isEqualTo: name)
+        .where('contact_number', isEqualTo: contactNumber)
+        .get();
 
     String uid = foo.docs.single.id;
 
-    contactList.add({
-      "Name": name.trim(),
-      "Contact": contactNumber.trim(),
-      "uid": uid
-    });
+    contactList.add(
+        {"Name": name.trim(), "Contact": contactNumber.trim(), "uid": uid});
 
-    _fireStore.collection("charities").doc("ex-charity").update({
-      "contact_list": contactList
-    });
+    _fireStore
+        .collection("charities")
+        .doc("ex-charity")
+        .update({"contact_list": contactList});
+  }
+
+  @override
+  getCollection(String collectionName) {
+    return _fireStore.collection("restaurants");
   }
 }

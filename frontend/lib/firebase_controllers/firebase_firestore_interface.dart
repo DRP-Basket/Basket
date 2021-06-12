@@ -5,7 +5,7 @@ class FirebaseFirestoreInterface {
       UserType userType, String user, String name, String contactNumber,
       {String location = ""}) async {}
 
-  getDonors () {}
+  getDonors() {}
 
   getUserType(String uid) async {}
 
@@ -24,5 +24,6 @@ class FirebaseFirestoreInterface {
   addDonation(String title, String location, String date) {}
 
   addContact(String name, String contactNumber) {}
-}
 
+  getCollection(String collectionName) {}
+}
