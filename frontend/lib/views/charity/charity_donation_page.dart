@@ -63,7 +63,7 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Charity Donation Page")),
+      appBar: AppBar(title: Text("Donation Events")),
       drawer: CharityDrawer(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

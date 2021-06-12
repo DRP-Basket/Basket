@@ -4,6 +4,7 @@ import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface
 import 'package:drp_basket_app/gps_controllers/geocoding_controller.dart';
 import 'package:drp_basket_app/locator.dart';
 import 'package:drp_basket_app/views/charity/donation_event.dart';
+import 'package:drp_basket_app/views/charity/receiver.dart';
 import '../user_type.dart';
 
 class FirebaseFirestoreController implements FirebaseFirestoreInterface {
@@ -88,7 +89,7 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
   }
 
   Stream<Object> getContactList() {
-    return _fireStore.collection("charities").doc("ex-charity").snapshots();
+    return _fireStore.collection("charities").doc("ex-charity").collection("receivers_list").snapshots();
   }
 
   Future<List> getContactMap() async {
@@ -135,6 +136,7 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
         .catchError((err) => print("Failed to add donation: $err"));
   }
 
+  // Currently unused
   Future<void> addContact(String name, String contactNumber) async {
     DocumentSnapshot ds =
         await _fireStore.collection("charities").doc("ex-charity").get();
@@ -157,5 +159,21 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
         .collection("charities")
         .doc("ex-charity")
         .update({"contact_list": contactList});
+  }
+
+  Future<void> addReceiver(Receiver receiver) async {
+    return _fireStore
+        .collection("charities")
+        .doc("ex-charity")
+        .collection("receivers_list")
+        .add({
+          'name': receiver.name,
+          'contact': receiver.contact,
+          'location': receiver.location,
+          'donations_claimed': [],
+        })
+        .then((value) => print('Receiver Added')) //TODO : implement front end warning
+        .catchError((err) => print("Failed to add receiver: $err"));
+  
   }
 }

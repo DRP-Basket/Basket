@@ -1,11 +1,10 @@
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:drp_basket_app/views/charity/add_contact.dart';
 import 'package:flutter/material.dart';
 
 import '../../locator.dart';
+import 'charity_drawer.dart';
 
 class ContactListPage extends StatefulWidget {
   static const String id = "ContactListPage";
@@ -22,8 +21,9 @@ class _ContactListPageState extends State<ContactListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Receiver List"),
+        title: Text("Receivers"),
       ),
+      drawer: CharityDrawer(),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () => Navigator.push(
@@ -31,7 +31,7 @@ class _ContactListPageState extends State<ContactListPage> {
       ),
       body: StreamBuilder(
           stream: locator<FirebaseFirestoreInterface>().getContactList(),
-          builder: (context, snapshot) {
+          builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (!snapshot.hasData) {
               return Center(
                 child: CircularProgressIndicator(
@@ -39,23 +39,22 @@ class _ContactListPageState extends State<ContactListPage> {
                 ),
               );
             } else {
-              final contactDS = (snapshot.data as DocumentSnapshot);
-              final contactMap = (contactDS.data() as Map<String, dynamic>);
-              final contactList = contactMap["contact_list"] as List;
-              print((contactMap["contact_list"][0]
-                  as Map<String, dynamic>)["Name"]);
+              var receivers = snapshot.data!.docs;
               return ListView(
-                children: contactList.map((e) {
-                  print(e["Name"]);
-                  print(e["Contact"]);
+                children: receivers.map((DocumentSnapshot ds) {
+                  var receiver = ds.data() as Map<String, dynamic>; 
+                  String name = receiver['name'];
+                  String contact = receiver['contact'];
+                  String location = receiver['location'];
+                  List<dynamic> donationsClaimed = receiver['donations_claimed'];
                   return Card(
                     child: Container(
                       padding: EdgeInsets.all(20),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(e["Name"]),
-                          Text(e["Contact"]),
+                          Text(name),
+                          Text(contact),
                         ],
                       ),
                     ),
