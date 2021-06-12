@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 
 class DateTimePicker extends StatefulWidget {
-
   final TextEditingController _dateController;
 
   DateTimePicker(this._dateController);
@@ -12,12 +11,11 @@ class DateTimePicker extends StatefulWidget {
 }
 
 class _DateTimePickerState extends State<DateTimePicker> {
-
   String date = "Choose Event Date";
 
   final TextEditingController _dateController;
 
-  _DateTimePickerState(this._dateController); 
+  _DateTimePickerState(this._dateController);
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +37,8 @@ class _DateTimePickerState extends State<DateTimePicker> {
                 DatePicker.showDatePicker(
                   context,
                   onConfirm: (DateTime d) {
-                    date = '${d.year} - ${d.month} - ${d.day}';
+                    date =
+                        '${d.year}-${d.month < 10 ? "0${d.month}" : d.month}-${d.day < 10 ? "0${d.day}" : d.day}';
                     _dateController.text = date;
                     setState(() {});
                   },

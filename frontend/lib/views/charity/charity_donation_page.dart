@@ -18,14 +18,14 @@ class CharityDonationPage extends StatefulWidget {
 }
 
 class _CharityDonationPageState extends State<CharityDonationPage> {
-
   String donationEventMsg(Map<String, dynamic> donation) {
     return 'Donation Event Happening!\n\'Event Name: ${donation['title']}\nEvent Location: ${donation['location']}\nEvent Time: ${donation['date']}';
   }
 
   void sendSMS(donationID, donationMap) async {
     String donationMessage = donationEventMsg(donationMap);
-    bool success = await locator<SMSController>().sendSMS(donationID, msgContent: donationMessage);
+    bool success = await locator<SMSController>()
+        .sendSMS(donationID, msgContent: donationMessage);
     if (success) {
       Alert(
           context: context,
@@ -86,12 +86,19 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
             }
             if (!snapshot.hasData) {
               return Center(
-                  child: CircularProgressIndicator(
-                    backgroundColor: Colors.lightBlueAccent,
-                  ),
+                child: CircularProgressIndicator(
+                  backgroundColor: Colors.lightBlueAccent,
+                ),
               );
             }
             var donations = snapshot.data!.docs;
+            donations.sort((a, b) {
+              var aData = a.data() as Map<String, dynamic>;
+              var bData = b.data() as Map<String, dynamic>;
+              DateTime aDate = DateTime.parse(aData["date"]);
+              DateTime bDate = DateTime.parse(bData["date"]);
+              return aDate.compareTo(bDate);
+            });
             return ListView(
               children: donations.map((DocumentSnapshot ds) {
                 var donationID = ds.reference.id;
@@ -118,9 +125,8 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
                           subtitle: Text(donation['location']),
                         ),
                         ElevatedButton(
-                          child: Text('Notify Receivers'),
-                          onPressed: () => sendSMS(donationID, donation)
-                        ),
+                            child: Text('Notify Receivers'),
+                            onPressed: () => sendSMS(donationID, donation)),
                       ],
                     ),
                   ),
