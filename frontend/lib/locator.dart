@@ -5,6 +5,7 @@ import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface
 import 'package:drp_basket_app/firebase_controllers/firebase_storage_controller.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_storage_interface.dart';
 import 'package:drp_basket_app/gps_controllers/geolocator_controller.dart';
+import 'package:drp_basket_app/sms_controller/sms_controller.dart';
 import 'package:drp_basket_app/view_controllers/receiver_controller.dart';
 import 'package:drp_basket_app/view_controllers/image_picker_controller.dart';
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
@@ -26,4 +27,5 @@ Future<void> setupServices() async {
   locator.registerSingleton<ImagePickerController>(ImagePickerController());
   locator.registerSingleton<GeoLocatorController>(GeoLocatorController());
   locator.registerSingleton<GeoCodingController>(GeoCodingController());
+  locator.registerSingleton<SMSController>(SMSController());
 }

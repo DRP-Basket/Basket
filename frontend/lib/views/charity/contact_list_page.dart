@@ -1,8 +1,11 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:drp_basket_app/views/charity/add_contact.dart';
 import 'package:flutter/material.dart';
+
+import '../../locator.dart';
 
 class ContactListPage extends StatefulWidget {
   static const String id = "ContactListPage";
@@ -14,7 +17,6 @@ class ContactListPage extends StatefulWidget {
 }
 
 class _ContactListPageState extends State<ContactListPage> {
-  final _fireStore = FirebaseFirestore.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +30,7 @@ class _ContactListPageState extends State<ContactListPage> {
             context, MaterialPageRoute(builder: (context) => AddContact())),
       ),
       body: StreamBuilder(
-          stream:
-              _fireStore.collection("charities").doc("ex-charity").snapshots(),
+          stream: locator<FirebaseFirestoreInterface>().getContactList(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
               return Center(

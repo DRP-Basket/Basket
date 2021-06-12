@@ -37,3 +37,6 @@ const String NAME = "name";
 const String CONTACT_NUMBER = "contact_number";
 const String ORDER_AGAIN_LIST = "order_again_list";
 const String ID = "ID";
+const String CHARITIES = "charities";
+const String REDEEM = "redeem";
+const String CONTACT_LIST = "contact_list";
