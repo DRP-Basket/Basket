@@ -3,6 +3,7 @@ import 'package:drp_basket_app/constants.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:drp_basket_app/gps_controllers/geocoding_controller.dart';
 import 'package:drp_basket_app/locator.dart';
+import 'package:drp_basket_app/views/charity/donation_event.dart';
 import '../user_type.dart';
 
 class FirebaseFirestoreController implements FirebaseFirestoreInterface {
@@ -100,7 +101,7 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
     return _fireStore
         .collection('charities')
         .doc('ex-charity')
-        .collection('donations')
+        .collection('donation_events')
         .snapshots();
   }
 
@@ -111,35 +112,50 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
         .collection("donations");
     return donations
         .add({
-      'title': title,
-      'location': location,
-      'date': date,
-    })
+          'title': title,
+          'location': location,
+          'date': date,
+        })
+        .then((value) => print('Donation Added'))
+        .catchError((err) => print("Failed to add donation: $err"));
+  }
+
+  Future<void> addDonationEvent(DonationEvent de) {
+    return _fireStore
+        .collection("charities")
+        .doc("ex-charity")
+        .collection("donation_events")
+        .add({
+          'event_name': de.name,
+          'event_location': de.location,
+          'event_description': de.description,
+          'event_date_time': de.dateTime,
+        })
         .then((value) => print('Donation Added'))
         .catchError((err) => print("Failed to add donation: $err"));
   }
 
   Future<void> addContact(String name, String contactNumber) async {
-    DocumentSnapshot ds = await _fireStore.collection("charities").doc(
-        "ex-charity").get();
+    DocumentSnapshot ds =
+        await _fireStore.collection("charities").doc("ex-charity").get();
 
-    List contactList = (ds.data() as Map<String,
-        dynamic>)["contact_list"] as List;
+    List contactList =
+        (ds.data() as Map<String, dynamic>)["contact_list"] as List;
 
-    QuerySnapshot foo = await
-    _fireStore.collection("receivers").where('name', isEqualTo: name).where(
-        'contact_number', isEqualTo: contactNumber).get();
+    QuerySnapshot foo = await _fireStore
+        .collection("receivers")
+        .where('name', isEqualTo: name)
+        .where('contact_number', isEqualTo: contactNumber)
+        .get();
 
     String uid = foo.docs.single.id;
 
-    contactList.add({
-      "Name": name.trim(),
-      "Contact": contactNumber.trim(),
-      "uid": uid
-    });
+    contactList.add(
+        {"Name": name.trim(), "Contact": contactNumber.trim(), "uid": uid});
 
-    _fireStore.collection("charities").doc("ex-charity").update({
-      "contact_list": contactList
-    });
+    _fireStore
+        .collection("charities")
+        .doc("ex-charity")
+        .update({"contact_list": contactList});
   }
 }

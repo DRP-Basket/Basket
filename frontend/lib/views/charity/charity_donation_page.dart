@@ -4,6 +4,7 @@ import 'package:drp_basket_app/locator.dart';
 import 'package:drp_basket_app/sms_controller/sms_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:intl/intl.dart';
 
 import 'add_donation.dart';
 import 'charity_drawer.dart';
@@ -67,7 +68,7 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => AddDonation()));
+              context, MaterialPageRoute(builder: (context) => DonationEventForm()));
         },
         child: Icon(Icons.add),
       ),
@@ -96,26 +97,28 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
               children: donations.map((DocumentSnapshot ds) {
                 var donationID = ds.reference.id;
                 var donation = ds.data() as Map<String, dynamic>;
-                var title = donation['title'];
+                String name = donation['event_name'];
+                String location = donation['event_location'];
+                DateTime dateTime = donation['event_date_time'].toDate();
                 return Card(
                   child: Container(
                     padding: EdgeInsets.all(20),
                     child: Column(
                       children: [
                         Text(
-                          title,
+                          name,
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         ListTile(
-                          title: Text('Date'),
-                          subtitle: Text(donation['date']),
+                          title: Text('Date And Time'),
+                          subtitle: Text(DateFormat.yMMMd().add_jm().format(dateTime)),
                         ),
                         ListTile(
                           title: Text('Location'),
-                          subtitle: Text(donation['location']),
+                          subtitle: Text(location),
                         ),
                         ElevatedButton(
                           child: Text('Notify Receivers'),

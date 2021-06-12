@@ -1,3 +1,5 @@
+import 'package:drp_basket_app/views/charity/donation_event.dart';
+
 import '../user_type.dart';
 
 class FirebaseFirestoreInterface {
@@ -24,5 +26,7 @@ class FirebaseFirestoreInterface {
   addDonation(String title, String location, String date) {}
 
   addContact(String name, String contactNumber) {}
+
+  addDonationEvent(DonationEvent de) {}
 }
 
