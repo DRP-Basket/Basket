@@ -14,15 +14,19 @@ class DonorStatsPage extends StatefulWidget {
 class _DonorStatsPageState extends State<DonorStatsPage>
     with TickerProviderStateMixin {
   late AnimationController controller;
-  Rank rank = Rank.CHALLENGER;
+  late Rank rank;
+  late double progressPercent;
+  int donations = 60;
 
   @override
   void initState() {
+    rank = getRank(donations);
+    progressPercent = getProgressPercent(rank, donations);
     controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
     )..addListener(() {
-        if (controller.value > 0.7) {
+        if (controller.value > progressPercent) {
           controller.stop();
         }
         setState(() {});
@@ -43,25 +47,96 @@ class _DonorStatsPageState extends State<DonorStatsPage>
       appBar: AppBar(
         title: const Text('Donor Stats'),
       ),
-      body: Center(
-        child: Column(
-          children: <Widget>[
-            SizedBox(
-              height: 10.0,
-            ),
-            CircularPercentIndicator(
-              percent: controller.value,
-              lineWidth: 13.0,
-              progressColor: rankColor[rank],
-              backgroundColor: Colors.grey,
-              radius: 200.0,
-              center: SizedBox(
-                height: 150.0,
-                width: 150.0,
-                child: Image.asset(getImagePath(rank)),
+      body: Padding(
+        padding: EdgeInsets.all(
+          30.0,
+        ),
+        child: Center(
+          child: Column(
+            children: <Widget>[
+              Text(
+                "Rank",
+                style: new TextStyle(
+                  decoration: TextDecoration.underline,
+                  fontSize: 30.0,
+                ),
               ),
-            ),
-          ],
+              SizedBox(
+                height: 15.0,
+              ),
+              CircularPercentIndicator(
+                percent: controller.value,
+                lineWidth: 13.0,
+                progressColor: rankColor[rank],
+                backgroundColor: Colors.grey,
+                radius: 200.0,
+                circularStrokeCap: CircularStrokeCap.round,
+                center: SizedBox(
+                  height: 150.0,
+                  width: 150.0,
+                  child: Image.asset(getImagePath(rank)),
+                ),
+                footer: Padding(
+                  padding: EdgeInsets.only(
+                    top: 20.0,
+                  ),
+                  child: Text(
+                    rankString[rank]!.toUpperCase(),
+                    style: new TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17.0,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 15.0,
+              ),
+              Text(
+                "Statistics",
+                style: new TextStyle(
+                  decoration: TextDecoration.underline,
+                  fontSize: 17.0,
+                ),
+              ),
+              SizedBox(
+                height: 20.0,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Orders made: "),
+                  Text(donations.toString()),
+                ],
+              ),
+              SizedBox(
+                height: 15.0,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Orders for next rank: "),
+                  Text(
+                    getAmountNeededForNextPoint(rank, donations).toString(),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 15.0,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Next rank: "),
+                  Text(
+                    nextRank(rank) != null
+                        ? rankString[nextRank(rank)]!.toUpperCase()
+                        : "Max rank reached",
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
       backgroundColor: Colors.white,
