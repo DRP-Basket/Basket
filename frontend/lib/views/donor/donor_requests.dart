@@ -1,55 +1,56 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:drp_basket_app/locator.dart';
-import 'package:drp_basket_app/views/donor/donor_drawer.dart';
+import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:drp_basket_app/views/donor/donor_respond.dart';
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 
 class DonorRequests extends StatefulWidget {
   static const id = "/donorRequests";
-  final String curUID;
-  const DonorRequests(this.curUID, {Key? key}) : super(key: key);
+  const DonorRequests({Key? key}) : super(key: key);
 
   @override
   _DonorRequestsState createState() => _DonorRequestsState();
 }
 
 class _DonorRequestsState extends State<DonorRequests> {
+  late final String curUID;
+
+  @override
+  void initState() {
+    super.initState();
+    curUID = locator<UserController>().curUser()!.uid;
+  }
+
   @override
   Widget build(BuildContext context) {
     final Stream<QuerySnapshot> _requestStream =
         locator<FirebaseFirestoreInterface>()
             .getCollection("donors")
-            .doc(widget.curUID)
+            .doc(curUID)
             .collection("requests")
             .snapshots();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Requests"),
-      ),
-      drawer: DonorDrawer(),
-      body: StreamBuilder(
-        stream: _requestStream,
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (!snapshot.hasData) {
-            return Center(
-              child: CircularProgressIndicator(
-                backgroundColor: Colors.lightBlueAccent,
-              ),
-            );
-          }
-          List<Widget> reqs = [];
-          var data = snapshot.data!.docs;
-          for (var i = 0; i < data.length; i++) {
-            var info = data[i].data();
-            reqs.add(_buildCard(
-                info["name"], info["message"], info["status"], data[i].id));
-          }
-          return ListView(children: reqs);
-        },
-      ),
+    return StreamBuilder(
+      stream: _requestStream,
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if (!snapshot.hasData) {
+          return Center(
+            child: CircularProgressIndicator(
+              backgroundColor: Colors.lightBlueAccent,
+            ),
+          );
+        }
+        List<Widget> reqs = [];
+        var data = snapshot.data!.docs;
+        for (var i = 0; i < data.length; i++) {
+          var info = data[i].data();
+          reqs.add(_buildCard(
+              info["name"], info["message"], info["status"], data[i].id));
+        }
+        return ListView(children: reqs);
+      },
     );
   }
 
@@ -75,8 +76,8 @@ class _DonorRequestsState extends State<DonorRequests> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => Provider<RequestModel>(
-                      create: (context) => RequestModel(
-                          name, message, status, widget.curUID, reqID),
+                      create: (context) =>
+                          RequestModel(name, message, status, curUID, reqID),
                       child: DonorRespond()),
                 ));
           },

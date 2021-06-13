@@ -44,7 +44,7 @@ class HomePage extends StatelessWidget {
             text: "Donor",
             onPressed: () async {
               locator<UserController>().testLogInWithEmailAndPassword();
-              Navigator.pushNamed(context, DonorHomePage.id);
+              Navigator.pushReplacementNamed(context, DonorHomePage.id);
             },
             backgroundColor: Colors.blueAccent,
             textColor: Colors.white,

@@ -3,7 +3,6 @@ import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:flutter/material.dart';
 
 import '../../locator.dart';
-import 'donor_drawer.dart';
 
 class DonorProfilePage extends StatelessWidget {
   static const String id = "DonorProfilePage";
@@ -12,57 +11,51 @@ class DonorProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     var curUser = locator<UserController>().curUser()!;
     var snapshot = locator<UserController>().donorFromID(curUser.uid);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Donor Profile Page'),
-      ),
-      drawer: DonorDrawer(),
-      body: Container(
-          padding: EdgeInsets.all(20),
-          child: Flexible(
-            child: Column(
-              children: [
-                FutureBuilder(
-                    future: _getImage(context, curUser.uid),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<ImageProvider> snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done)
-                        return CircleAvatar(
-                          radius: 60,
-                          foregroundImage: snapshot.data,
-                        );
+    return Container(
+        padding: EdgeInsets.all(20),
+        child: Flexible(
+          child: Column(
+            children: [
+              FutureBuilder(
+                  future: _getImage(context, curUser.uid),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<ImageProvider> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done)
+                      return CircleAvatar(
+                        radius: 60,
+                        foregroundImage: snapshot.data,
+                      );
 
-                      if (snapshot.connectionState == ConnectionState.waiting)
-                        return CircleAvatar(
-                          child: CircularProgressIndicator(),
-                        );
+                    if (snapshot.connectionState == ConnectionState.waiting)
+                      return CircleAvatar(
+                        child: CircularProgressIndicator(),
+                      );
 
-                      return CircleAvatar();
-                    }),
-                FutureBuilder(
-                    future: snapshot,
-                    builder: (BuildContext context,
-                        AsyncSnapshot<DocumentSnapshot> snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done) {
-                        Map<String, dynamic> data =
-                            snapshot.data!.data()! as Map<String, dynamic>;
-                        return Container(
-                          child: Column(
-                            children: [
-                              accountInfo('Name', data['name']),
-                              accountInfo('Email', curUser.email!),
-                              accountInfo(
-                                  'Contact Number', data['contact_number']),
-                            ],
-                          ),
-                        );
-                      }
-                      return Container();
-                    })
-              ],
-            ),
-          )),
-    );
+                    return CircleAvatar();
+                  }),
+              FutureBuilder(
+                  future: snapshot,
+                  builder: (BuildContext context,
+                      AsyncSnapshot<DocumentSnapshot> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      Map<String, dynamic> data =
+                          snapshot.data!.data()! as Map<String, dynamic>;
+                      return Container(
+                        child: Column(
+                          children: [
+                            accountInfo('Name', data['name']),
+                            accountInfo('Email', curUser.email!),
+                            accountInfo(
+                                'Contact Number', data['contact_number']),
+                          ],
+                        ),
+                      );
+                    }
+                    return Container();
+                  })
+            ],
+          ),
+        ));
   }
 
   Future<ImageProvider> _getImage(BuildContext context, String image) async {

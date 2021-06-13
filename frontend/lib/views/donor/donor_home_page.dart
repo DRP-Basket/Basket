@@ -2,10 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/constants.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:drp_basket_app/locator.dart';
+import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:drp_basket_app/views/donor/donor_add_item.dart';
+import 'package:drp_basket_app/views/donor/donor_profile_page.dart';
+import 'package:drp_basket_app/views/donor/donor_requests.dart';
+import 'package:drp_basket_app/views/home_page.dart';
 import 'package:flutter/material.dart';
-
-import 'donor_drawer.dart';
 
 class DonorHomePage extends StatefulWidget {
   static const String id = "DonorHomePage";
@@ -17,67 +19,119 @@ class DonorHomePage extends StatefulWidget {
 }
 
 class _DonorHomePageState extends State<DonorHomePage> {
+  final List<String> _titles = [
+    "Donation Listings",
+    "Charity Requests",
+    "Vincent's Store", // DONOR NAME
+  ];
+
+  final List<Widget> _widgets = [];
+
   @override
   void initState() {
     super.initState();
+    _widgets.add(DonorHomePage());
+    _widgets.add(DonorRequests());
+    _widgets.add(DonorProfilePage());
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
+  int _currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: Text("Donations"),
+        title: Text(_titles[_currentIndex]),
+        toolbarHeight: MediaQuery.of(context).size.height / 12,
+        actions: _currentIndex == 2
+            ? [
+                IconButton(
+                  onPressed: () {
+                    locator<UserController>().userSignOut();
+                    Navigator.pushReplacementNamed(context, HomePage.id);
+                  },
+                  icon: Icon(Icons.logout),
+                )
+              ]
+            : [],
       ),
-      drawer: DonorDrawer(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => DonorAddItem()));
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.grey[200],
+        selectedItemColor: secondary_color,
+        currentIndex: _currentIndex,
+        iconSize: 26,
+        selectedFontSize: 15,
+        selectedIconTheme: IconThemeData(size: 30),
+        items: [
+          BottomNavigationBarItem(
+            label: "Donations",
+            icon: Icon(Icons.favorite_outline_rounded),
+          ),
+          BottomNavigationBarItem(
+            label: "Requests",
+            icon: Icon(Icons.food_bank_outlined),
+          ),
+          BottomNavigationBarItem(
+            label: "Profile",
+            icon: Icon(Icons.store_outlined),
+          ),
+        ],
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
         },
-        child: Icon(Icons.add),
-        backgroundColor: secondary_color,
       ),
-      body: StreamBuilder(
-          stream: locator<FirebaseFirestoreInterface>()
-              .getCollection("restaurants")
-              .doc("vincent's store")
-              .snapshots(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return Center(
-                child: CircularProgressIndicator(
-                  backgroundColor: Colors.lightBlueAccent,
-                ),
-              );
-            } else {
-              final foodDS = (snapshot.data as DocumentSnapshot);
-              final foodMap = (foodDS.data() as Map<String, dynamic>);
-              List<Widget> foodItems = [];
-              for (var food in foodMap.keys) {
-                foodItems.add(Card(
-                  child: Container(
-                    padding: EdgeInsets.all(20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(food),
-                        Text(foodMap[food].toString()),
-                      ],
-                    ),
-                  ),
-                ));
-              }
-              return ListView(
-                children: foodItems,
-              );
-            }
-          }),
+      floatingActionButton: _currentIndex == 0
+          ? FloatingActionButton(
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => DonorAddItem()));
+              },
+              child: Icon(Icons.add),
+              backgroundColor: secondary_color,
+            )
+          : null,
+      body: _widgets[_currentIndex],
     );
+  }
+
+  Widget DonorHomePage() {
+    return StreamBuilder(
+        stream: locator<FirebaseFirestoreInterface>()
+            .getCollection("restaurants")
+            .doc("vincent's store")
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return Center(
+              child: CircularProgressIndicator(
+                backgroundColor: Colors.lightBlueAccent,
+              ),
+            );
+          } else {
+            final foodDS = (snapshot.data as DocumentSnapshot);
+            final foodMap = (foodDS.data() as Map<String, dynamic>);
+            List<Widget> foodItems = [];
+            for (var food in foodMap.keys) {
+              foodItems.add(Card(
+                child: Container(
+                  padding: EdgeInsets.all(20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(food),
+                      Text(foodMap[food].toString()),
+                    ],
+                  ),
+                ),
+              ));
+            }
+            return ListView(
+              children: foodItems,
+            );
+          }
+        });
   }
 }
