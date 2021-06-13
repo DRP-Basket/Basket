@@ -106,7 +106,7 @@ class _DonorRequestsState extends State<DonorRequests> {
 class RequestModel {
   final String name;
   final String message;
-  final String status;
+  String status;
   final String curUID;
   final String reqID;
 

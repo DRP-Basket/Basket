@@ -12,24 +12,15 @@ class DonorRespond extends StatefulWidget {
 }
 
 class _DonorRespondState extends State<DonorRespond> {
-  late String status;
-  late String name;
-  late String message;
-  late String curUID;
-  late String reqID;
+  late RequestModel requestModel;
 
   @override
   Widget build(BuildContext context) {
-    RequestModel requestModel = Provider.of(context);
-    status = requestModel.status;
-    name = requestModel.name;
-    message = requestModel.message;
-    curUID = requestModel.curUID;
-    reqID = requestModel.reqID;
+    requestModel = Provider.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(name),
+        title: Text(requestModel.name),
       ),
       body: Container(
         child: _message(),
@@ -48,7 +39,7 @@ class _DonorRespondState extends State<DonorRespond> {
           padding: EdgeInsets.only(top: 10),
         ),
         Container(
-          child: Text(message, style: TextStyle(fontSize: 16)),
+          child: Text(requestModel.message, style: TextStyle(fontSize: 16)),
           padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         ),
         _statusText(),
@@ -59,7 +50,7 @@ class _DonorRespondState extends State<DonorRespond> {
 
   Widget _statusText() {
     List<TextSpan> children = [];
-    if (status == "pending") {
+    if (requestModel.status == "pending") {
       children.add(TextSpan(
           text: "pending",
           style: TextStyle(color: Colors.orange[800], fontSize: 20)));
@@ -79,7 +70,7 @@ class _DonorRespondState extends State<DonorRespond> {
 
   Widget _getButtonBar() {
     List<Widget> children = [];
-    if (status == "pending") {
+    if (requestModel.status == "pending") {
       children.add(ElevatedButton(onPressed: null, child: Text("Delete")));
       children.add(ElevatedButton(
         onPressed: () {
@@ -110,15 +101,20 @@ class _DonorRespondState extends State<DonorRespond> {
   void _statusTap(bool confirm) async {
     final DocumentReference ref = FirebaseFirestore.instance
         .collection("donors")
-        .doc(curUID)
+        .doc(requestModel.curUID)
         .collection("requests")
-        .doc(reqID);
+        .doc(requestModel.reqID);
+    String newStatus;
     if (confirm) {
-      await ref.update({"status": "confirmed"}).catchError(
-          (error) => print(error.toString()));
+      newStatus = "confirmed";
     } else {
-      await ref.update({"status": "pending"}).catchError(
-          (error) => print(error.toString()));
+      newStatus = "pending";
     }
+    await ref
+        .update({"status": newStatus})
+        .then((value) => setState(() {
+              requestModel.status = newStatus;
+            }))
+        .catchError((error) => print(error.toString()));
   }
 }
