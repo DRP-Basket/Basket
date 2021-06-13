@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:drp_basket_app/locator.dart';
 import 'package:drp_basket_app/sms_controller/sms_controller.dart';
+import 'package:drp_basket_app/views/charity/charity_event_page.dart';
 import 'package:flutter/material.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:intl/intl.dart';
@@ -19,14 +20,14 @@ class CharityDonationPage extends StatefulWidget {
 }
 
 class _CharityDonationPageState extends State<CharityDonationPage> {
-
   String donationEventMsg(Map<String, dynamic> donation) {
     return 'Donation Event Happening!\n\'Event Name: ${donation['title']}\nEvent Location: ${donation['location']}\nEvent Time: ${donation['date']}';
   }
 
   void sendSMS(donationID, donationMap) async {
     String donationMessage = donationEventMsg(donationMap);
-    bool success = await locator<SMSController>().sendSMS(donationID, msgContent: donationMessage);
+    bool success = await locator<SMSController>()
+        .sendSMS(donationID, msgContent: donationMessage);
     if (success) {
       Alert(
           context: context,
@@ -65,12 +66,13 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
     return Scaffold(
       appBar: AppBar(title: Text("Donation Events")),
       drawer: CharityDrawer(),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => DonationEventForm()));
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => DonationEventForm()));
         },
-        child: Icon(Icons.add),
+        label: Text("Add Item"),
+        icon: Icon(Icons.add),
       ),
       body: StreamBuilder(
           stream: locator<FirebaseFirestoreInterface>().getDonationList(),
@@ -87,9 +89,9 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
             }
             if (!snapshot.hasData) {
               return Center(
-                  child: CircularProgressIndicator(
-                    backgroundColor: Colors.lightBlueAccent,
-                  ),
+                child: CircularProgressIndicator(
+                  backgroundColor: Colors.lightBlueAccent,
+                ),
               );
             }
             var donations = snapshot.data!.docs;
@@ -100,31 +102,40 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
                 String name = donation['event_name'];
                 String location = donation['event_location'];
                 DateTime dateTime = donation['event_date_time'].toDate();
-                return Card(
-                  child: Container(
-                    padding: EdgeInsets.all(20),
-                    child: Column(
-                      children: [
-                        Text(
-                          name,
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
+                return GestureDetector(
+                  onTap: () => {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => CharityEventPage(
+                                donationID: donationID, donationMap: donation)))
+                  },
+                  child: Card(
+                    child: Container(
+                      padding: EdgeInsets.all(20),
+                      child: Column(
+                        children: [
+                          Text(
+                            name,
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        ListTile(
-                          title: Text('Date And Time'),
-                          subtitle: Text(DateFormat.yMMMd().add_jm().format(dateTime)),
-                        ),
-                        ListTile(
-                          title: Text('Location'),
-                          subtitle: Text(location),
-                        ),
-                        ElevatedButton(
-                          child: Text('Notify Receivers'),
-                          onPressed: () => sendSMS(donationID, donation)
-                        ),
-                      ],
+                          ListTile(
+                            title: Text('Date And Time'),
+                            subtitle: Text(
+                                DateFormat.yMMMd().add_jm().format(dateTime)),
+                          ),
+                          ListTile(
+                            title: Text('Location'),
+                            subtitle: Text(location),
+                          ),
+                          ElevatedButton(
+                              child: Text('Notify Receivers'),
+                              onPressed: () => sendSMS(donationID, donation)),
+                        ],
+                      ),
                     ),
                   ),
                 );

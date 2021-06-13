@@ -176,4 +176,24 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
         .catchError((err) => print("Failed to add receiver: $err"));
   
   }
+
+  Stream<Object> getPendingList(String donationEventID) {
+    return _fireStore
+        .collection("charities")
+        .doc("ex-charity")
+        .collection("donation_events")
+        .doc(donationEventID)
+        .collection("pending")
+        .snapshots();
+  }
+
+  Stream<Object> getConfirmedList(String donationEventID) {
+    return _fireStore
+        .collection("charities")
+        .doc("ex-charity")
+        .collection("donation_events")
+        .doc(donationEventID)
+        .collection("confirmed")
+        .snapshots();
+  }
 }
