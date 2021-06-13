@@ -7,7 +7,9 @@ import 'package:drp_basket_app/views/donor/donor_add_item.dart';
 import 'package:drp_basket_app/views/donor/donor_profile_page.dart';
 import 'package:drp_basket_app/views/donor/donor_requests.dart';
 import 'package:drp_basket_app/views/home_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class DonorHomePage extends StatefulWidget {
   static const String id = "DonorHomePage";
@@ -22,10 +24,12 @@ class _DonorHomePageState extends State<DonorHomePage> {
   final List<String> _titles = [
     "Donation Listings",
     "Charity Requests",
-    "Vincent's Store", // DONOR NAME
+    "Vincent's Store", // TODO: DONOR NAME
   ];
-
   final List<Widget> _widgets = [];
+  int _currentIndex = 0;
+  late User curUser;
+  late final DonorInformationModel donorInformationModel;
 
   @override
   void initState() {
@@ -33,9 +37,12 @@ class _DonorHomePageState extends State<DonorHomePage> {
     _widgets.add(DonorHomePage());
     _widgets.add(DonorRequests());
     _widgets.add(DonorProfilePage());
-  }
+    curUser = locator<UserController>().curUser()!;
 
-  int _currentIndex = 0;
+    // TODO: LINK TO FIREBASE ACCOUNT
+    donorInformationModel = DonorInformationModel(
+        curUser.uid, "Vincent", "vincent@basket.com", "0123456789");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +100,9 @@ class _DonorHomePageState extends State<DonorHomePage> {
               backgroundColor: secondary_color,
             )
           : null,
-      body: _widgets[_currentIndex],
+      body: Provider<DonorInformationModel>(
+          create: (context) => donorInformationModel,
+          child: _widgets[_currentIndex]),
     );
   }
 
@@ -133,5 +142,19 @@ class _DonorHomePageState extends State<DonorHomePage> {
             );
           }
         });
+  }
+}
+
+class DonorInformationModel {
+  final String uid;
+  final String name;
+  final String email;
+  final String contactNumber;
+  ImageProvider? imageProvider = null;
+
+  DonorInformationModel(this.uid, this.name, this.email, this.contactNumber);
+
+  void updateImage(ImageProvider imageProvider) {
+    this.imageProvider = imageProvider;
   }
 }
