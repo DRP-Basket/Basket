@@ -26,4 +26,6 @@ class FirebaseFirestoreInterface {
   addContact(String name, String contactNumber) {}
 
   getCollection(String collectionName) {}
+
+  getDonation() {}
 }

@@ -147,4 +147,11 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
   CollectionReference getCollection(String collectionName) {
     return _fireStore.collection(collectionName);
   }
+
+  Future<int> getDonation() async {
+    DocumentSnapshot ds =
+    await _fireStore.collection("donors").doc("testing_donor").get();
+    int donations = ((ds.data() as Map<String, dynamic>)["donations"] as int);
+    return donations;
+  }
 }

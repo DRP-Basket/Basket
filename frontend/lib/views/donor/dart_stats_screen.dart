@@ -1,4 +1,7 @@
+import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
+import 'package:drp_basket_app/locator.dart';
 import 'package:drp_basket_app/views/donor/rank.dart';
+import 'package:drp_basket_app/views/donor/rank_explaination_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
@@ -16,11 +19,14 @@ class _DonorStatsPageState extends State<DonorStatsPage>
   late AnimationController controller;
   late Rank rank;
   late double progressPercent;
-  int donations = 60;
+  late int donations;
+  bool loading = true;
 
-  @override
-  void initState() {
+  void initDonation() async {
+    // TODO when implemented login stuff, use user controller to get stats
+    donations = await locator<FirebaseFirestoreInterface>().getDonation();
     rank = getRank(donations);
+    loading = false;
     progressPercent = getProgressPercent(rank, donations);
     controller = AnimationController(
       vsync: this,
@@ -32,6 +38,11 @@ class _DonorStatsPageState extends State<DonorStatsPage>
         setState(() {});
       });
     controller.forward();
+  }
+
+  @override
+  void initState() {
+    initDonation();
     super.initState();
   }
 
@@ -47,98 +58,113 @@ class _DonorStatsPageState extends State<DonorStatsPage>
       appBar: AppBar(
         title: const Text('Donor Stats'),
       ),
-      body: Padding(
-        padding: EdgeInsets.all(
-          30.0,
-        ),
-        child: Center(
-          child: Column(
-            children: <Widget>[
-              Text(
-                "Rank",
-                style: new TextStyle(
-                  decoration: TextDecoration.underline,
-                  fontSize: 30.0,
-                ),
+      body: loading
+          ? Center(
+              child: CircularProgressIndicator(
+                backgroundColor: Colors.lightBlueAccent,
               ),
-              SizedBox(
-                height: 15.0,
+            )
+          : Padding(
+              padding: EdgeInsets.all(
+                30.0,
               ),
-              CircularPercentIndicator(
-                percent: controller.value,
-                lineWidth: 13.0,
-                progressColor: rankColor[rank],
-                backgroundColor: Colors.grey,
-                radius: 200.0,
-                circularStrokeCap: CircularStrokeCap.round,
-                center: SizedBox(
-                  height: 150.0,
-                  width: 150.0,
-                  child: Image.asset(getImagePath(rank)),
-                ),
-                footer: Padding(
-                  padding: EdgeInsets.only(
-                    top: 20.0,
-                  ),
-                  child: Text(
-                    rankString[rank]!.toUpperCase(),
-                    style: new TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 17.0,
+              child: Center(
+                child: Column(
+                  children: <Widget>[
+                    Text(
+                      "Rank",
+                      style: new TextStyle(
+                        decoration: TextDecoration.underline,
+                        fontSize: 30.0,
+                      ),
                     ),
-                  ),
+                    SizedBox(
+                      height: 15.0,
+                    ),
+                    GestureDetector(
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => RankExplanationScreen(),
+                        ),
+                      ),
+                      child: CircularPercentIndicator(
+                        percent: controller.value,
+                        lineWidth: 13.0,
+                        progressColor: rankColor[rank],
+                        backgroundColor: Colors.grey,
+                        radius: 200.0,
+                        circularStrokeCap: CircularStrokeCap.round,
+                        center: SizedBox(
+                          height: 150.0,
+                          width: 150.0,
+                          child: Image.asset(getImagePath(rank)),
+                        ),
+                        footer: Padding(
+                          padding: EdgeInsets.only(
+                            top: 20.0,
+                          ),
+                          child: Text(
+                            rankString[rank]!.toUpperCase(),
+                            style: new TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 17.0,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 15.0,
+                    ),
+                    Text(
+                      "Statistics",
+                      style: new TextStyle(
+                        decoration: TextDecoration.underline,
+                        fontSize: 17.0,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20.0,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Orders made: "),
+                        Text(donations.toString()),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 15.0,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Orders for next rank: "),
+                        Text(
+                          getAmountNeededForNextPoint(rank, donations)
+                              .toString(),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 15.0,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Next rank: "),
+                        Text(
+                          nextRank(rank) != null
+                              ? rankString[nextRank(rank)]!.toUpperCase()
+                              : "Max rank reached",
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-              SizedBox(
-                height: 15.0,
-              ),
-              Text(
-                "Statistics",
-                style: new TextStyle(
-                  decoration: TextDecoration.underline,
-                  fontSize: 17.0,
-                ),
-              ),
-              SizedBox(
-                height: 20.0,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Orders made: "),
-                  Text(donations.toString()),
-                ],
-              ),
-              SizedBox(
-                height: 15.0,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Orders for next rank: "),
-                  Text(
-                    getAmountNeededForNextPoint(rank, donations).toString(),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 15.0,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Next rank: "),
-                  Text(
-                    nextRank(rank) != null
-                        ? rankString[nextRank(rank)]!.toUpperCase()
-                        : "Max rank reached",
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
+            ),
       backgroundColor: Colors.white,
     );
   }
