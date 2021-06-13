@@ -1,23 +1,31 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
+import 'package:drp_basket_app/views/donor/donor_home_page.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../locator.dart';
 
-class DonorProfilePage extends StatelessWidget {
+class DonorProfilePage extends StatefulWidget {
   static const String id = "DonorProfilePage";
 
   @override
+  _DonorProfilePageState createState() => _DonorProfilePageState();
+}
+
+class _DonorProfilePageState extends State<DonorProfilePage> {
+  late DonorInformationModel donorInformationModel;
+
+  @override
   Widget build(BuildContext context) {
-    var curUser = locator<UserController>().curUser()!;
-    var snapshot = locator<UserController>().donorFromID(curUser.uid);
+    donorInformationModel = Provider.of<DonorInformationModel>(context);
+
     return Container(
-        padding: EdgeInsets.all(20),
-        child: Flexible(
-          child: Column(
-            children: [
-              FutureBuilder(
-                  future: _getImage(context, curUser.uid),
+      padding: EdgeInsets.all(20),
+      child: Column(
+        children: [
+          donorInformationModel.imageProvider == null
+              ? FutureBuilder(
+                  future: _getImage(context, donorInformationModel),
                   builder: (BuildContext context,
                       AsyncSnapshot<ImageProvider> snapshot) {
                     if (snapshot.connectionState == ConnectionState.done)
@@ -32,47 +40,39 @@ class DonorProfilePage extends StatelessWidget {
                       );
 
                     return CircleAvatar();
-                  }),
-              FutureBuilder(
-                  future: snapshot,
-                  builder: (BuildContext context,
-                      AsyncSnapshot<DocumentSnapshot> snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      Map<String, dynamic> data =
-                          snapshot.data!.data()! as Map<String, dynamic>;
-                      return Container(
-                        child: Column(
-                          children: [
-                            accountInfo('Name', data['name']),
-                            accountInfo('Email', curUser.email!),
-                            accountInfo(
-                                'Contact Number', data['contact_number']),
-                          ],
-                        ),
-                      );
-                    }
-                    return Container();
                   })
-            ],
-          ),
-        ));
+              : CircleAvatar(
+                  radius: 60,
+                  foregroundImage: donorInformationModel.imageProvider,
+                ),
+          Container(
+            child: Column(
+              children: [
+                accountInfo('Name', donorInformationModel.name),
+                accountInfo('Email', donorInformationModel.email),
+                accountInfo(
+                    'Contact Number', donorInformationModel.contactNumber),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
   }
 
-  Future<ImageProvider> _getImage(BuildContext context, String image) async {
-    ImageProvider m = NetworkImage(
-        'https://i.pinimg.com/originals/59/54/b4/5954b408c66525ad932faa693a647e3f.jpg');
+  Future<ImageProvider> _getImage(
+      BuildContext context, DonorInformationModel donorInformationModel) async {
+    String downloadUrl;
     try {
-      await locator<UserController>()
-          .loadFromStorage(context, image)
-          .then((downloadUrl) {
-        m = NetworkImage(
-          downloadUrl.toString(),
-        );
-      });
+      downloadUrl = await locator<UserController>()
+          .loadFromStorage(context, donorInformationModel.uid);
     } catch (err) {
-      print("Error loading picture");
+      downloadUrl =
+          "https://i.pinimg.com/originals/59/54/b4/5954b408c66525ad932faa693a647e3f.jpg";
     }
-    return m;
+    ImageProvider imageProvider = NetworkImage(downloadUrl);
+    donorInformationModel.updateImage(imageProvider);
+    return imageProvider;
   }
 
   Widget accountInfo(String category, String info) {
