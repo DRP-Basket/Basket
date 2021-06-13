@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../locator.dart';
 import 'charity_drawer.dart';
+import 'receiver.dart';
 
 class ContactListPage extends StatefulWidget {
   static const String id = "ContactListPage";
@@ -16,7 +17,6 @@ class ContactListPage extends StatefulWidget {
 }
 
 class _ContactListPageState extends State<ContactListPage> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,7 +31,8 @@ class _ContactListPageState extends State<ContactListPage> {
       ),
       body: StreamBuilder(
           stream: locator<FirebaseFirestoreInterface>().getContactList(),
-          builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          builder:
+              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (!snapshot.hasData) {
               return Center(
                 child: CircularProgressIndicator(
@@ -42,20 +43,27 @@ class _ContactListPageState extends State<ContactListPage> {
               var receivers = snapshot.data!.docs;
               return ListView(
                 children: receivers.map((DocumentSnapshot ds) {
-                  var receiver = ds.data() as Map<String, dynamic>; 
+                  var receiverID = ds.reference.id;
+                  var receiver = ds.data() as Map<String, dynamic>;
                   String name = receiver['name'];
                   String contact = receiver['contact'];
                   String location = receiver['location'];
-                  List<dynamic> donationsClaimed = receiver['donations_claimed'];
-                  return Card(
-                    child: Container(
-                      padding: EdgeInsets.all(20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(name),
-                          Text(contact),
-                        ],
+                  List<dynamic> donationsClaimed =
+                      receiver['donations_claimed'];
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (ctx) => ReceiverPage(receiverID)));
+                    },
+                    child: Card(
+                      child: Container(
+                        padding: EdgeInsets.all(20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(name),
+                            Text(contact),
+                          ],
+                        ),
                       ),
                     ),
                   );

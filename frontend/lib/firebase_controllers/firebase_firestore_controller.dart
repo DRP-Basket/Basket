@@ -89,7 +89,11 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
   }
 
   Stream<Object> getContactList() {
-    return _fireStore.collection("charities").doc("ex-charity").collection("receivers_list").snapshots();
+    return _fireStore
+        .collection("charities")
+        .doc("ex-charity")
+        .collection("receivers_list")
+        .snapshots();
   }
 
   Future<List> getContactMap() async {
@@ -172,8 +176,20 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
           'location': receiver.location,
           'donations_claimed': [],
         })
-        .then((value) => print('Receiver Added')) //TODO : implement front end warning
+        .then((value) =>
+            print('Receiver Added')) //TODO : implement front end warning
         .catchError((err) => print("Failed to add receiver: $err"));
-  
+  }
+
+  DocumentReference<Map<String, dynamic>> getCurrentCharity() {
+    return _fireStore.collection('charities').doc('ex-charity');
+  }
+
+  Stream<DocumentSnapshot<Map<String, dynamic>>> getReceiver(String id) {
+    return getCurrentCharity().collection('receivers_list').doc(id).snapshots();
+  }
+
+  Stream<DocumentSnapshot<Map<String, dynamic>>> getDonationEvent(String id) {
+    return getCurrentCharity().collection('donation_events').doc(id).snapshots();
   }
 }

@@ -31,5 +31,9 @@ class FirebaseFirestoreInterface {
   addDonationEvent(DonationEvent de) {}
 
   addReceiver(Receiver receiverToAdd) {}
+
+  getReceiver(String id) {}
+  
+  getDonationEvent(String id) {}
 }
 
