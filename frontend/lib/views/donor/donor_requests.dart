@@ -55,34 +55,33 @@ class _DonorRequestsState extends State<DonorRequests> {
   }
 
   Widget _buildCard(String name, String message, String status, String reqID) {
-    return Card(
-      child: ListTile(
-        leading: _getIconFromStatus(status),
-        title: Text(
-          name,
-          style: TextStyle(fontSize: 21),
-        ),
-        subtitle: Padding(
-          padding: EdgeInsets.only(top: 5),
-          child: Text(
-            message,
-            style: TextStyle(fontSize: 14),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Provider<RequestModel>(
+                  create: (context) =>
+                      RequestModel(name, message, status, curUID, reqID),
+                  child: DonorRespond()),
+            ));
+      },
+      child: Card(
+        child: ListTile(
+          leading: _getIconFromStatus(status),
+          title: Text(
+            name,
+            style: TextStyle(fontSize: 21),
           ),
+          subtitle: Padding(
+            padding: EdgeInsets.only(top: 5),
+            child: Text(
+              message,
+              style: TextStyle(fontSize: 14),
+            ),
+          ),
+          isThreeLine: true,
         ),
-        trailing: IconButton(
-          icon: Icon(Icons.more_horiz),
-          onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => Provider<RequestModel>(
-                      create: (context) =>
-                          RequestModel(name, message, status, curUID, reqID),
-                      child: DonorRespond()),
-                ));
-          },
-        ),
-        isThreeLine: true,
       ),
     );
   }
