@@ -1,18 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/constants.dart';
+import 'package:drp_basket_app/views/donor/donor_requests.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class DonorRespond extends StatefulWidget {
-  final String name;
-  final String message;
-  final int index;
-  final Function getStatus;
-  final String curUID;
-  final String reqID;
-  const DonorRespond(this.name, this.message, this.index, this.getStatus,
-      this.curUID, this.reqID,
-      {Key? key})
-      : super(key: key);
+  const DonorRespond({Key? key}) : super(key: key);
 
   @override
   _DonorRespondState createState() => _DonorRespondState();
@@ -20,18 +13,23 @@ class DonorRespond extends StatefulWidget {
 
 class _DonorRespondState extends State<DonorRespond> {
   late String status;
-
-  @override
-  void initState() {
-    super.initState();
-    status = widget.getStatus(widget.index);
-  }
+  late String name;
+  late String message;
+  late String curUID;
+  late String reqID;
 
   @override
   Widget build(BuildContext context) {
+    RequestModel requestModel = Provider.of(context);
+    status = requestModel.status;
+    name = requestModel.name;
+    message = requestModel.message;
+    curUID = requestModel.curUID;
+    reqID = requestModel.reqID;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.name),
+        title: Text(name),
       ),
       body: Container(
         child: _message(),
@@ -50,7 +48,7 @@ class _DonorRespondState extends State<DonorRespond> {
           padding: EdgeInsets.only(top: 10),
         ),
         Container(
-          child: Text(widget.message, style: TextStyle(fontSize: 16)),
+          child: Text(message, style: TextStyle(fontSize: 16)),
           padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         ),
         _statusText(),
@@ -112,9 +110,9 @@ class _DonorRespondState extends State<DonorRespond> {
   void _statusTap(bool confirm) async {
     final DocumentReference ref = FirebaseFirestore.instance
         .collection("donors")
-        .doc(widget.curUID)
+        .doc(curUID)
         .collection("requests")
-        .doc(widget.reqID);
+        .doc(reqID);
     if (confirm) {
       await ref.update({"status": "confirmed"}).catchError(
           (error) => print(error.toString()));
@@ -122,8 +120,5 @@ class _DonorRespondState extends State<DonorRespond> {
       await ref.update({"status": "pending"}).catchError(
           (error) => print(error.toString()));
     }
-    setState(() {
-      status = widget.getStatus(widget.index);
-    });
   }
 }

@@ -4,6 +4,7 @@ import 'package:drp_basket_app/locator.dart';
 import 'package:drp_basket_app/views/donor/donor_drawer.dart';
 import 'package:drp_basket_app/views/donor/donor_respond.dart';
 import "package:flutter/material.dart";
+import "package:provider/provider.dart";
 
 class DonorRequests extends StatefulWidget {
   static const id = "/donorRequests";
@@ -15,8 +16,6 @@ class DonorRequests extends StatefulWidget {
 }
 
 class _DonorRequestsState extends State<DonorRequests> {
-  List<String> statuses = [];
-
   @override
   Widget build(BuildContext context) {
     final Stream<QuerySnapshot> _requestStream =
@@ -45,8 +44,8 @@ class _DonorRequestsState extends State<DonorRequests> {
           var data = snapshot.data!.docs;
           for (var i = 0; i < data.length; i++) {
             var info = data[i].data();
-            _changeStatus(info["status"], i);
-            reqs.add(_buildCard(info["name"], info["message"], data[i].id, i));
+            reqs.add(_buildCard(
+                info["name"], info["message"], info["status"], data[i].id));
           }
           return ListView(children: reqs);
         },
@@ -54,10 +53,10 @@ class _DonorRequestsState extends State<DonorRequests> {
     );
   }
 
-  Widget _buildCard(String name, String message, String reqID, int index) {
+  Widget _buildCard(String name, String message, String status, String reqID) {
     return Card(
       child: ListTile(
-        leading: _getIconFromStatus(statuses[index]),
+        leading: _getIconFromStatus(status),
         title: Text(
           name,
           style: TextStyle(fontSize: 21),
@@ -75,8 +74,10 @@ class _DonorRequestsState extends State<DonorRequests> {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => DonorRespond(
-                      name, message, index, _getStatus, widget.curUID, reqID),
+                  builder: (context) => Provider<RequestModel>(
+                      create: (context) => RequestModel(
+                          name, message, status, widget.curUID, reqID),
+                      child: DonorRespond()),
                 ));
           },
         ),
@@ -100,16 +101,14 @@ class _DonorRequestsState extends State<DonorRequests> {
       );
     }
   }
+}
 
-  void _changeStatus(String status, int index) {
-    if (index >= statuses.length) {
-      statuses.add(status);
-    } else {
-      statuses[index] = status;
-    }
-  }
+class RequestModel {
+  final String name;
+  final String message;
+  final String status;
+  final String curUID;
+  final String reqID;
 
-  String _getStatus(int index) {
-    return statuses[index];
-  }
+  RequestModel(this.name, this.message, this.status, this.curUID, this.reqID);
 }
