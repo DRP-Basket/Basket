@@ -9,8 +9,15 @@ class Receiver {
   final String name;
   final String contact;
   final String location;
+  final DateTime? lastClaimed;
 
-  Receiver(this.name, this.contact, this.location);
+  Receiver(this.name, this.contact, this.location, {this.lastClaimed: null});
+
+  static Receiver buildFromMap(Map<String, dynamic> rm) {
+    return Receiver(rm['name'], rm['contact'], rm['location'],
+        lastClaimed: rm['last_claimed']);
+  }
+
 }
 
 class ReceiverPage extends StatefulWidget {
@@ -23,6 +30,8 @@ class ReceiverPage extends StatefulWidget {
 }
 
 class _ReceiverPageState extends State<ReceiverPage> {
+  static DateFormat dateFormat = DateFormat('MMM d, y');
+
   final String id;
 
   _ReceiverPageState(this.id);
@@ -37,14 +46,11 @@ class _ReceiverPageState extends State<ReceiverPage> {
   }
 
   // Displays general receiver information - name, contact, location
-  Widget _receiverInfo(Map<String, dynamic> receiver) {
-    String name = receiver['name'];
-    String contact = receiver['contact'];
-    String location = receiver['location'];
+  Widget _receiverInfo(Receiver receiver) {
     return Column(
       children: [
         Text(
-          name,
+          receiver.name,
           style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),
@@ -52,10 +58,20 @@ class _ReceiverPageState extends State<ReceiverPage> {
           height: 15,
         ),
         Card(
-          child: ListTile(leading: Icon(Icons.call), title: Text(contact)),
+          child: ListTile(
+              leading: Icon(Icons.call), title: Text(receiver.contact)),
         ),
         Card(
-          child: ListTile(leading: Icon(Icons.home), title: Text(location)),
+          child: ListTile(
+              leading: Icon(Icons.home), title: Text(receiver.location)),
+        ),
+        Card(
+          child: ListTile(
+              leading: Icon(Icons.calendar_today_outlined),
+              title: Text('Last Claimed'),
+              subtitle: Text(receiver.lastClaimed == null
+                  ? ' - '
+                  : dateFormat.format(receiver.lastClaimed!))),
         ),
       ],
     );
@@ -100,7 +116,6 @@ class _ReceiverPageState extends State<ReceiverPage> {
 
   // Displays info about a single donation claimed by the receiver (event name + date)
   Widget _donationClaimed(String id) {
-    var dateFormat = DateFormat('MMM d, y');
     return StreamBuilder(
       stream: locator<FirebaseFirestoreInterface>().getDonationEvent(id),
       builder: (BuildContext ctx, AsyncSnapshot<DocumentSnapshot> snapshot) {
@@ -137,7 +152,8 @@ class _ReceiverPageState extends State<ReceiverPage> {
               ),
             );
           } else {
-            var receiver = snapshot.data!.data() as Map<String, dynamic>;
+            var receiverMap = snapshot.data!.data() as Map<String, dynamic>;
+            var receiver = Receiver.buildFromMap(receiverMap);
             return Scaffold(
               appBar: AppBar(),
               body: SingleChildScrollView(
