@@ -1,3 +1,6 @@
+import 'package:drp_basket_app/views/charity/donation_event.dart';
+import 'package:drp_basket_app/views/charity/receiver.dart';
+
 import '../user_type.dart';
 
 class FirebaseFirestoreInterface {
@@ -15,7 +18,7 @@ class FirebaseFirestoreInterface {
 
   assignNewRedeemCode(String redeemCode, String uid, String donationID) {}
 
-  getContactList() {}
+  getContactList({bool sortByLastClaimed: false}) {}
 
   getContactMap() {}
 
@@ -25,6 +28,19 @@ class FirebaseFirestoreInterface {
 
   addContact(String name, String contactNumber) {}
 
+  addDonationEvent(DonationEvent de) {}
+
+  addReceiver(Receiver receiverToAdd) {}
+
+  getReceiver(String id) {}
+
+  getDonationEvent(String id) {}
+
+  getDonationEventSnapshot(String donationEventID) {}
+
+  addContactToPending(String donationEventID, List contacts) {}
+
+  donationsClaimed(String receiverID) {}
   getCollection(String collectionName) {}
 
   getDonation() {}
