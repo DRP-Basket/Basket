@@ -154,6 +154,7 @@ class _ReceiverPageState extends State<ReceiverPage> {
             );
           } else {
             var receiverMap = snapshot.data!.data() as Map<String, dynamic>;
+            print(receiverMap);
             var receiver = Receiver.buildFromMap(receiverMap);
             return Scaffold(
               appBar: AppBar(),
