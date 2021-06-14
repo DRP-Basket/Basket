@@ -54,8 +54,7 @@ class DonorDrawer extends StatelessWidget {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                          DonorRequests(donor.uid)))
+                      builder: (BuildContext context) => DonorRequests()))
             },
           ),
           ListTile(

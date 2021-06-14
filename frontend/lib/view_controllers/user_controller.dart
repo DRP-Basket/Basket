@@ -12,7 +12,7 @@ import 'dart:io';
 import 'package:flutter/src/widgets/framework.dart';
 
 class UserController {
-  late UserCredential _currentUser;
+  UserCredential? _currentUser = null;
   FirebaseAuthInterface _firebaseAuthController =
       locator<FirebaseAuthInterface>();
   FirebaseStorageInterface _firebaseStorageController =
@@ -54,7 +54,7 @@ class UserController {
 
   final String _loginFailed = "Login failed";
 
-  void testLogInWithEmailAndPassword() async {
+  Future<void> testLogInWithEmailAndPassword() async {
     _currentUser = await _firebaseAuthController.loginWithEmailAndPassword(
         "donor@basket.com", "basket123");
   }
@@ -91,7 +91,7 @@ class UserController {
     if (containsImage) {
       File image = locator<ImagePickerController>().getImage();
       String destination =
-          cloudProfileFilePath[userType]! + "${_currentUser.user!.uid}";
+          cloudProfileFilePath[userType]! + "${_currentUser!.user!.uid}";
       try {
         await _firebaseStorageController.uploadFile(destination, image);
       } catch (exception) {
@@ -105,7 +105,7 @@ class UserController {
 
     try {
       await _firebaseFirestoreController.addNewUserInformation(
-          userType, _currentUser.user!.uid, name, contactNumber,
+          userType, _currentUser!.user!.uid, name, contactNumber,
           location: address);
       registerScreen.updateUISuccess();
     } catch (exception) {
@@ -116,19 +116,25 @@ class UserController {
   }
 
   Future<UserType> checkUserType() async {
-    return _firebaseFirestoreController.getUserType(_currentUser.user!.uid);
+    return _firebaseFirestoreController.getUserType(_currentUser!.user!.uid);
   }
 
   Future<List<Map<String, dynamic>>> getUserOrderAgainList() async {
     return await _firebaseFirestoreController
-        .getOrderAgainList(_currentUser.user!.uid);
+        .getOrderAgainList(_currentUser!.user!.uid);
   }
 
   Future<void> userSignOut() {
+    _currentUser = null;
     return _firebaseAuthController.signOut();
   }
 
-  User? curUser() => _currentUser.user;
+  User? curUser() {
+    if (_currentUser != null) {
+      return _currentUser!.user;
+    }
+    return null;
+  }
 
   Future<DocumentSnapshot<Map<String, dynamic>>> donorFromID(String id) =>
       _firebaseFirestoreController.donorFromID(id);
