@@ -142,10 +142,10 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
         .collection("donations");
     return donations
         .add({
-      'title': title,
-      'location': location,
-      'date': date,
-    })
+          'title': title,
+          'location': location,
+          'date': date,
+        })
         .then((value) => print('Donation Added'))
         .catchError((err) => print("Failed to add donation: $err"));
   }
@@ -170,10 +170,10 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
   // Currently unused
   Future<void> addContact(String name, String contactNumber) async {
     DocumentSnapshot ds =
-    await _fireStore.collection("charities").doc("ex-charity").get();
+        await _fireStore.collection("charities").doc("ex-charity").get();
 
     List contactList =
-    (ds.data() as Map<String, dynamic>)["contact_list"] as List;
+        (ds.data() as Map<String, dynamic>)["contact_list"] as List;
 
     QuerySnapshot foo = await _fireStore
         .collection("receivers")
@@ -240,5 +240,17 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
         .collection("donation_events")
         .doc(donationEventID)
         .snapshots();
+  }
+
+  @override
+  CollectionReference getCollection(String collectionName) {
+    return _fireStore.collection(collectionName);
+  }
+
+  Future<int> getDonation() async {
+    DocumentSnapshot ds =
+    await _fireStore.collection("donors").doc("testing_donor").get();
+    int donations = ((ds.data() as Map<String, dynamic>)["donations"] as int);
+    return donations;
   }
 }

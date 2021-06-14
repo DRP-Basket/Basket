@@ -41,4 +41,7 @@ class FirebaseFirestoreInterface {
   addContactToPending(String donationEventID, List contacts) {}
 
   donationsClaimed(String receiverID) {}
+  getCollection(String collectionName) {}
+
+  getDonation() {}
 }

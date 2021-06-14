@@ -95,6 +95,13 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
               );
             }
             var donations = snapshot.data!.docs;
+            donations.sort((a, b) {
+              var aData = a.data() as Map<String, dynamic>;
+              var bData = b.data() as Map<String, dynamic>;
+              DateTime aDate = DateTime.parse(aData["date"]);
+              DateTime bDate = DateTime.parse(bData["date"]);
+              return aDate.compareTo(bDate);
+            });
             return ListView(
               children: donations.map((DocumentSnapshot ds) {
                 var donationID = ds.reference.id;

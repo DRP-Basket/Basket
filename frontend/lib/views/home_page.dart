@@ -1,28 +1,25 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/components/long_button.dart';
-import 'package:drp_basket_app/firebase_controllers/firebase_auth_controller.dart';
+import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:drp_basket_app/locator.dart';
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:drp_basket_app/views/donor/donor_home_page.dart';
-import 'package:drp_basket_app/views/receivers/home_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'charity/charity_donation_page.dart';
+import 'donor/dart_stats_screen.dart';
 
 class HomePage extends StatelessWidget {
   static const String id = "HomePage";
-  final _fireStore = FirebaseFirestore.instance;
-  FirebaseAuthController _firebaseAuthController = FirebaseAuthController();
 
   HomePage({Key? key}) : super(key: key);
 
   Future<void> getName() async {
-    FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-    DocumentSnapshot ds =
-        await _fireStore.collection("testing").doc("testing").get();
+    DocumentSnapshot ds = await locator<FirebaseFirestoreInterface>()
+        .getCollection("testing")
+        .doc("testing")
+        .get();
     String name = (ds.data() as Map<String, dynamic>)["testing"];
-    print(name);
     // final user = _firebaseAuth.currentUser;
     // if (user != null) {
     //   print(user.email);
@@ -47,12 +44,8 @@ class HomePage extends StatelessWidget {
           LongButton(
             text: "Donor",
             onPressed: () async {
-              UserCredential userCredential = await _firebaseAuthController
-                  .loginWithEmailAndPassword("donor@basket.com", "basket123");
-              User? user = userCredential.user;
-              if (user != null) {
-                Navigator.pushNamed(context, DonorHomePage.id);
-              }
+              locator<UserController>().testLogInWithEmailAndPassword();
+              Navigator.pushNamed(context, DonorHomePage.id);
             },
             backgroundColor: Colors.blueAccent,
             textColor: Colors.white,
