@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:drp_basket_app/locator.dart';
 import 'package:telephony/telephony.dart';
@@ -24,10 +25,11 @@ class SMSController {
     bool? permissionsGranted = await telephony.requestPhoneAndSmsPermissions;
     if (permissionsGranted!) {
       List contacts = await locator<FirebaseFirestoreInterface>().getContactMap();
-      for (Map<String, dynamic> contact in contacts) {
-        print(contact["uid"]);
-        String redemptionLink = "Please click on the link ${getRedeemURL(contact["uid"], donationID)} when you collect your food.";
-        telephony.sendSms(to: contact["Contact"], message: msgContent + '\n' + redemptionLink);
+      await locator<FirebaseFirestoreInterface>().addContactToPending(donationID, contacts);
+      for (DocumentSnapshot contactDS in contacts) {
+        var contactInfo = (contactDS.data() as Map<String, dynamic>);
+        String redemptionLink = "Please click on the link ${getRedeemURL(contactDS.id, donationID)} when you collect your food.";
+        telephony.sendSms(to: contactInfo["contact"], message: msgContent + '\n' + redemptionLink);
       }
       return true;
     }

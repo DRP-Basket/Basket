@@ -51,9 +51,9 @@ class _CharityEventPageState extends State<CharityEventPage> {
           children: [
             StreamBuilder(
               stream: locator<FirebaseFirestoreInterface>()
-                  .getConfirmedList(widget.donationID),
+                  .getDonationEventSnapshot(widget.donationID),
               builder: (BuildContext context,
-                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                  AsyncSnapshot<DocumentSnapshot> snapshot) {
                 if (!snapshot.hasData) {
                   return Center(
                     child: CircularProgressIndicator(
@@ -61,14 +61,13 @@ class _CharityEventPageState extends State<CharityEventPage> {
                     ),
                   );
                 } else {
-                  var receivers = snapshot.data!.docs;
+                  List pendingList = (snapshot.data!.data() as Map<String, dynamic>)["confirmed"];
                   return ListView(
-                    children: receivers.map((DocumentSnapshot ds) {
-                      var receiver = ds.data() as Map<String, dynamic>;
+                    children: pendingList.map((receiver) {
                       String name = receiver['name'];
                       String contact = receiver['contact'];
                       return GestureDetector(
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (ctx) => ReceiverPage(ds.id))),
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (ctx) => ReceiverPage(receiver["uid"]))),
                         child: Card(
                           child: Container(
                             padding: EdgeInsets.all(20),
@@ -89,9 +88,9 @@ class _CharityEventPageState extends State<CharityEventPage> {
             ),
             StreamBuilder(
               stream: locator<FirebaseFirestoreInterface>()
-                  .getPendingList(widget.donationID),
+                  .getDonationEventSnapshot(widget.donationID),
               builder: (BuildContext context,
-                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                  AsyncSnapshot<DocumentSnapshot> snapshot) {
                 if (!snapshot.hasData) {
                   return Center(
                     child: CircularProgressIndicator(
@@ -99,14 +98,13 @@ class _CharityEventPageState extends State<CharityEventPage> {
                     ),
                   );
                 } else {
-                  var receivers = snapshot.data!.docs;
+                  List pendingList = (snapshot.data!.data() as Map<String, dynamic>)["pending"];
                   return ListView(
-                    children: receivers.map((DocumentSnapshot ds) {
-                      var receiver = ds.data() as Map<String, dynamic>;
+                    children: pendingList.map((receiver) {
                       String name = receiver['name'];
                       String contact = receiver['contact'];
                       return GestureDetector(
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (ctx) => ReceiverPage(ds.id))),
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (ctx) => ReceiverPage(receiver["uid"]))),
                         child: Card(
                           child: Container(
                             padding: EdgeInsets.all(20),

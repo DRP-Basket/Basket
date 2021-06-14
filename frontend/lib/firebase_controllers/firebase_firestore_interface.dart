@@ -8,7 +8,7 @@ class FirebaseFirestoreInterface {
       UserType userType, String user, String name, String contactNumber,
       {String location = ""}) async {}
 
-  getDonors () {}
+  getDonors() {}
 
   getUserType(String uid) async {}
 
@@ -33,13 +33,12 @@ class FirebaseFirestoreInterface {
   addReceiver(Receiver receiverToAdd) {}
 
   getReceiver(String id) {}
-  
+
   getDonationEvent(String id) {}
 
-  getPendingList(String donationEventID) {}
+  getDonationEventSnapshot(String donationEventID) {}
 
-  getConfirmedList(String donationEventID) {}
+  addContactToPending(String donationEventID, List contacts) {}
 
   donationsClaimed(String receiverID) {}
 }
-

@@ -15,7 +15,7 @@ class Receiver {
 
   static Receiver buildFromMap(Map<String, dynamic> rm) {
     return Receiver(rm['name'], rm['contact'], rm['location'],
-        lastClaimed: rm['last_claimed']);
+        lastClaimed: rm['last_claimed'].toDate());
   }
 
 }
@@ -153,6 +153,7 @@ class _ReceiverPageState extends State<ReceiverPage> {
             );
           } else {
             var receiverMap = snapshot.data!.data() as Map<String, dynamic>;
+            print(receiverMap);
             var receiver = Receiver.buildFromMap(receiverMap);
             return Scaffold(
               appBar: AppBar(),
