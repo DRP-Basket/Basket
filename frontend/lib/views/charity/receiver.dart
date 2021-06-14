@@ -122,7 +122,7 @@ class _ReceiverPageState extends State<ReceiverPage> {
                   child: Column(
                     children: [
                       _receiverInfo(receiver),
-                      _donationsClaimed(receiver['donations_claimed']),
+                      // _donationsClaimed(receiver['donations_claimed']),
                     ],
                   ),
                 ),

@@ -48,8 +48,6 @@ class _ContactListPageState extends State<ContactListPage> {
                   String name = receiver['name'];
                   String contact = receiver['contact'];
                   String location = receiver['location'];
-                  List<dynamic> donationsClaimed =
-                      receiver['donations_claimed'];
                   return GestureDetector(
                     onTap: () {
                       Navigator.push(context, MaterialPageRoute(builder: (ctx) => ReceiverPage(receiverID)));

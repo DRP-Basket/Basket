@@ -192,4 +192,24 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
   Stream<DocumentSnapshot<Map<String, dynamic>>> getDonationEvent(String id) {
     return getCurrentCharity().collection('donation_events').doc(id).snapshots();
   }
+
+  Stream<Object> getPendingList(String donationEventID) {
+    return _fireStore
+        .collection("charities")
+        .doc("ex-charity")
+        .collection("donation_events")
+        .doc(donationEventID)
+        .collection("pending")
+        .snapshots();
+  }
+
+  Stream<Object> getConfirmedList(String donationEventID) {
+    return _fireStore
+        .collection("charities")
+        .doc("ex-charity")
+        .collection("donation_events")
+        .doc(donationEventID)
+        .collection("confirmed")
+        .snapshots();
+  }
 }
