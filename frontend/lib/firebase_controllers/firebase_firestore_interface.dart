@@ -39,5 +39,7 @@ class FirebaseFirestoreInterface {
   getPendingList(String donationEventID) {}
 
   getConfirmedList(String donationEventID) {}
+
+  donationsClaimed(String receiverID) {}
 }
 
