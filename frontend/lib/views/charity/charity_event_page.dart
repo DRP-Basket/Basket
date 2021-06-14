@@ -61,9 +61,32 @@ class _CharityEventPageState extends State<CharityEventPage> {
                     ),
                   );
                 } else {
-                  List pendingList = (snapshot.data!.data() as Map<String, dynamic>)["confirmed"];
+                  List confirmedList = (snapshot.data!.data() as Map<String, dynamic>)["confirmed"];
+                  List pendingList = (snapshot.data!.data() as Map<String, dynamic>)["pending"];
+                  if (pendingList.isEmpty) {
+                    return Padding(
+                      padding: EdgeInsets.all(50.0),
+                      child: Center(
+                        child: Text(
+                            "Please notify users by clicking on the notify button on the event's page",
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    );
+                  }
+                  if (confirmedList.isEmpty) {
+                    return Padding(
+                      padding: EdgeInsets.all(50.0),
+                      child: Center(
+                        child: Text(
+                          "Please wait for users to confirm their attendance",
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    );
+                  }
                   return ListView(
-                    children: pendingList.map((receiver) {
+                    children: confirmedList.map((receiver) {
                       String name = receiver['name'];
                       String contact = receiver['contact'];
                       return GestureDetector(
@@ -99,6 +122,17 @@ class _CharityEventPageState extends State<CharityEventPage> {
                   );
                 } else {
                   List pendingList = (snapshot.data!.data() as Map<String, dynamic>)["pending"];
+                  if (pendingList.isEmpty) {
+                    return Padding(
+                      padding: EdgeInsets.all(50.0),
+                      child: Center(
+                        child: Text(
+                            "Please notify users by clicking on the notify button on the event's page",
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    );
+                  }
                   return ListView(
                     children: pendingList.map((receiver) {
                       String name = receiver['name'];
