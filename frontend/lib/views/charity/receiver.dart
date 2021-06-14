@@ -27,6 +27,16 @@ class _ReceiverPageState extends State<ReceiverPage> {
 
   _ReceiverPageState(this.id);
 
+  // Loading widget while waiting for data
+  Widget _loading() {
+    return Center(
+      child: CircularProgressIndicator(
+        backgroundColor: Colors.lightBlueAccent,
+      ),
+    );
+  }
+
+  // Displays general receiver information - name, contact, location
   Widget _receiverInfo(Map<String, dynamic> receiver) {
     String name = receiver['name'];
     String contact = receiver['contact'];
@@ -51,7 +61,8 @@ class _ReceiverPageState extends State<ReceiverPage> {
     );
   }
 
-  Widget _donationsClaimed(List<dynamic> donationsClaimed) {
+  // Displays donations claimed by the receiver in reverse chronological order
+  Widget _donationsClaimed(String receiverID) {
     return Card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,23 +77,35 @@ class _ReceiverPageState extends State<ReceiverPage> {
           Divider(
             thickness: 0.5,
           ),
-          ...donationsClaimed.map((donationID) => _donationClaimed(donationID)),
+          StreamBuilder(
+            stream: locator<FirebaseFirestoreInterface>()
+                .donationsClaimed(receiverID),
+            builder: (BuildContext ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
+              if (!snapshot.hasData) {
+                return _loading();
+              } else {
+                var donationsClaimed = snapshot.data!.docs;
+                return Column(
+                  children: donationsClaimed.map((DocumentSnapshot ds) {
+                    return _donationClaimed(ds.reference.id);
+                  }).toList(),
+                );
+              }
+            },
+          ),
         ],
       ),
     );
   }
 
+  // Displays info about a single donation claimed by the receiver (event name + date)
   Widget _donationClaimed(String id) {
     var dateFormat = DateFormat('MMM d, y');
     return StreamBuilder(
       stream: locator<FirebaseFirestoreInterface>().getDonationEvent(id),
       builder: (BuildContext ctx, AsyncSnapshot<DocumentSnapshot> snapshot) {
         if (!snapshot.hasData) {
-          return Center(
-            child: CircularProgressIndicator(
-              backgroundColor: Colors.lightBlueAccent,
-            ),
-          );
+          return _loading();
         } else {
           var donationEvent = snapshot.data!.data() as Map<String, dynamic>;
           return ListTile(
@@ -101,6 +124,7 @@ class _ReceiverPageState extends State<ReceiverPage> {
     );
   }
 
+  // Displays a receiver's information and donations claimed by the receiver
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
@@ -122,7 +146,7 @@ class _ReceiverPageState extends State<ReceiverPage> {
                   child: Column(
                     children: [
                       _receiverInfo(receiver),
-                      _donationsClaimed(receiver['donations_claimed']),
+                      _donationsClaimed(id),
                     ],
                   ),
                 ),

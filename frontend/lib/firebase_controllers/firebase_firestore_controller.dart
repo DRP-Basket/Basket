@@ -174,7 +174,6 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
           'name': receiver.name,
           'contact': receiver.contact,
           'location': receiver.location,
-          'donations_claimed': [],
         })
         .then((value) =>
             print('Receiver Added')) //TODO : implement front end warning
@@ -190,6 +189,19 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
   }
 
   Stream<DocumentSnapshot<Map<String, dynamic>>> getDonationEvent(String id) {
-    return getCurrentCharity().collection('donation_events').doc(id).snapshots();
+    return getCurrentCharity()
+        .collection('donation_events')
+        .doc(id)
+        .snapshots();
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> donationsClaimed(
+      String receiverID) {
+    return getCurrentCharity()
+        .collection('receivers_list')
+        .doc(receiverID)
+        .collection('donations_claimed')
+        .orderBy('time_claimed', descending: true)
+        .snapshots();
   }
 }

@@ -35,5 +35,7 @@ class FirebaseFirestoreInterface {
   getReceiver(String id) {}
   
   getDonationEvent(String id) {}
+
+  donationsClaimed(String receiverID) {}
 }
 
