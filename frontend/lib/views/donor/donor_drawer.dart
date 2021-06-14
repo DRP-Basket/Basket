@@ -1,3 +1,4 @@
+import 'package:drp_basket_app/views/donor/dart_stats_screen.dart';
 import 'package:drp_basket_app/views/donor/donor_requests.dart';
 import 'package:drp_basket_app/views/home_page.dart';
 import 'package:flutter/material.dart';
@@ -60,6 +61,10 @@ class DonorDrawer extends StatelessWidget {
             title: Text('Profile'),
             onTap: () =>
                 {Navigator.popAndPushNamed(context, DonorProfilePage.id)},
+          ),
+          ListTile(
+            title: Text('Stats'),
+            onTap: () => {Navigator.popAndPushNamed(context, DonorStatsPage.id)},
           ),
           ListTile(
             title: Text('Sign out'),
