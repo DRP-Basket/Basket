@@ -18,11 +18,27 @@ class ContactListPage extends StatefulWidget {
 }
 
 class _ContactListPageState extends State<ContactListPage> {
+
+  bool sortByLastClaimed = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Receivers"),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: GestureDetector(
+              child: Icon(Icons.sort),
+              onTap: () {
+                setState(() {
+                  sortByLastClaimed = !sortByLastClaimed;
+                });
+              }
+            ),
+          )
+        ],
       ),
       drawer: CharityDrawer(),
       floatingActionButton: FloatingActionButton(
@@ -31,7 +47,7 @@ class _ContactListPageState extends State<ContactListPage> {
             context, MaterialPageRoute(builder: (context) => AddContact())),
       ),
       body: StreamBuilder(
-          stream: locator<FirebaseFirestoreInterface>().getContactList(),
+          stream: locator<FirebaseFirestoreInterface>().getContactList(sortByLastClaimed: sortByLastClaimed),
           builder:
               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (!snapshot.hasData) {
@@ -90,4 +106,11 @@ class _ContactListPageState extends State<ContactListPage> {
     return Text(
         'Last Claimed: ${receiver.lastClaimed == null ? '-' : dateFormat.format(receiver.lastClaimed!)}');
   }
+
+  // Widget _getSortedReceivers() {
+  //   if (sortByLastClaimed) {
+
+  //   }
+  // }
+
 }

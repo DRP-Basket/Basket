@@ -88,12 +88,15 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
         .set({"user": uid, "donation_event": donationID});
   }
 
-  Stream<Object> getContactList() {
-    return _fireStore
+  Stream<Object> getContactList({bool sortByLastClaimed: false}) {
+    var receivers = _fireStore
         .collection("charities")
         .doc("ex-charity")
-        .collection("receivers_list")
-        .snapshots();
+        .collection("receivers_list");
+    if (sortByLastClaimed) {
+      return receivers.orderBy('last_claimed').snapshots();
+    } 
+    return receivers.orderBy('name').snapshots();
   }
 
   Future<List> getContactMap() async {
@@ -174,6 +177,7 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
           'name': receiver.name,
           'contact': receiver.contact,
           'location': receiver.location,
+          'last_claimed': null,
         })
         .then((value) =>
             print('Receiver Added')) //TODO : implement front end warning

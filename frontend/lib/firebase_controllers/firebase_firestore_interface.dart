@@ -18,7 +18,7 @@ class FirebaseFirestoreInterface {
 
   assignNewRedeemCode(String redeemCode, String uid, String donationID) {}
 
-  getContactList() {}
+  getContactList({bool sortByLastClaimed: false}) {}
 
   getContactMap() {}
 
