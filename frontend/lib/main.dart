@@ -26,8 +26,11 @@ class Basket extends StatelessWidget {
     return MaterialApp(
       title: LOGO_NAME,
       theme: ThemeData(
-        primaryColor: primary_color,
-      ),
+          primaryColor: primary_color,
+          timePickerTheme: TimePickerThemeData(
+            dialHandColor: fourth_color,
+            hourMinuteTextColor: third_color,
+          )),
       home: HomePage(),
       routes: {
         // General
@@ -42,7 +45,7 @@ class Basket extends StatelessWidget {
         DonorProfilePage.id: (context) => DonorProfilePage(),
         // Receiver
         // ReceiverHomePage.id: (context) => ReceiverHomePage(),
-        // Charity 
+        // Charity
         CharityHomePage.id: (context) => CharityHomePage(),
         CharityDonationPage.id: (context) => CharityDonationPage(),
         ContactListPage.id: (context) => ContactListPage(),
