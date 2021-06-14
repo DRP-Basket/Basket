@@ -13,6 +13,8 @@ class FirebaseFirestoreInterface {
 
   donorFromID(String id) {}
 
+  charityFromID(String id) {}
+
   assignNewRedeemCode(String redeemCode, String uid, String donationID) {}
 
   getContactList() {}
