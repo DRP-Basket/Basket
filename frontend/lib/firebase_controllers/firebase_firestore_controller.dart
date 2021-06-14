@@ -198,18 +198,11 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
         .doc("ex-charity")
         .collection("receivers_list")
         .add({
-<<<<<<< HEAD
           'name': receiver.name,
           'contact': receiver.contact,
           'location': receiver.location,
           'last_claimed': null,
         })
-=======
-      'name': receiver.name,
-      'contact': receiver.contact,
-      'location': receiver.location,
-    })
->>>>>>> c4028d9092b693fc234346011e79e6a265ea49bd
         .then((value) =>
         print('Receiver Added')) //TODO : implement front end warning
         .catchError((err) => print("Failed to add receiver: $err"));
