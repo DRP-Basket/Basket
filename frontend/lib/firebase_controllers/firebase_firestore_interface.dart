@@ -46,4 +46,8 @@ class FirebaseFirestoreInterface {
   getCollection(String collectionName) {}
 
   getDonation() {}
+
+  getAvailableDonations() {}
+
+  getDonor(String donorID) {}
 }

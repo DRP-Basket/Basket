@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'constants.dart';
 import 'locator.dart';
 import 'views/charity/charity_home_page.dart';
+import 'views/charity/donations/donations_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,6 +51,7 @@ class Basket extends StatelessWidget {
         CharityHomePage.id: (context) => CharityHomePage(),
         CharityEventsPage.id: (context) => CharityEventsPage(),
         ReceiversList.id: (context) => ReceiversList(),
+        CharityDonationsPage.id: (context) => CharityDonationsPage(),
       },
     );
   }

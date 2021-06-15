@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../../../locator.dart';
 import '../../../firebase_controllers/firebase_firestore_interface.dart';
+import '../utilities/utilities.dart';
 import 'charity_receiver.dart';
 
 // Page displaying information of a single receiver (name + contact + location + donations claimed)
@@ -23,15 +24,6 @@ class _ReceiverPageState extends State<ReceiverPage> {
   final String id;
 
   _ReceiverPageState(this.id);
-
-  // Loading widget while waiting for data
-  Widget _loading() {
-    return Center(
-      child: CircularProgressIndicator(
-        backgroundColor: Colors.lightBlueAccent,
-      ),
-    );
-  }
 
   // Displays general receiver information - name, contact, location
   Widget _receiverInfo(Receiver receiver) {
@@ -86,7 +78,7 @@ class _ReceiverPageState extends State<ReceiverPage> {
                 .donationsClaimed(receiverID),
             builder: (BuildContext ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
               if (!snapshot.hasData) {
-                return _loading();
+                return Utilities.loading();
               } else {
                 var donationsClaimed = snapshot.data!.docs;
                 return Column(
@@ -108,7 +100,7 @@ class _ReceiverPageState extends State<ReceiverPage> {
       stream: locator<FirebaseFirestoreInterface>().getDonationEvent(id),
       builder: (BuildContext ctx, AsyncSnapshot<DocumentSnapshot> snapshot) {
         if (!snapshot.hasData) {
-          return _loading();
+          return Utilities.loading();
         } else {
           var donationEvent = snapshot.data!.data() as Map<String, dynamic>;
           return ListTile(

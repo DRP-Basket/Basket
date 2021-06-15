@@ -257,4 +257,14 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
     int donations = ((ds.data() as Map<String, dynamic>)["donations"] as int);
     return donations;
   }
+
+  @override
+  Stream<QuerySnapshot<Map<String, dynamic>>> getAvailableDonations() {
+    return _fireStore.collection("available_donations").snapshots();
+  }
+
+  @override
+  Stream<DocumentSnapshot<Map<String, dynamic>>> getDonor(String donorID) {
+    return _fireStore.collection("donors").doc(donorID).snapshots();
+  }
 }

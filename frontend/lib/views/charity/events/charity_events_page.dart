@@ -13,7 +13,7 @@ import 'charity_event_page.dart';
 // Page displaying all events by a charity
 
 class CharityEventsPage extends StatefulWidget {
-  static const String id = "CharityDonationPage";
+  static const String id = "CharityEventsPage";
 
   const CharityEventsPage({Key? key}) : super(key: key);
 
