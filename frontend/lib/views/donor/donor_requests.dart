@@ -48,10 +48,8 @@ class _DonorRequestsState extends State<DonorRequests> {
 
         // Sort to display newest request first
         response.sort((a, b) {
-          var aData = a.data() as Map<String, dynamic>;
-          var bData = b.data() as Map<String, dynamic>;
-          Timestamp aTime = aData["create_time"];
-          Timestamp bTime = bData["create_time"];
+          Timestamp aTime = a.data()["create_time"];
+          Timestamp bTime = b.data()["create_time"];
           return bTime.compareTo(aTime);
         });
 
@@ -73,18 +71,22 @@ class _DonorRequestsState extends State<DonorRequests> {
                   ),
                 );
               }
-              if (snapshot.data == null) {
-                return Center(child: Text("No requests"));
-              } else {
-                List<Widget> reqs = [];
+              List<Widget> reqs = [];
+              if (snapshot.data != null) {
                 for (int i = 0; i < snapshot.data!.length; i += 2) {
-                  reqs.add(_buildCard(reqIDs[i ~/ 2], requestData[i ~/ 2],
-                      snapshot.data![i].data(), snapshot.data![i + 1]));
+                  if (requestData[i ~/ 2]["status"] != "successful" ||
+                      requestData[i ~/ 2]["status"] != "unsuccessful") {
+                    reqs.add(_buildCard(reqIDs[i ~/ 2], requestData[i ~/ 2],
+                        snapshot.data![i].data(), snapshot.data![i + 1]));
+                  }
                 }
-                return ListView(
-                  children: reqs,
-                );
               }
+              if (snapshot.data == null || reqs.isEmpty) {
+                return Center(child: Text("No requests"));
+              }
+              return ListView(
+                children: reqs,
+              );
             });
       },
     );
