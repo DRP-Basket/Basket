@@ -80,8 +80,12 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
     return _fireStore.collection('user').doc(id).get();
   }
 
-  Future<void> assignNewRedeemCode(String redeemCode, String uid,
-      String donationID) {
+  Future<DocumentSnapshot<Map<String, dynamic>>> charityFromID(String id) {
+    return _fireStore.collection('charities').doc(id).get();
+  }
+
+  Future<void> assignNewRedeemCode(
+      String redeemCode, String uid, String donationID) {
     return _fireStore
         .collection(REDEEM)
         .doc(redeemCode)
