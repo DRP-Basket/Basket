@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/constants.dart';
+import 'package:drp_basket_app/firebase_controllers/firebase_auth_interface.dart';
+import 'package:drp_basket_app/locator.dart';
 import 'package:drp_basket_app/views/donor/donor_message.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -160,16 +162,27 @@ class _DonorRespondState extends State<DonorRespond> {
   }
 
   Future<void> _deleteTap() async {
-    final DocumentReference ref = FirebaseFirestore.instance
+    DocumentReference reqRef = FirebaseFirestore.instance
         .collection("donors")
         .doc(requestModel.curUID)
         .collection("requests")
         .doc(requestModel.reqID);
+    DocumentReference charityRef = FirebaseFirestore.instance
+        .collection("charities")
+        .doc("ex-charity")
+        .collection("donors")
+        .doc(locator<FirebaseAuthInterface>().curUser()!.uid);
+    var charityData = await charityRef.get();
+    var charityMap = charityData.data() as Map<String, dynamic>;
+    List<dynamic> newReqIDs = charityMap["requests"];
+    newReqIDs.remove(requestModel.reqID);
+
     Navigator.pop(context);
     setState(() {
       loading = true;
     });
-    await ref.delete().then((value) => Navigator.pop(context));
+    await charityRef.update({"requests": newReqIDs});
+    await reqRef.delete().then((value) => Navigator.pop(context));
   }
 
   Widget _getDonationInfo() {
