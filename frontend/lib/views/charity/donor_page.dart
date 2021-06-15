@@ -3,6 +3,7 @@ import 'package:drp_basket_app/constants.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:drp_basket_app/locator.dart';
 import 'package:drp_basket_app/views/charity/charity_donor.dart';
+import 'package:drp_basket_app/views/charity/donor_request_end.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -251,7 +252,7 @@ class _DonorPageState extends State<DonorPage> with TickerProviderStateMixin {
             requestData["create_time"].microsecondsSinceEpoch)
         .toString()
         .split(':');
-    return Card(
+    Widget card = Card(
       child: ListTile(
         leading: icon,
         title: Text(
@@ -267,6 +268,24 @@ class _DonorPageState extends State<DonorPage> with TickerProviderStateMixin {
         ),
       ),
     );
+    if (status == "confirmed") {
+      return GestureDetector(
+        onTap: () => {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Provider<Map<String, dynamic>>(
+                create: (context) => requestData,
+                child: DonorRequestEnd(),
+              ),
+            ),
+          )
+        },
+        child: card,
+      );
+    } else {
+      return card;
+    }
   }
 
   Future<void> _sendNewReq() async {
