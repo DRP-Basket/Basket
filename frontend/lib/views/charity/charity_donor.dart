@@ -1,6 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:drp_basket_app/constants.dart';
+import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
+import 'package:drp_basket_app/firebase_controllers/firebase_storage_interface.dart';
+import 'package:drp_basket_app/locator.dart';
+import 'package:drp_basket_app/user_type.dart';
 import 'package:drp_basket_app/views/charity/charity_drawer.dart';
+import 'package:drp_basket_app/views/charity/donor_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class CharityDonor extends StatefulWidget {
   const CharityDonor({Key? key}) : super(key: key);
@@ -12,11 +20,163 @@ class CharityDonor extends StatefulWidget {
 class _CharityDonorState extends State<CharityDonor> {
   @override
   Widget build(BuildContext context) {
+    final Stream<QuerySnapshot> _donorsStream =
+        locator<FirebaseFirestoreInterface>()
+            .getCollection("charities")
+            .doc("ex-charity")
+            .collection("donors")
+            .snapshots();
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Donors"),
-      ),
-      drawer: CharityDrawer(),
+        appBar: AppBar(
+          title: Text("Donors"),
+        ),
+        drawer: CharityDrawer(),
+        body: StreamBuilder(
+          stream: _donorsStream,
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Container();
+            }
+            if (snapshot.data.docs.isEmpty) {
+              return Center(
+                child: Text(
+                  "No donors",
+                  style: TextStyle(
+                    color: third_color,
+                    fontSize: 24,
+                  ),
+                ),
+              );
+            }
+            List<String> donorIDs = [];
+            snapshot.data.docs.forEach((doc) {
+              donorIDs.add(doc.id);
+            });
+            // Each set will be donorData, donorImage
+            List<Future> futures = [];
+            donorIDs.forEach((req) {
+              futures.add(_getDonorData(req));
+              futures.add(_getImage(req));
+            });
+            return FutureBuilder(
+              future: Future.wait(futures),
+              builder: (BuildContext context,
+                  AsyncSnapshot<List<dynamic>> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                List<Widget> children = [];
+                List<dynamic> data = snapshot.data!;
+                for (int i = 0; i < data.length; i += 2) {
+                  Map<String, dynamic> curDonorData = data[i].data();
+                  DonorModel curDonorModel = DonorModel(
+                      donorIDs[i ~/ 2],
+                      curDonorData["name"],
+                      curDonorData["address"],
+                      curDonorData["contact_number"],
+                      data[i + 1]);
+                  children.add(_buildCard(curDonorModel));
+                }
+                return ListView(
+                  children: children,
+                );
+              },
+            );
+          },
+        ));
+  }
+
+  Future<DocumentSnapshot> _getDonorData(String donorUID) {
+    return locator<FirebaseFirestoreInterface>()
+        .getCollection("donors")
+        .doc(donorUID)
+        .get();
+  }
+
+  Future<ImageProvider> _getImage(String uid) async {
+    String downloadUrl = await locator<FirebaseStorageInterface>()
+        .getImageUrl(UserType.DONOR, uid);
+    return NetworkImage(downloadUrl);
+  }
+
+  Widget _buildCard(DonorModel donorModel) {
+    return GestureDetector(
+      onTap: () => {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context) => Provider<DonorModel>(
+                      create: (context) => donorModel,
+                      child: DonorPage(),
+                    )))
+      },
+      child: Card(
+          shape: OutlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
+          child: Row(
+            children: [
+              Spacer(),
+              Expanded(
+                flex: 13,
+                child: Container(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 5),
+                    child: CircleAvatar(
+                      backgroundImage: donorModel.image,
+                      radius: 50,
+                    ),
+                  ),
+                ),
+              ),
+              Spacer(
+                flex: 2,
+              ),
+              Expanded(
+                flex: 35,
+                child: Container(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        donorModel.name,
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 2),
+                        child: Text(
+                          '${donorModel.address}',
+                          style: TextStyle(
+                            color: third_color,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        '${donorModel.contactNumber}',
+                        style: TextStyle(
+                          color: third_color,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          )),
     );
   }
+}
+
+class DonorModel {
+  final String uid;
+  final String name;
+  final String address;
+  final String contactNumber;
+  final ImageProvider image;
+
+  DonorModel(this.uid, this.name, this.address, this.contactNumber, this.image);
 }
