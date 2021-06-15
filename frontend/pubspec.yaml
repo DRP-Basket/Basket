@@ -40,6 +40,8 @@ dependencies:
   geocoding: ^2.0.0
   flutter_datetime_picker: ^1.5.1
   telephony: ^0.1.4
+  provider: ^5.0.0
+  flutter_form_builder: ^6.0.1
   percent_indicator: ^3.0.1
 
 dev_dependencies:

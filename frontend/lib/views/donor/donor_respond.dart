@@ -1,129 +1,178 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/constants.dart';
+import 'package:drp_basket_app/views/donor/donor_message.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:drp_basket_app/views/donor/utilities.dart';
 
 class DonorRespond extends StatefulWidget {
-  final String name;
-  final String message;
-  final int index;
-  final Function getStatus;
-  final String curUID;
-  final String reqID;
-  const DonorRespond(this.name, this.message, this.index, this.getStatus,
-      this.curUID, this.reqID,
-      {Key? key})
-      : super(key: key);
+  const DonorRespond({Key? key}) : super(key: key);
 
   @override
   _DonorRespondState createState() => _DonorRespondState();
 }
 
 class _DonorRespondState extends State<DonorRespond> {
-  late String status;
-
-  @override
-  void initState() {
-    super.initState();
-    status = widget.getStatus(widget.index);
-  }
+  late RequestModel requestModel;
+  bool loading = false;
 
   @override
   Widget build(BuildContext context) {
+    requestModel = Provider.of(context);
+    print(requestModel.requestData);
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.name),
+        title: Text(requestModel.charityData["name"]),
       ),
-      body: Container(
-        child: _message(),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+          child: !loading
+              ? _body()
+              : Center(
+                  child: CircularProgressIndicator(
+                    backgroundColor: Colors.lightBlueAccent,
+                  ),
+                ),
+        ),
       ),
     );
   }
 
-  Widget _message() {
+  Widget _body() {
+    List<String> timeStrings = DateTime.fromMicrosecondsSinceEpoch(
+            requestModel.requestData["create_time"].microsecondsSinceEpoch)
+        .toString()
+        .split(':');
     return Column(
       mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        Padding(
+          padding: EdgeInsets.only(top: 5),
+          child: Text(
+            'Sent at ${timeStrings[0]}:${timeStrings[1]}',
+            style: TextStyle(fontSize: 16),
+          ),
+        ),
+        Image(
+          image: requestModel.image,
+          width: MediaQuery.of(context).size.width,
+        ),
         Container(
-          child: Text("Message",
-              style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
+          child: Text("Description",
+              style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold)),
+          padding: EdgeInsets.only(top: 5),
+        ),
+        Container(
+          child: Text(requestModel.charityData["description"],
+              style: TextStyle(fontSize: 16)),
+          padding: EdgeInsets.symmetric(vertical: 10),
+        ),
+        Container(
+          child: Text("Contact",
+              style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold)),
           padding: EdgeInsets.only(top: 10),
         ),
-        Container(
-          child: Text(widget.message, style: TextStyle(fontSize: 16)),
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (requestModel.charityData["contact_number"] != null)
+              Container(
+                child: Text(requestModel.charityData["contact_number"],
+                    style: TextStyle(fontSize: 16)),
+                padding: EdgeInsets.only(top: 5),
+              ),
+            if (requestModel.charityData["email_address"] != null)
+              Container(
+                child: Text(requestModel.charityData["email_address"],
+                    style: TextStyle(fontSize: 16)),
+                padding: EdgeInsets.only(top: 2.5),
+              ),
+          ],
         ),
-        _statusText(),
-        _getButtonBar(),
+        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Padding(
+              padding: EdgeInsets.only(top: 30),
+              child: getStatusText(requestModel.requestData["status"], 24))
+        ]),
+        if (requestModel.requestData["status"] == "pending") _getButtonBar(),
+        if (requestModel.requestData["status"] == "confirmed")
+          _getDonationInfo(),
       ],
     );
   }
 
-  Widget _statusText() {
-    List<TextSpan> children = [];
-    if (status == "pending") {
-      children.add(TextSpan(
-          text: "pending",
-          style: TextStyle(color: Colors.orange[800], fontSize: 20)));
-    } else {
-      children.add(TextSpan(
-          text: "confirmed",
-          style: TextStyle(color: Colors.green[800], fontSize: 20)));
-    }
-    return Container(
-        padding: EdgeInsets.only(top: 15),
-        child: RichText(
-            text: TextSpan(
-                text: "Status: ",
-                style: TextStyle(color: Colors.black, fontSize: 20),
-                children: children)));
-  }
-
   Widget _getButtonBar() {
-    List<Widget> children = [];
-    if (status == "pending") {
-      children.add(ElevatedButton(onPressed: null, child: Text("Delete")));
-      children.add(ElevatedButton(
-        onPressed: () {
-          _statusTap(true);
-        },
-        child: Text("Confirm"),
-        style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all<Color>(fourth_color)),
-      ));
-    } else {
-      children.add(ElevatedButton(
-        onPressed: () {
-          _statusTap(false);
-        },
-        child: Text("Delete"),
-        style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.all<Color>(Colors.deepOrange),
-        ),
-      ));
-      children.add(ElevatedButton(onPressed: null, child: Text("Confirm")));
-    }
     return ButtonBar(
       alignment: MainAxisAlignment.center,
-      children: children,
+      children: [
+        ElevatedButton(
+          onPressed: () => showDialog(
+              context: context, builder: (context) => _getDeleteDialog()),
+          child: Text(
+            "Delete",
+            style: TextStyle(fontSize: 18),
+          ),
+          style: ButtonStyle(
+            backgroundColor:
+                MaterialStateProperty.all<Color>(Colors.deepOrange),
+          ),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => Provider(
+                        create: (context) => requestModel,
+                        child: DonorMessage())));
+            // _statusTap(true);
+          },
+          child: Text(
+            "Accept",
+            style: TextStyle(fontSize: 18),
+          ),
+          style: ButtonStyle(
+              backgroundColor:
+                  MaterialStateProperty.all<Color>(secondary_color)),
+        ),
+      ],
     );
   }
 
-  void _statusTap(bool confirm) async {
+  Widget _getDeleteDialog() {
+    return AlertDialog(
+      title: Text("Are you sure?"),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.pop(context, 'Cancel'),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () => _deleteTap(),
+          child: const Text('OK'),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _deleteTap() async {
     final DocumentReference ref = FirebaseFirestore.instance
         .collection("donors")
-        .doc(widget.curUID)
+        .doc(requestModel.curUID)
         .collection("requests")
-        .doc(widget.reqID);
-    if (confirm) {
-      await ref.update({"status": "confirmed"}).catchError(
-          (error) => print(error.toString()));
-    } else {
-      await ref.update({"status": "pending"}).catchError(
-          (error) => print(error.toString()));
-    }
+        .doc(requestModel.reqID);
+    Navigator.pop(context);
     setState(() {
-      status = widget.getStatus(widget.index);
+      loading = true;
     });
+    await ref.delete().then((value) => Navigator.pop(context));
+  }
+
+  Widget _getDonationInfo() {
+    return Container();
   }
 }

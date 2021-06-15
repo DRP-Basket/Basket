@@ -15,16 +15,20 @@ class FirebaseStorageController implements FirebaseStorageInterface {
     }
   }
 
-
   Future<String> getImageUrl(UserType userType, String uid) async {
     String path = cloudProfileFilePath[userType]! + uid;
-    var storageRef = _storage.ref().child(path);
-    String url = await storageRef.getDownloadURL();
+    var storageRef = _storage.ref(path);
+    String url;
+    try {
+      url = await storageRef.getDownloadURL();
+    } catch (err) {
+      url =
+          "https://i.pinimg.com/originals/59/54/b4/5954b408c66525ad932faa693a647e3f.jpg";
+    }
     return url;
   }
 
   Future<String> loadFromStorage(String image) {
-    return _storage.ref().child(image).getDownloadURL();
+    return _storage.ref(image).getDownloadURL();
   }
 }
-

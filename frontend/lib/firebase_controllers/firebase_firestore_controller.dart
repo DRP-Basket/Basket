@@ -3,13 +3,15 @@ import 'package:drp_basket_app/constants.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:drp_basket_app/gps_controllers/geocoding_controller.dart';
 import 'package:drp_basket_app/locator.dart';
+import 'package:drp_basket_app/views/charity/donation_event.dart';
+import 'package:drp_basket_app/views/charity/receiver.dart';
 import '../user_type.dart';
 
 class FirebaseFirestoreController implements FirebaseFirestoreInterface {
   final _fireStore = FirebaseFirestore.instance;
 
-  Future<void> addNewUserInformation(
-      UserType userType, String user, String name, String contactNumber,
+  Future<void> addNewUserInformation(UserType userType, String user,
+      String name, String contactNumber,
       {String location = ""}) async {
     if (userType == UserType.CHARITY) {
       await _fireStore.collection(cloudCollection[userType]!).doc(user).set({
@@ -18,7 +20,7 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
       });
     } else {
       Map<String, double> results =
-          await locator<GeoCodingController>().getLatitudeLongitude(location);
+      await locator<GeoCodingController>().getLatitudeLongitude(location);
 
       await _fireStore.collection(cloudCollection[userType]!).doc(user).set({
         NAME: name,
@@ -37,16 +39,16 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
   Future<List<Map<String, dynamic>>> getOrderAgainList(String uid) async {
     DocumentSnapshot ds = await _fireStore.collection(RECEIVERS).doc(uid).get();
     List<dynamic>? orderAgainList =
-        ((ds.data() as Map<String, dynamic>)[ORDER_AGAIN_LIST]);
+    ((ds.data() as Map<String, dynamic>)[ORDER_AGAIN_LIST]);
 
     List<Map<String, dynamic>> donorInformation = [];
     if (orderAgainList != null) {
       orderAgainList = orderAgainList.map((e) => e as String).toList();
       for (var donorID in orderAgainList) {
         DocumentSnapshot tempDs =
-            await _fireStore.collection(DONORS).doc(donorID).get();
+        await _fireStore.collection(DONORS).doc(donorID).get();
         Map<String, dynamic> donorInfo =
-            (tempDs.data() as Map<String, dynamic>);
+        (tempDs.data() as Map<String, dynamic>);
         donorInfo[ID] = donorID;
         donorInformation.add(donorInfo);
       }
@@ -90,21 +92,50 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
         .set({"user": uid, "donation_event": donationID});
   }
 
-  Stream<Object> getContactList() {
-    return _fireStore.collection("charities").doc("ex-charity").snapshots();
+  Stream<Object> getContactList({bool sortByLastClaimed: false}) {
+    var receivers = _fireStore
+        .collection("charities")
+        .doc("ex-charity")
+        .collection("receivers_list");
+    if (sortByLastClaimed) {
+      return receivers.orderBy('last_claimed').snapshots();
+    } 
+    return receivers.orderBy('name').snapshots();
   }
 
   Future<List> getContactMap() async {
-    DocumentSnapshot ds =
-        await _fireStore.collection(CHARITIES).doc("ex-charity").get();
-    return ((ds.data() as Map<String, dynamic>)[CONTACT_LIST] as List);
+    QuerySnapshot querySnapshot =
+    await _fireStore.collection(CHARITIES).doc("ex-charity").collection(
+        "receivers_list").get();
+
+    return querySnapshot.docs;
+  }
+
+  Future<void> addContactToPending(String donationEventID,
+      List contacts) async {
+    List<Map<String, String>> contactData = [];
+
+    for (DocumentSnapshot contactDS in contacts) {
+      var contactInfo = (contactDS.data() as Map<String, dynamic>);
+      contactData.add({
+        "name": contactInfo["name"],
+        "contact": contactInfo["contact"],
+        "uid": contactDS.id,
+      });
+    }
+
+    _fireStore.collection(CHARITIES).doc("ex-charity").collection(
+        "donation_events").doc(donationEventID).update({
+      "pending": contactData,
+      "confirmed": [],
+    });
   }
 
   Stream<QuerySnapshot<Object?>> getDonationList() {
     return _fireStore
         .collection('charities')
         .doc('ex-charity')
-        .collection('donations')
+        .collection('donation_events')
         .snapshots();
   }
 
@@ -123,6 +154,24 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
         .catchError((err) => print("Failed to add donation: $err"));
   }
 
+  Future<void> addDonationEvent(DonationEvent de) {
+    return _fireStore
+        .collection("charities")
+        .doc("ex-charity")
+        .collection("donation_events")
+        .add({
+      'event_name': de.name,
+      'event_location': de.location,
+      'event_description': de.description,
+      'event_date_time': de.dateTime,
+      'pending': [],
+      'confirmed': [],
+    })
+        .then((value) => print('Donation Added'))
+        .catchError((err) => print("Failed to add donation: $err"));
+  }
+
+  // Currently unused
   Future<void> addContact(String name, String contactNumber) async {
     DocumentSnapshot ds =
         await _fireStore.collection("charities").doc("ex-charity").get();
@@ -145,6 +194,56 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
         .collection("charities")
         .doc("ex-charity")
         .update({"contact_list": contactList});
+  }
+
+  Future<void> addReceiver(Receiver receiver) async {
+    return _fireStore
+        .collection("charities")
+        .doc("ex-charity")
+        .collection("receivers_list")
+        .add({
+          'name': receiver.name,
+          'contact': receiver.contact,
+          'location': receiver.location,
+          'last_claimed': null,
+        })
+        .then((value) =>
+        print('Receiver Added')) //TODO : implement front end warning
+        .catchError((err) => print("Failed to add receiver: $err"));
+  }
+
+  DocumentReference<Map<String, dynamic>> getCurrentCharity() {
+    return _fireStore.collection('charities').doc('ex-charity');
+  }
+
+  Stream<DocumentSnapshot<Map<String, dynamic>>> getReceiver(String id) {
+    return getCurrentCharity().collection('receivers_list').doc(id).snapshots();
+  }
+
+  Stream<DocumentSnapshot<Map<String, dynamic>>> getDonationEvent(String id) {
+    return getCurrentCharity()
+        .collection('donation_events')
+        .doc(id)
+        .snapshots();
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> donationsClaimed(
+      String receiverID) {
+    return getCurrentCharity()
+        .collection('receivers_list')
+        .doc(receiverID)
+        .collection('donations_claimed')
+        .orderBy('time_claimed', descending: true)
+        .snapshots();
+  }
+
+  Stream<Object> getDonationEventSnapshot(String donationEventID) {
+    return _fireStore
+        .collection("charities")
+        .doc("ex-charity")
+        .collection("donation_events")
+        .doc(donationEventID)
+        .snapshots();
   }
 
   @override
