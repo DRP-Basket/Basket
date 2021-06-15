@@ -3,8 +3,8 @@ import 'package:drp_basket_app/constants.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:drp_basket_app/gps_controllers/geocoding_controller.dart';
 import 'package:drp_basket_app/locator.dart';
-import 'package:drp_basket_app/views/charity/donation_event.dart';
-import 'package:drp_basket_app/views/charity/receiver.dart';
+import 'package:drp_basket_app/views/charity/events/charity_event.dart';
+import 'package:drp_basket_app/views/charity/contacts/charity_receiver.dart';
 import '../user_type.dart';
 
 class FirebaseFirestoreController implements FirebaseFirestoreInterface {

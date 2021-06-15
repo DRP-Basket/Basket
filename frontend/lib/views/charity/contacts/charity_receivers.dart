@@ -1,23 +1,26 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
-import 'package:drp_basket_app/views/charity/add_contact.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../locator.dart';
-import 'charity_drawer.dart';
-import 'receiver.dart';
+import '../../../locator.dart';
+import '../../../firebase_controllers/firebase_firestore_interface.dart';
+import '../charity_drawer.dart';
+import 'charity_receiver.dart';
+import 'charity_receiver_form.dart';
+import 'charity_receiver_page.dart';
 
-class ContactListPage extends StatefulWidget {
+// Page showing all receiver contacts
+
+class ReceiversList extends StatefulWidget {
   static const String id = "ContactListPage";
 
-  const ContactListPage({Key? key}) : super(key: key);
+  const ReceiversList({Key? key}) : super(key: key);
 
   @override
-  _ContactListPageState createState() => _ContactListPageState();
+  _ReceiversListState createState() => _ReceiversListState();
 }
 
-class _ContactListPageState extends State<ContactListPage> {
+class _ReceiversListState extends State<ReceiversList> {
 
   bool sortByLastClaimed = false;
 
@@ -44,7 +47,7 @@ class _ContactListPageState extends State<ContactListPage> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () => Navigator.push(
-            context, MaterialPageRoute(builder: (context) => AddContact())),
+            context, MaterialPageRoute(builder: (context) => ReceiverForm())),
       ),
       body: StreamBuilder(
           stream: locator<FirebaseFirestoreInterface>().getContactList(sortByLastClaimed: sortByLastClaimed),

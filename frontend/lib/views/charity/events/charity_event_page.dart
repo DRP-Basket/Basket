@@ -1,8 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
-import 'package:drp_basket_app/locator.dart';
-import 'package:drp_basket_app/views/charity/receiver.dart';
 import 'package:flutter/material.dart';
+
+import '../../../locator.dart';
+import '../../../firebase_controllers/firebase_firestore_interface.dart';
+import '../contacts/charity_receiver_page.dart';
+
+// Page displaying details of charity event: confirmed & pending list of receivers attending the event
 
 class CharityEventPage extends StatefulWidget {
   final String donationID;

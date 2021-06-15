@@ -1,6 +1,6 @@
 import 'package:drp_basket_app/views/auth/register_choice_screen.dart';
-import 'package:drp_basket_app/views/charity/charity_donation_page.dart';
-import 'package:drp_basket_app/views/charity/contact_list_page.dart';
+import 'package:drp_basket_app/views/charity/events/charity_events_page.dart';
+import 'package:drp_basket_app/views/charity/contacts/charity_receivers.dart';
 import 'package:drp_basket_app/views/donor/dart_stats_screen.dart';
 import 'package:drp_basket_app/views/donor/donor_home_page.dart';
 import 'package:drp_basket_app/views/donor/donor_profile_page.dart';
@@ -48,8 +48,8 @@ class Basket extends StatelessWidget {
         // ReceiverHomePage.id: (context) => ReceiverHomePage(),
         // Charity
         CharityHomePage.id: (context) => CharityHomePage(),
-        CharityDonationPage.id: (context) => CharityDonationPage(),
-        ContactListPage.id: (context) => ContactListPage(),
+        CharityEventsPage.id: (context) => CharityEventsPage(),
+        ReceiversList.id: (context) => ReceiversList(),
       },
     );
   }

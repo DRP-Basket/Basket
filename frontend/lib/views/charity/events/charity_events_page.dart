@@ -2,24 +2,26 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:drp_basket_app/locator.dart';
 import 'package:drp_basket_app/sms_controller/sms_controller.dart';
-import 'package:drp_basket_app/views/charity/charity_event_page.dart';
 import 'package:flutter/material.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:intl/intl.dart';
 
-import 'add_donation.dart';
-import 'charity_drawer.dart';
+import 'charity_event_form.dart';
+import '../charity_drawer.dart';
+import 'charity_event_page.dart';
 
-class CharityDonationPage extends StatefulWidget {
+// Page displaying all events by a charity
+
+class CharityEventsPage extends StatefulWidget {
   static const String id = "CharityDonationPage";
 
-  const CharityDonationPage({Key? key}) : super(key: key);
+  const CharityEventsPage({Key? key}) : super(key: key);
 
   @override
-  _CharityDonationPageState createState() => _CharityDonationPageState();
+  _CharityEventsPageState createState() => _CharityEventsPageState();
 }
 
-class _CharityDonationPageState extends State<CharityDonationPage> {
+class _CharityEventsPageState extends State<CharityEventsPage> {
   String donationEventMsg(Map<String, dynamic> donation) {
     return 'Donation Event Happening!\n\'Event Name: ${donation['title']}\nEvent Location: ${donation['location']}\nEvent Time: ${donation['date']}';
   }
@@ -69,7 +71,7 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           Navigator.push(context,
-              MaterialPageRoute(builder: (context) => DonationEventForm()));
+              MaterialPageRoute(builder: (context) => CharityEventForm()));
         },
         label: Text("Add Item"),
         icon: Icon(Icons.add),
