@@ -98,9 +98,9 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
             donations.sort((a, b) {
               var aData = a.data() as Map<String, dynamic>;
               var bData = b.data() as Map<String, dynamic>;
-              DateTime aDate = DateTime.parse(aData["date"]);
-              DateTime bDate = DateTime.parse(bData["date"]);
-              return aDate.compareTo(bDate);
+              Timestamp aDate = aData["event_date_time"];
+              Timestamp bDate = bData["event_date_time"];
+              return bDate.compareTo(aDate);
             });
             return ListView(
               children: donations.map((DocumentSnapshot ds) {
