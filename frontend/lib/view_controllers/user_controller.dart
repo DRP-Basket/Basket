@@ -124,9 +124,9 @@ class UserController {
         .getOrderAgainList(_currentUser!.user!.uid);
   }
 
-  Future<void> userSignOut() {
+  Future<void> userSignOut() async {
     _currentUser = null;
-    return _firebaseAuthController.signOut();
+    await _firebaseAuthController.signOut();
   }
 
   User? curUser() {
