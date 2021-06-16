@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:drp_basket_app/constants.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_storage_interface.dart';
 import 'package:drp_basket_app/locator.dart';
 import 'package:drp_basket_app/user_type.dart';
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
+import 'package:drp_basket_app/views/donor/donor_past_requests.dart';
 import 'package:drp_basket_app/views/donor/donor_respond.dart';
 import 'package:drp_basket_app/views/donor/utilities.dart';
 import "package:flutter/material.dart";
@@ -67,32 +69,44 @@ class _DonorRequestsState extends State<DonorRequests> {
             _getFutures(info, futures);
           }
 
-          return FutureBuilder(
-              future: Future.wait(futures),
-              builder: (BuildContext context,
-                  AsyncSnapshot<List<dynamic>> snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                    child: CircularProgressIndicator(
-                      backgroundColor: Colors.lightBlueAccent,
-                    ),
-                  );
-                }
-                if (snapshot.data == null) {
-                  return Center(child: Text("No requests"));
-                } else {
-                  List<Widget> reqs = [];
-                  for (int i = 0; i < snapshot.data!.length; i += 2) {
+        return FutureBuilder(
+            future: Future.wait(futures),
+            builder:
+                (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                  child: CircularProgressIndicator(
+                    backgroundColor: Colors.lightBlueAccent,
+                  ),
+                );
+              }
+              List<Widget> reqs = [_buildViewHistoryCard()];
+              if (snapshot.data != null) {
+                for (int i = 0; i < snapshot.data!.length; i += 2) {
+                  if (requestData[i ~/ 2]["status"] != "successful" &&
+                      requestData[i ~/ 2]["status"] != "unsuccessful") {
                     reqs.add(_buildCard(reqIDs[i ~/ 2], requestData[i ~/ 2],
                         snapshot.data![i].data(), snapshot.data![i + 1]));
                   }
-                  return ListView(
-                    children: reqs,
-                  );
                 }
-              });
-        },
-      ),
+              }
+              if (snapshot.data == null || reqs.length == 1) {
+                reqs.add(Center(
+                  heightFactor: 10,
+                  child: Text(
+                    "No incoming requests",
+                    style: TextStyle(
+                      color: third_color,
+                      fontSize: 20,
+                    ),
+                  ),
+                ));
+              }
+              return ListView(
+                children: reqs,
+              );
+            });
+      },
     );
   }
 
@@ -118,6 +132,26 @@ class _DonorRequestsState extends State<DonorRequests> {
     }
     ImageProvider imageProvider = NetworkImage(downloadUrl);
     return imageProvider;
+  }
+
+  Widget _buildViewHistoryCard() {
+    return GestureDetector(
+      onTap: () => {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => DonorPastRequests(curUID)),
+        )
+      },
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(5)),
+          side: BorderSide(color: third_color),
+        ),
+        child: ListTile(
+          title: Text("View Past Requests >"),
+        ),
+      ),
+    );
   }
 
   Widget _buildCard(String reqID, Map<String, dynamic> requestData,
@@ -163,7 +197,8 @@ class _DonorRequestsState extends State<DonorRequests> {
                 ),
                 Padding(
                   padding: EdgeInsets.only(top: 7.5, left: 10),
-                  child: getStatusText(requestData["status"], 15),
+                  child: DonorRequestUtilities.getStatusText(
+                      requestData["status"], 15),
                 )
               ]),
           isThreeLine: true,
