@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../locator.dart';
+import '../home_page.dart';
 
 class DonorProfilePage extends StatefulWidget {
   static const String id = "DonorProfilePage";
@@ -19,44 +20,32 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
   Widget build(BuildContext context) {
     donorInformationModel = Provider.of<DonorInformationModel>(context);
 
-    return Container(
-      padding: EdgeInsets.all(20),
-      child: Column(
-        children: [
-          donorInformationModel.imageProvider == null
-              ? FutureBuilder(
-                  future: _getImage(context, donorInformationModel),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<ImageProvider> snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done)
-                      return CircleAvatar(
-                        radius: 60,
-                        foregroundImage: snapshot.data,
-                      );
-
-                    if (snapshot.connectionState == ConnectionState.waiting)
-                      return CircleAvatar(
-                        child: CircularProgressIndicator(),
-                      );
-
-                    return CircleAvatar();
-                  })
-              : CircleAvatar(
-                  radius: 60,
-                  foregroundImage: donorInformationModel.imageProvider,
-                ),
-          Container(
-            child: Column(
-              children: [
-                accountInfo('Name', donorInformationModel.name),
-                accountInfo('Email', donorInformationModel.email),
-                accountInfo(
-                    'Contact Number', donorInformationModel.contactNumber),
-              ],
-            ),
-          )
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        title: Text('Profile'),
+        toolbarHeight: MediaQuery.of(context).size.height / 12,
+        actions: [
+          _logOutButton(),
         ],
       ),
+      body: Container(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            children: [
+              _profileImage(),
+              Container(
+                child: Column(
+                  children: [
+                    accountInfo('Name', donorInformationModel.name),
+                    accountInfo('Email', donorInformationModel.email),
+                    accountInfo(
+                        'Contact Number', donorInformationModel.contactNumber),
+                  ],
+                ),
+              ),
+            ],
+          )),
     );
   }
 
@@ -79,6 +68,42 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
     return ListTile(
       title: Text(category),
       subtitle: Text(info),
+    );
+  }
+
+  Widget _logOutButton() {
+    return IconButton(
+      onPressed: () {
+        locator<UserController>().userSignOut();
+        Navigator.pushReplacementNamed(context, HomePage.id);
+      },
+      icon: Icon(Icons.logout),
+    );
+  }
+
+  Widget _profileImage() {
+    if (donorInformationModel.imageProvider != null) {
+      return CircleAvatar(
+        radius: 60,
+        foregroundImage: donorInformationModel.imageProvider,
+      );
+    }
+    return FutureBuilder(
+      future: _getImage(context, donorInformationModel),
+      builder: (BuildContext context, AsyncSnapshot<ImageProvider> snapshot) {
+        if (snapshot.connectionState == ConnectionState.done)
+          return CircleAvatar(
+            radius: 60,
+            foregroundImage: snapshot.data,
+          );
+
+        if (snapshot.connectionState == ConnectionState.waiting)
+          return CircleAvatar(
+            child: CircularProgressIndicator(),
+          );
+
+        return CircleAvatar();
+      },
     );
   }
 }

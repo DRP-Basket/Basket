@@ -5,6 +5,7 @@ import '../../../locator.dart';
 import '../../../firebase_controllers/firebase_firestore_interface.dart';
 import '../charity_drawer.dart';
 import '../utilities/utilities.dart';
+import 'donation.dart';
 import 'donation_page.dart';
 
 // Page displaying donations posted by donor
@@ -34,22 +35,20 @@ class _CharityDonationsPageState extends State<CharityDonationsPage> {
                 var donations = snapshot.data!.docs;
                 return ListView(
                   children: donations.map((DocumentSnapshot ds) {
-                    var donation = ds.data() as Map<String, dynamic>;
-                    String donorID = donation['donor_id'];
-                    String donationID = donation['donation_id'];
+                    var donation = Donation.buildFromMap(ds.reference.id, ds.data() as Map<String, dynamic>);
                     return GestureDetector(
                       child: Card(
                         child: Container(
                           padding: EdgeInsets.all(20),
                           child: Column(
                             children: [
-                              _donationTile(donorID, donationID),
+                              _donationTile(donation.donorID),
                             ],
                           ),
                         ),
                       ),
                       onTap: () => {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => CharityDonationPage(donorID, donationID)))
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => CharityDonationPage(donation)))
                       },
                     );
                   }).toList(),
@@ -58,7 +57,7 @@ class _CharityDonationsPageState extends State<CharityDonationsPage> {
             }));
   }
 
-  Widget _donationTile(String donorID, String donationID) {
+  Widget _donationTile(String donorID) {
     return StreamBuilder(
       stream: locator<FirebaseFirestoreInterface>().getDonor(donorID),
       builder: (BuildContext ctx, AsyncSnapshot<DocumentSnapshot> snapshot) {

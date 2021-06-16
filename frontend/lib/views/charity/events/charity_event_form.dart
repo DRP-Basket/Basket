@@ -49,6 +49,7 @@ class _CharityEventFormState extends State<CharityEventForm> {
         ));
   }
 
+  //TODO null checking
   void _addDonationEvent() {
     if (_formKey.currentState!.validate()) {
       var event = _formKey.currentState!.fields;

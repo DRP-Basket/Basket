@@ -34,59 +34,65 @@ class _DonorRequestsState extends State<DonorRequests> {
             .doc(curUID)
             .collection("requests")
             .snapshots();
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        title: Text('Charity Requests'),
+        toolbarHeight: MediaQuery.of(context).size.height / 12,
+      ),
+      body: StreamBuilder(
+        stream: _requestStream,
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Container();
+          }
+          List<String> reqIDs = [];
+          List<Map<String, dynamic>> requestData = [];
+          List<Future> futures = [];
+          var response = snapshot.data!.docs;
 
-    return StreamBuilder(
-      stream: _requestStream,
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Container();
-        }
-        List<String> reqIDs = [];
-        List<Map<String, dynamic>> requestData = [];
-        List<Future> futures = [];
-        var response = snapshot.data!.docs;
+          // Sort to display newest request first
+          response.sort((a, b) {
+            var aData = a.data() as Map<String, dynamic>;
+            var bData = b.data() as Map<String, dynamic>;
+            Timestamp aTime = aData["create_time"];
+            Timestamp bTime = bData["create_time"];
+            return bTime.compareTo(aTime);
+          });
 
-        // Sort to display newest request first
-        response.sort((a, b) {
-          var aData = a.data() as Map<String, dynamic>;
-          var bData = b.data() as Map<String, dynamic>;
-          Timestamp aTime = aData["create_time"];
-          Timestamp bTime = bData["create_time"];
-          return bTime.compareTo(aTime);
-        });
+          for (var i = 0; i < response.length; i++) {
+            reqIDs.add(response[i].id);
+            var info = response[i].data();
+            requestData.add(info);
+            _getFutures(info, futures);
+          }
 
-        for (var i = 0; i < response.length; i++) {
-          reqIDs.add(response[i].id);
-          var info = response[i].data();
-          requestData.add(info);
-          _getFutures(info, futures);
-        }
-
-        return FutureBuilder(
-            future: Future.wait(futures),
-            builder:
-                (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(
-                  child: CircularProgressIndicator(
-                    backgroundColor: Colors.lightBlueAccent,
-                  ),
-                );
-              }
-              if (snapshot.data == null) {
-                return Center(child: Text("No requests"));
-              } else {
-                List<Widget> reqs = [];
-                for (int i = 0; i < snapshot.data!.length; i += 2) {
-                  reqs.add(_buildCard(reqIDs[i ~/ 2], requestData[i ~/ 2],
-                      snapshot.data![i].data(), snapshot.data![i + 1]));
+          return FutureBuilder(
+              future: Future.wait(futures),
+              builder: (BuildContext context,
+                  AsyncSnapshot<List<dynamic>> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      backgroundColor: Colors.lightBlueAccent,
+                    ),
+                  );
                 }
-                return ListView(
-                  children: reqs,
-                );
-              }
-            });
-      },
+                if (snapshot.data == null) {
+                  return Center(child: Text("No requests"));
+                } else {
+                  List<Widget> reqs = [];
+                  for (int i = 0; i < snapshot.data!.length; i += 2) {
+                    reqs.add(_buildCard(reqIDs[i ~/ 2], requestData[i ~/ 2],
+                        snapshot.data![i].data(), snapshot.data![i + 1]));
+                  }
+                  return ListView(
+                    children: reqs,
+                  );
+                }
+              });
+        },
+      ),
     );
   }
 

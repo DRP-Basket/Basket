@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 
 import 'charity/events/charity_events_page.dart';
 import 'donor/dart_stats_screen.dart';
+import 'donor/donor_main.dart';
 
 class HomePage extends StatelessWidget {
   static const String id = "HomePage";
@@ -46,7 +47,7 @@ class HomePage extends StatelessWidget {
             onPressed: () {
               locator<UserController>().testLogInWithEmailAndPassword().then(
                   (value) => Navigator.pushReplacementNamed(
-                      context, DonorHomePage.id));
+                      context, DonorMain.id));
             },
             backgroundColor: Colors.blueAccent,
             textColor: Colors.white,

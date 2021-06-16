@@ -1,3 +1,4 @@
+import 'package:drp_basket_app/views/donor/donations/donor_donation_form.dart';
 import 'package:drp_basket_app/views/charity/events/charity_event.dart';
 import 'package:drp_basket_app/views/charity/contacts/charity_receiver.dart';
 
@@ -26,7 +27,7 @@ class FirebaseFirestoreInterface {
 
   getDonationList() {}
 
-  addDonation(String title, String location, String date) {}
+  addDonation(Donation donation) {}
 
   addContact(String name, String contactNumber) {}
 

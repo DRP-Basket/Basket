@@ -1,35 +1,33 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:flutter/material.dart';
 
 import '../../../locator.dart';
+import 'donation.dart';
 
 class CharityDonationPage extends StatefulWidget {
-  final String donorID;
-  final String donationID;
+  final Donation donation;
 
-  const CharityDonationPage(this.donorID, this.donationID, {Key? key})
+  const CharityDonationPage(this.donation, {Key? key})
       : super(key: key);
 
   @override
   _CharityDonationPageState createState() =>
-      _CharityDonationPageState(donorID, donationID);
+      _CharityDonationPageState(donation);
 }
 
 class _CharityDonationPageState extends State<CharityDonationPage> {
-  final String donorID;
-  final String donationID;
+  final Donation donation;
 
-  _CharityDonationPageState(this.donorID, this.donationID);
+  _CharityDonationPageState(this.donation);
 
   @override
   Widget build(BuildContext context) {
-    var store = FirebaseFirestore.instance;
-    var donorDoc = store.collection('donors').doc(donorID);
-
+    var _store = FirebaseFirestore.instance;
     return Scaffold(
       appBar: AppBar(),
       body: StreamBuilder(
-        stream: donorDoc.snapshots(),
+        stream: _store.collection('donors').doc(donation.donorID).snapshots(),
         builder: (BuildContext ctx, AsyncSnapshot<DocumentSnapshot> snapshot) {
           var donor = snapshot.data!.data() as Map<String, dynamic>;
           return Container(
