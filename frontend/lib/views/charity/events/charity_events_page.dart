@@ -15,6 +15,7 @@ import 'package:intl/intl.dart';
 
 import '../../../constants.dart';
 import '../../home_page.dart';
+import '../charity_drawer.dart';
 import 'charity_event_form.dart';
 import 'charity_event_page.dart';
 
@@ -111,6 +112,7 @@ class _CharityEventsPageState extends State<CharityEventsPage> {
               icon: Icon(Icons.logout),
             )
           ]),
+      drawer: CharityDrawer(),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.grey[200],

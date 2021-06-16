@@ -6,6 +6,7 @@ import 'package:drp_basket_app/views/donor/donations/donor_donation_form.dart';
 import 'package:flutter/material.dart';
 
 import '../../../locator.dart';
+import 'claim_request_form.dart';
 
 class CharityDonationPage extends StatefulWidget {
   final Donation donation;
@@ -44,7 +45,7 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
                   SizedBox(
                     height: 20,
                   ),
-                  _pingDonorButton(),
+                  _pingDonorButton(donation),
                 ],
               ),
             ),
@@ -88,7 +89,7 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
           ListTile(
             leading: Icon(Icons.watch_later_sharp),
             title: Text('Collect By'),
-            subtitle: Text(formatDateTime(donation.collectBy!)),
+            subtitle: Text(formatDateTime(donation.collectBy)),
           ),
           Divider(),
           ListTile(
@@ -109,7 +110,7 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
     );
   }
 
-  Widget _pingDonorButton() {
+  Widget _pingDonorButton(Donation donation) {
     return ElevatedButton.icon(
       icon: Icon(Icons.send_sharp),
       label: Text('Request Claim'),
@@ -118,7 +119,10 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
         primary: primary_color,
       ),
       onPressed: () {
-        
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ClaimRequestForm(donation)));
       },
     );
   }

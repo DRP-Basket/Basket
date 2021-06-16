@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:drp_basket_app/views/charity/utilities/form_utilities.dart';
 import 'package:flutter/material.dart';
@@ -56,19 +57,19 @@ class Donation {
   late String donationID;
   String donorID;
   DateTime timeCreated;
-  DateTime? collectBy;
+  DateTime collectBy;
   String? description;
   String status;
 
   Donation(
       {required this.donorID,
       required this.timeCreated,
-      this.collectBy,
+      required this.collectBy,
       this.description,
       this.status = 'Unclaimed'});
 
   static Donation createAndAddDonation(
-      DateTime? collectBy, String? description) {
+      DateTime collectBy, String? description) {
     Donation donation = Donation(
       donorID: _curDonorID(),
       timeCreated: DateTime.now(),
@@ -83,9 +84,7 @@ class Donation {
     Donation _donation = Donation(
       donorID: donation['donor_id'],
       timeCreated: donation['time_created'].toDate(),
-      collectBy: donation['collect_by'] == null
-          ? null
-          : donation['collect_by'].toDate(),
+      collectBy: donation['collect_by'].toDate(),
       description: donation['description'],
       status: donation['status'],
     );
@@ -99,5 +98,9 @@ class Donation {
 
   bool hasPendingRequest() {
     return false;
+  }
+
+  static Future<Donation> buildFromID(String id) {
+    return FirebaseFirestore.instance.collection('donations').doc(id).get().then((ds) => buildFromMap(id, ds.data()!));
   }
 }

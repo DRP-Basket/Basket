@@ -34,7 +34,9 @@ class _CharityDonationsPageState extends State<CharityDonationsPage> {
               } else {
                 var donations = snapshot.data!.docs;
                 return donations.isEmpty
-                    ? Center(child: Text('No Donations Currently'))
+                    ? Center(
+                        child: Text('No Donations Currently'),
+                      )
                     : ListView(
                         children: donations.map((DocumentSnapshot ds) {
                           var donation = Donation.buildFromMap(ds.reference.id,
@@ -93,10 +95,10 @@ class _CharityDonationsPageState extends State<CharityDonationsPage> {
                 title: Text(donor['address']),
               ),
               ListTile(
-                dense: true, 
+                dense: true,
                 leading: Icon(Icons.watch_later_sharp),
-                title: Text('Collect By:'), 
-                subtitle: Text(formatDateTime(donation.collectBy!)),
+                title: Text('Collect By:'),
+                subtitle: Text(formatDateTime(donation.collectBy)),
               ),
             ],
           ),
