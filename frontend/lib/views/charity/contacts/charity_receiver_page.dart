@@ -1,25 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../locator.dart';
+import '../../../locator.dart';
+import '../../../firebase_controllers/firebase_firestore_interface.dart';
+import 'charity_receiver.dart';
 
-class Receiver {
-  final String name;
-  final String contact;
-  final String location;
-  final DateTime? lastClaimed;
-
-  Receiver(this.name, this.contact, this.location, {this.lastClaimed: null});
-
-  static Receiver buildFromMap(Map<String, dynamic> rm) {
-    var lastClaimed = rm['last_claimed'] != null ? rm['last_claimed'].toDate() : null;
-    return Receiver(rm['name'], rm['contact'], rm['location'],
-        lastClaimed: lastClaimed);
-  }
-
-}
+// Page displaying information of a single receiver (name + contact + location + donations claimed)
 
 class ReceiverPage extends StatefulWidget {
   final String id;

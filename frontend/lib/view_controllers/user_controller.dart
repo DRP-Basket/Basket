@@ -139,6 +139,9 @@ class UserController {
   Future<DocumentSnapshot<Map<String, dynamic>>> donorFromID(String id) =>
       _firebaseFirestoreController.donorFromID(id);
 
+  Future<DocumentSnapshot<Map<String, dynamic>>> charityFromID(String id) =>
+      _firebaseFirestoreController.charityFromID(id);
+
   loadFromStorage(BuildContext context, String image) =>
       _firebaseStorageController.loadFromStorage(image);
 }

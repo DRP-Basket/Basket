@@ -2,18 +2,20 @@ import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
-import '../../locator.dart';
-import 'donation_event.dart';
-import 'form_utilities.dart';
+import '../../../locator.dart';
+import 'charity_event.dart';
+import '../form_utilities.dart';
 
-class DonationEventForm extends StatefulWidget {
-  const DonationEventForm({Key? key}) : super(key: key);
+// Form to fill in when adding a new charity event
+
+class CharityEventForm extends StatefulWidget {
+  const CharityEventForm({Key? key}) : super(key: key);
 
   @override
-  _DonationEventFormState createState() => _DonationEventFormState();
+  _CharityEventFormState createState() => _CharityEventFormState();
 }
 
-class _DonationEventFormState extends State<DonationEventForm> {
+class _CharityEventFormState extends State<CharityEventForm> {
   final _formKey = GlobalKey<FormBuilderState>();
   static const String name = 'Event Name';
   static const String location = 'Event Location';

@@ -6,7 +6,7 @@ import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:drp_basket_app/views/donor/donor_home_page.dart';
 import 'package:flutter/material.dart';
 
-import 'charity/charity_donation_page.dart';
+import 'charity/events/charity_events_page.dart';
 import 'donor/dart_stats_screen.dart';
 
 class HomePage extends StatelessWidget {
@@ -56,7 +56,7 @@ class HomePage extends StatelessWidget {
             onPressed: () => {
               locator<UserController>().testLogInWithEmailAndPassword().then(
                   (value) => Navigator.pushReplacementNamed(
-                      context, CharityDonationPage.id))
+                      context, CharityEventsPage.id))
             },
             backgroundColor: Colors.purpleAccent,
             textColor: Colors.white,

@@ -1,5 +1,5 @@
-import 'package:drp_basket_app/views/charity/donation_event.dart';
-import 'package:drp_basket_app/views/charity/receiver.dart';
+import 'package:drp_basket_app/views/charity/events/charity_event.dart';
+import 'package:drp_basket_app/views/charity/contacts/charity_receiver.dart';
 
 import '../user_type.dart';
 
@@ -15,6 +15,8 @@ class FirebaseFirestoreInterface {
   getOrderAgainList(String uid) async {}
 
   donorFromID(String id) {}
+
+  charityFromID(String id) {}
 
   assignNewRedeemCode(String redeemCode, String uid, String donationID) {}
 

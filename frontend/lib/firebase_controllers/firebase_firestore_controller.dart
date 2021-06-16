@@ -3,8 +3,8 @@ import 'package:drp_basket_app/constants.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:drp_basket_app/gps_controllers/geocoding_controller.dart';
 import 'package:drp_basket_app/locator.dart';
-import 'package:drp_basket_app/views/charity/donation_event.dart';
-import 'package:drp_basket_app/views/charity/receiver.dart';
+import 'package:drp_basket_app/views/charity/events/charity_event.dart';
+import 'package:drp_basket_app/views/charity/contacts/charity_receiver.dart';
 import '../user_type.dart';
 
 class FirebaseFirestoreController implements FirebaseFirestoreInterface {
@@ -80,8 +80,12 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
     return _fireStore.collection('user').doc(id).get();
   }
 
-  Future<void> assignNewRedeemCode(String redeemCode, String uid,
-      String donationID) {
+  Future<DocumentSnapshot<Map<String, dynamic>>> charityFromID(String id) {
+    return _fireStore.collection('charities').doc(id).get();
+  }
+
+  Future<void> assignNewRedeemCode(
+      String redeemCode, String uid, String donationID) {
     return _fireStore
         .collection(REDEEM)
         .doc(redeemCode)

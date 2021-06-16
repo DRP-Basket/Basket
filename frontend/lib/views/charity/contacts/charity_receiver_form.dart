@@ -2,18 +2,20 @@ import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
-import '../../locator.dart';
-import 'form_utilities.dart';
-import 'receiver.dart';
+import '../../../locator.dart';
+import '../form_utilities.dart';
+import 'charity_receiver.dart';
 
-class AddContact extends StatefulWidget {
-  const AddContact({Key? key}) : super(key: key);
+// Form to be filled in when adding a receiver contact
+
+class ReceiverForm extends StatefulWidget {
+  const ReceiverForm({Key? key}) : super(key: key);
 
   @override
-  _AddContactState createState() => _AddContactState();
+  _ReceiverFormState createState() => _ReceiverFormState();
 }
 
-class _AddContactState extends State<AddContact> {
+class _ReceiverFormState extends State<ReceiverForm> {
 
   final _formKey = GlobalKey<FormBuilderState>();
 
