@@ -4,9 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../../../locator.dart';
 import '../../../firebase_controllers/firebase_firestore_interface.dart';
-import '../charity_drawer.dart';
 import 'charity_receiver.dart';
-import 'charity_receiver_form.dart';
 import 'charity_receiver_page.dart';
 
 // Page showing all receiver contacts
