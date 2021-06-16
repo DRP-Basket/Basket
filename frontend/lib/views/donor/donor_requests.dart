@@ -74,7 +74,7 @@ class _DonorRequestsState extends State<DonorRequests> {
               List<Widget> reqs = [];
               if (snapshot.data != null) {
                 for (int i = 0; i < snapshot.data!.length; i += 2) {
-                  if (requestData[i ~/ 2]["status"] != "successful" ||
+                  if (requestData[i ~/ 2]["status"] != "successful" &&
                       requestData[i ~/ 2]["status"] != "unsuccessful") {
                     reqs.add(_buildCard(reqIDs[i ~/ 2], requestData[i ~/ 2],
                         snapshot.data![i].data(), snapshot.data![i + 1]));
