@@ -53,8 +53,11 @@ class HomePage extends StatelessWidget {
           ),
           LongButton(
             text: "Charity",
-            onPressed: () =>
-                {Navigator.pushNamed(context, CharityEventsPage.id)},
+            onPressed: () => {
+              locator<UserController>().testLogInWithEmailAndPassword().then(
+                  (value) => Navigator.pushReplacementNamed(
+                      context, CharityEventsPage.id))
+            },
             backgroundColor: Colors.purpleAccent,
             textColor: Colors.white,
           ),

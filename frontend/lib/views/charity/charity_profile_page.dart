@@ -1,88 +1,82 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
+import 'package:drp_basket_app/views/charity/events/charity_events_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../locator.dart';
 
-class CharityProfilePage extends StatelessWidget {
-  // TODO: Connect this to the rest of the app.
+class CharityProfilePage extends StatefulWidget {
   static const String id = "CharityProfilePage";
 
   CharityProfilePage({Key? key}) : super(key: key);
 
   @override
+  _CharityProfilePageState createState() => _CharityProfilePageState();
+}
+
+class _CharityProfilePageState extends State<CharityProfilePage> {
+  late CharityInformationModel charityInformationModel;
+
+  @override
   Widget build(BuildContext context) {
-    var curUser = locator<UserController>().curUser()!;
-    var snapshot = locator<UserController>().donorFromID(curUser.uid);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Charity Profile Page'),
-      ),
-      body: Container(
-          padding: EdgeInsets.all(20),
-          child: Flexible(
+    charityInformationModel = Provider.of<CharityInformationModel>(context);
+
+    return Container(
+      padding: EdgeInsets.all(20),
+      child: Column(
+        children: [
+          charityInformationModel.imageProvider == null
+              ? FutureBuilder(
+              future: _getImage(context, charityInformationModel),
+              builder: (BuildContext context,
+                  AsyncSnapshot<ImageProvider> snapshot) {
+                if (snapshot.connectionState == ConnectionState.done)
+                  return CircleAvatar(
+                    radius: 60,
+                    foregroundImage: snapshot.data,
+                  );
+
+                if (snapshot.connectionState == ConnectionState.waiting)
+                  return CircleAvatar(
+                    child: CircularProgressIndicator(),
+                  );
+
+                return CircleAvatar();
+              })
+              : CircleAvatar(
+            radius: 60,
+            foregroundImage: charityInformationModel.imageProvider,
+          ),
+          Container(
             child: Column(
               children: [
-                FutureBuilder(
-                    future: _getImage(context, curUser.uid),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<ImageProvider> snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done)
-                        return CircleAvatar(
-                          radius: 60,
-                          foregroundImage: snapshot.data,
-                        );
-
-                      if (snapshot.connectionState == ConnectionState.waiting)
-                        return CircleAvatar(
-                          child: CircularProgressIndicator(),
-                        );
-
-                      return CircleAvatar();
-                    }),
-                FutureBuilder(
-                    future: snapshot,
-                    builder: (BuildContext context,
-                        AsyncSnapshot<DocumentSnapshot> snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done) {
-                        Map<String, dynamic> data =
-                        snapshot.data!.data()! as Map<String, dynamic>;
-                        return Container(
-                          child: Column(
-                            children: [
-                              accountInfo('Name', data['name']),
-                              accountInfo('Email', curUser.email!),
-                              accountInfo(
-                                  'Contact Number', data['contact_number']),
-                              accountInfo('Description', data['description']),
-                            ],
-                          ),
-                        );
-                      }
-                      return Container();
-                    })
+                accountInfo('Name', charityInformationModel.name),
+                accountInfo('Email', charityInformationModel.email),
+                accountInfo(
+                    'Contact Number', charityInformationModel.contactNumber),
               ],
             ),
-          )),
+          )
+        ],
+      ),
     );
   }
 
-  Future<ImageProvider> _getImage(BuildContext context, String image) async {
-    ImageProvider m = NetworkImage(
-        'https://i.pinimg.com/originals/59/54/b4/5954b408c66525ad932faa693a647e3f.jpg');
+  Future<ImageProvider> _getImage(
+      BuildContext context, CharityInformationModel donorInformationModel) async {
+    String downloadUrl;
     try {
-      await locator<UserController>()
-          .loadFromStorage(context, image)
-          .then((downloadUrl) {
-        m = NetworkImage(
-          downloadUrl.toString(),
-        );
-      });
+      downloadUrl = await locator<UserController>()
+          .loadFromStorage(context, donorInformationModel.uid);
     } catch (err) {
-      print("Error loading picture");
+      downloadUrl =
+      "https://i.pinimg.com/originals/59/54/b4/5954b408c66525ad932faa693a647e3f.jpg";
     }
-    return m;
+    ImageProvider imageProvider = NetworkImage(downloadUrl);
+    donorInformationModel.updateImage(imageProvider);
+    return imageProvider;
   }
 
   Widget accountInfo(String category, String info) {
