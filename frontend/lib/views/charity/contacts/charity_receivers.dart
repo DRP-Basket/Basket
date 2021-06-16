@@ -21,87 +21,62 @@ class ReceiversList extends StatefulWidget {
 }
 
 class _ReceiversListState extends State<ReceiversList> {
-
   bool sortByLastClaimed = false;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Receivers"),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: GestureDetector(
-              child: Icon(Icons.sort),
-              onTap: () {
-                setState(() {
-                  sortByLastClaimed = !sortByLastClaimed;
-                });
-              }
-            ),
-          )
-        ],
-      ),
-      drawer: CharityDrawer(),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: () => Navigator.push(
-            context, MaterialPageRoute(builder: (context) => ReceiverForm())),
-      ),
-      body: StreamBuilder(
-          stream: locator<FirebaseFirestoreInterface>().getContactList(sortByLastClaimed: sortByLastClaimed),
-          builder:
-              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-            if (!snapshot.hasData) {
-              return Center(
-                child: CircularProgressIndicator(
-                  backgroundColor: Colors.lightBlueAccent,
-                ),
-              );
-            } else {
-              var receivers = snapshot.data!.docs;
-              return ListView(
-                children: receivers.map((DocumentSnapshot ds) {
-                  var receiverID = ds.reference.id;
-                  var receiverMap = ds.data() as Map<String, dynamic>;
-                  var receiver = Receiver.buildFromMap(receiverMap);
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (ctx) => ReceiverPage(receiverID)));
-                    },
-                    child: Card(
-                      child: Container(
-                        padding: EdgeInsets.all(20),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  receiver.name,
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                  ),
+    return StreamBuilder(
+        stream: locator<FirebaseFirestoreInterface>()
+            .getContactList(sortByLastClaimed: sortByLastClaimed),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (!snapshot.hasData) {
+            return Center(
+              child: CircularProgressIndicator(
+                backgroundColor: Colors.lightBlueAccent,
+              ),
+            );
+          } else {
+            var receivers = snapshot.data!.docs;
+            return ListView(
+              children: receivers.map((DocumentSnapshot ds) {
+                var receiverID = ds.reference.id;
+                var receiverMap = ds.data() as Map<String, dynamic>;
+                var receiver = Receiver.buildFromMap(receiverMap);
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (ctx) => ReceiverPage(receiverID)));
+                  },
+                  child: Card(
+                    child: Container(
+                      padding: EdgeInsets.all(20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                receiver.name,
+                                style: TextStyle(
+                                  fontSize: 20,
                                 ),
-                                _displayLastClaimed(receiver),
-                              ],
-                            ),
-                            Text(receiver.contact),
-                          ],
-                        ),
+                              ),
+                              _displayLastClaimed(receiver),
+                            ],
+                          ),
+                          Text(receiver.contact),
+                        ],
                       ),
                     ),
-                  );
-                }).toList(),
-              );
-            }
-          }),
-    );
+                  ),
+                );
+              }).toList(),
+            );
+          }
+        });
   }
 
   Widget _displayLastClaimed(Receiver receiver) {
@@ -110,10 +85,10 @@ class _ReceiversListState extends State<ReceiversList> {
         'Last Claimed: ${receiver.lastClaimed == null ? '-' : dateFormat.format(receiver.lastClaimed!)}');
   }
 
-  // Widget _getSortedReceivers() {
-  //   if (sortByLastClaimed) {
+// Widget _getSortedReceivers() {
+//   if (sortByLastClaimed) {
 
-  //   }
-  // }
+//   }
+// }
 
 }
