@@ -69,44 +69,45 @@ class _DonorRequestsState extends State<DonorRequests> {
             _getFutures(info, futures);
           }
 
-        return FutureBuilder(
-            future: Future.wait(futures),
-            builder:
-                (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(
-                  child: CircularProgressIndicator(
-                    backgroundColor: Colors.lightBlueAccent,
-                  ),
-                );
-              }
-              List<Widget> reqs = [_buildViewHistoryCard()];
-              if (snapshot.data != null) {
-                for (int i = 0; i < snapshot.data!.length; i += 2) {
-                  if (requestData[i ~/ 2]["status"] != "successful" &&
-                      requestData[i ~/ 2]["status"] != "unsuccessful") {
-                    reqs.add(_buildCard(reqIDs[i ~/ 2], requestData[i ~/ 2],
-                        snapshot.data![i].data(), snapshot.data![i + 1]));
+          return FutureBuilder(
+              future: Future.wait(futures),
+              builder: (BuildContext context,
+                  AsyncSnapshot<List<dynamic>> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      backgroundColor: Colors.lightBlueAccent,
+                    ),
+                  );
+                }
+                List<Widget> reqs = [_buildViewHistoryCard()];
+                if (snapshot.data != null) {
+                  for (int i = 0; i < snapshot.data!.length; i += 2) {
+                    if (requestData[i ~/ 2]["status"] != "successful" &&
+                        requestData[i ~/ 2]["status"] != "unsuccessful") {
+                      reqs.add(_buildCard(reqIDs[i ~/ 2], requestData[i ~/ 2],
+                          snapshot.data![i].data(), snapshot.data![i + 1]));
+                    }
                   }
                 }
-              }
-              if (snapshot.data == null || reqs.length == 1) {
-                reqs.add(Center(
-                  heightFactor: 10,
-                  child: Text(
-                    "No incoming requests",
-                    style: TextStyle(
-                      color: third_color,
-                      fontSize: 20,
+                if (snapshot.data == null || reqs.length == 1) {
+                  reqs.add(Center(
+                    heightFactor: 10,
+                    child: Text(
+                      "No incoming requests",
+                      style: TextStyle(
+                        color: third_color,
+                        fontSize: 20,
+                      ),
                     ),
-                  ),
-                ));
-              }
-              return ListView(
-                children: reqs,
-              );
-            });
-      },
+                  ));
+                }
+                return ListView(
+                  children: reqs,
+                );
+              });
+        },
+      ),
     );
   }
 
