@@ -122,7 +122,7 @@ class _CharityEventsPageState extends State<CharityEventsPage> {
             icon: Icon(Icons.event),
           ),
           BottomNavigationBarItem(
-            label: "Requests",
+            label: "Receivers",
             icon: Icon(Icons.group),
           ),
           BottomNavigationBarItem(
