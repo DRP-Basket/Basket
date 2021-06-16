@@ -3,6 +3,7 @@ import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface
 import 'package:drp_basket_app/locator.dart';
 import 'package:drp_basket_app/sms_controller/sms_controller.dart';
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
+import 'package:drp_basket_app/views/charity/charity_donor.dart';
 import 'package:drp_basket_app/views/charity/charity_profile_page.dart';
 import 'package:drp_basket_app/views/charity/contacts/charity_receiver_form.dart';
 import 'package:drp_basket_app/views/charity/contacts/charity_receivers.dart';
@@ -15,7 +16,6 @@ import 'package:intl/intl.dart';
 import '../../../constants.dart';
 import '../../home_page.dart';
 import 'charity_event_form.dart';
-import '../charity_drawer.dart';
 import 'charity_event_page.dart';
 
 // Page displaying all events by a charity
@@ -33,6 +33,7 @@ class _CharityEventsPageState extends State<CharityEventsPage> {
   final List<String> _titles = [
     "Donation Events",
     "Receivers",
+    "Donors",
     "Your Profile",
   ];
   final List<Widget> _widgets = [];
@@ -43,8 +44,9 @@ class _CharityEventsPageState extends State<CharityEventsPage> {
   @override
   void initState() {
     super.initState();
-    _widgets.add(CharityEventsPage());
+    _widgets.add(_buildCharityEventsPage());
     _widgets.add(ReceiversList());
+    _widgets.add(CharityDonor());
     _widgets.add(CharityProfilePage());
     curUser = locator<UserController>().curUser()!;
 
@@ -110,6 +112,7 @@ class _CharityEventsPageState extends State<CharityEventsPage> {
             )
           ]),
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.grey[200],
         selectedItemColor: secondary_color,
         currentIndex: _currentIndex,
@@ -122,8 +125,12 @@ class _CharityEventsPageState extends State<CharityEventsPage> {
             icon: Icon(Icons.event),
           ),
           BottomNavigationBarItem(
-            label: "Requests",
+            label: "Receivers",
             icon: Icon(Icons.group),
+          ),
+          BottomNavigationBarItem(
+            label: "Donors",
+            icon: Icon(Icons.store),
           ),
           BottomNavigationBarItem(
             label: "Profile",
@@ -132,6 +139,8 @@ class _CharityEventsPageState extends State<CharityEventsPage> {
         ],
         onTap: (index) {
           setState(() {
+            print(_widgets.length);
+            print(index);
             _currentIndex = index;
           });
         },
@@ -148,10 +157,8 @@ class _CharityEventsPageState extends State<CharityEventsPage> {
       case 0:
         return FloatingActionButton.extended(
           onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => CharityEventForm()));
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => CharityEventForm()));
           },
           label: Text("Add Event"),
           icon: Icon(Icons.add),
@@ -168,11 +175,12 @@ class _CharityEventsPageState extends State<CharityEventsPage> {
         );
 
       case 2:
+      case 3:
         return null;
     }
   }
 
-  Widget CharityEventsPage() {
+  Widget _buildCharityEventsPage() {
     return StreamBuilder(
         stream: locator<FirebaseFirestoreInterface>().getDonationList(),
         builder: (BuildContext ctx, AsyncSnapshot<QuerySnapshot> snapshot) {

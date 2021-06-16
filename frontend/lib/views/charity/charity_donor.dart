@@ -4,7 +4,6 @@ import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface
 import 'package:drp_basket_app/firebase_controllers/firebase_storage_interface.dart';
 import 'package:drp_basket_app/locator.dart';
 import 'package:drp_basket_app/user_type.dart';
-import 'package:drp_basket_app/views/charity/charity_drawer.dart';
 import 'package:drp_basket_app/views/charity/donor_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -27,66 +26,61 @@ class _CharityDonorState extends State<CharityDonor> {
             .collection("donors")
             .snapshots();
 
-    return Scaffold(
-        appBar: AppBar(
-          title: Text("Donors"),
-        ),
-        drawer: CharityDrawer(),
-        body: StreamBuilder(
-          stream: _donorsStream,
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
+    return StreamBuilder(
+      stream: _donorsStream,
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Container();
+        }
+        if (snapshot.data.docs.isEmpty) {
+          return Center(
+            child: Text(
+              "No donors",
+              style: TextStyle(
+                color: third_color,
+                fontSize: 24,
+              ),
+            ),
+          );
+        }
+        List<String> donorIDs = [];
+        snapshot.data.docs.forEach((doc) {
+          donorIDs.add(doc.id);
+        });
+        // Each set will be donorData, donorImage
+        List<Future> futures = [];
+        donorIDs.forEach((req) {
+          futures.add(_getDonorData(req));
+          futures.add(_getImage(req));
+        });
+        return FutureBuilder(
+          future: Future.wait(futures),
+          builder:
+              (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Container();
-            }
-            if (snapshot.data.docs.isEmpty) {
               return Center(
-                child: Text(
-                  "No donors",
-                  style: TextStyle(
-                    color: third_color,
-                    fontSize: 24,
-                  ),
-                ),
+                child: CircularProgressIndicator(),
               );
             }
-            List<String> donorIDs = [];
-            snapshot.data.docs.forEach((doc) {
-              donorIDs.add(doc.id);
-            });
-            // Each set will be donorData, donorImage
-            List<Future> futures = [];
-            donorIDs.forEach((req) {
-              futures.add(_getDonorData(req));
-              futures.add(_getImage(req));
-            });
-            return FutureBuilder(
-              future: Future.wait(futures),
-              builder: (BuildContext context,
-                  AsyncSnapshot<List<dynamic>> snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-                List<Widget> children = [];
-                List<dynamic> data = snapshot.data!;
-                for (int i = 0; i < data.length; i += 2) {
-                  Map<String, dynamic> curDonorData = data[i].data();
-                  DonorModel curDonorModel = DonorModel(
-                      donorIDs[i ~/ 2],
-                      curDonorData["name"],
-                      curDonorData["address"],
-                      curDonorData["contact_number"],
-                      data[i + 1]);
-                  children.add(_buildCard(curDonorModel));
-                }
-                return ListView(
-                  children: children,
-                );
-              },
+            List<Widget> children = [];
+            List<dynamic> data = snapshot.data!;
+            for (int i = 0; i < data.length; i += 2) {
+              Map<String, dynamic> curDonorData = data[i].data();
+              DonorModel curDonorModel = DonorModel(
+                  donorIDs[i ~/ 2],
+                  curDonorData["name"],
+                  curDonorData["address"],
+                  curDonorData["contact_number"],
+                  data[i + 1]);
+              children.add(_buildCard(curDonorModel));
+            }
+            return ListView(
+              children: children,
             );
           },
-        ));
+        );
+      },
+    );
   }
 
   Future<DocumentSnapshot> _getDonorData(String donorUID) {
