@@ -99,7 +99,8 @@ class _DonorRespondState extends State<DonorRespond> {
         Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           Padding(
               padding: EdgeInsets.only(top: 30),
-              child: getStatusText(requestModel.requestData["status"], 24))
+              child: DonorRequestUtilities.getStatusText(
+                  requestModel.requestData["status"], 24))
         ]),
         if (requestModel.requestData["status"] == "pending") _getButtonBar(),
         if (requestModel.requestData["status"] == "confirmed")

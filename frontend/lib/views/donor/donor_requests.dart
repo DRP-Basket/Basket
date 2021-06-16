@@ -30,12 +30,11 @@ class _DonorRequestsState extends State<DonorRequests> {
 
   @override
   Widget build(BuildContext context) {
-    final Stream<QuerySnapshot> _requestStream =
-        locator<FirebaseFirestoreInterface>()
-            .getCollection("donors")
-            .doc(curUID)
-            .collection("requests")
-            .snapshots();
+    Stream<QuerySnapshot> _requestStream = locator<FirebaseFirestoreInterface>()
+        .getCollection("donors")
+        .doc(curUID)
+        .collection("requests")
+        .snapshots();
 
     return StreamBuilder(
       stream: _requestStream,
@@ -132,7 +131,7 @@ class _DonorRequestsState extends State<DonorRequests> {
       onTap: () => {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => DonorPastRequests()),
+          MaterialPageRoute(builder: (context) => DonorPastRequests(curUID)),
         )
       },
       child: Card(
@@ -190,7 +189,8 @@ class _DonorRequestsState extends State<DonorRequests> {
                 ),
                 Padding(
                   padding: EdgeInsets.only(top: 7.5, left: 10),
-                  child: getStatusText(requestData["status"], 15),
+                  child: DonorRequestUtilities.getStatusText(
+                      requestData["status"], 15),
                 )
               ]),
           isThreeLine: true,
