@@ -1,15 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:drp_basket_app/constants.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
+import 'package:drp_basket_app/views/charity/utilities/utilities.dart';
+import 'package:drp_basket_app/views/donor/donations/donor_donation_form.dart';
 import 'package:flutter/material.dart';
 
 import '../../../locator.dart';
-import 'donation.dart';
 
 class CharityDonationPage extends StatefulWidget {
   final Donation donation;
 
-  const CharityDonationPage(this.donation, {Key? key})
-      : super(key: key);
+  const CharityDonationPage(this.donation, {Key? key}) : super(key: key);
 
   @override
   _CharityDonationPageState createState() =>
@@ -29,6 +30,9 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
       body: StreamBuilder(
         stream: _store.collection('donors').doc(donation.donorID).snapshots(),
         builder: (BuildContext ctx, AsyncSnapshot<DocumentSnapshot> snapshot) {
+          if (!snapshot.hasData) {
+            return Utilities.loading();
+          }
           var donor = snapshot.data!.data() as Map<String, dynamic>;
           return Container(
             padding: EdgeInsets.all(20),
@@ -36,6 +40,11 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
               child: Column(
                 children: [
                   _donorInfo(donor),
+                  _donationInfo(),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  _pingDonorButton(),
                 ],
               ),
             ),
@@ -65,6 +74,52 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
               leading: Icon(Icons.home), title: Text(donor['address'])),
         ),
       ],
+    );
+  }
+
+  Widget _donationInfo() {
+    return Card(
+      child: Column(
+        children: [
+          ListTile(
+            title: Text('Donation Info'),
+          ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.watch_later_sharp),
+            title: Text('Collect By'),
+            subtitle: Text(formatDateTime(donation.collectBy!)),
+          ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.description_sharp),
+            title: Text('Description'),
+            subtitle: Text(donation.description == null
+                ? '(empty)'
+                : donation.description!),
+          ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.add),
+            title: Text('Time Posted'),
+            subtitle: Text(formatDateTime(donation.timeCreated)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _pingDonorButton() {
+    return ElevatedButton.icon(
+      icon: Icon(Icons.send_sharp),
+      label: Text('Request Claim'),
+      style: ElevatedButton.styleFrom(
+        padding: EdgeInsets.all(10),
+        primary: primary_color,
+      ),
+      onPressed: () {
+        
+      },
     );
   }
 }

@@ -26,12 +26,17 @@ class FormUtilities {
     );
   }
 
-  static Widget dateTimePicker(String fieldName) {
+  static FormBuilderDateTimePicker dateTimePicker(String fieldName) {
     return FormBuilderDateTimePicker(
       style: fieldStyle(),
       name: fieldName,
       inputType: InputType.both,
       decoration: fieldDecor(fieldName, false),
+      validator: (value) {
+        if (value == null) {
+          return 'Please choose date and time';
+        }
+      },
     );
   }
 

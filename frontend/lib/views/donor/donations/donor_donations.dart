@@ -76,12 +76,10 @@ class _DonorDonationsPageState extends State<DonorDonationsPage> {
                       snapshot.data!.data() as Map<String, dynamic>;
                   var donation =
                       Donation.buildFromMap(ds.reference.id, donationMap);
-                  return GestureDetector(
-                    child: Card(
-                      child: Container(
-                        padding: EdgeInsets.all(20),
-                        child: _displayDonation(donation),
-                      ),
+                  return Card(
+                    child: Container(
+                      padding: EdgeInsets.symmetric(vertical: 5),
+                      child: _displayDonation(donation),
                     ),
                   );
                 });
@@ -93,44 +91,40 @@ class _DonorDonationsPageState extends State<DonorDonationsPage> {
 
   Widget _displayDonation(Donation donation) {
     return ExpandablePanel(
-      header: Text(donation.timeCreated.toString()),
+      header: Container(
+        padding: EdgeInsets.all(10),
+        child: Text(
+          donation.timeCreated.toString(),
+          style: TextStyle(
+            fontSize: 24,
+          ),
+        ),
+      ),
       collapsed: Container(
-        child: _getStatus(donation),
+        child: ListTile(
+          title: Text('Status'),
+          subtitle: Text(donation.status),
+        ),
       ),
       expanded: Column(
         children: [
-          ElevatedButton(
-            child: Text('Mark as Claimed'),
-            onPressed: () => {_markDonationClaimed(donation)},
+          ListTile(
+            title: Text('Status'),
+            subtitle: Text(donation.status),
           ),
-          Text(
-            'Description: ${donation.description == null ? '-' : donation.description}',
+          ListTile(
+            title: Text('Description'),
+            subtitle: Text(
+                donation.description == null ? '-' : donation.description!),
           ),
-          Text(
-            'Collect by: ${donation.collectBy == null ? '-' : donation.collectBy}',
+          ListTile(
+            title: Text('Collect by'),
+            subtitle: Text(donation.collectBy == null
+                ? '-'
+                : donation.collectBy.toString()),
           ),
         ],
       ),
     );
-  }
-
-  Widget _getStatus(Donation donation) {
-    var status;
-    if (donation.claimed) {
-      status = 'Claimed';
-    } else if (donation.collectBy != null &&
-        DateTime.now().isAfter(donation.collectBy!)) {
-      status = 'Expired';
-    } else {
-      status = 'Unclaimed';
-    }
-    return Text('Status: $status');
-  }
-
-  void _markDonationClaimed(Donation donation) {
-    var _store = FirebaseFirestore.instance;
-    _store.collection('donations').doc(donation.donationID).update({
-      'claimed': true,
-    });
   }
 }

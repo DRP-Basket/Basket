@@ -254,7 +254,7 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
   Stream<QuerySnapshot<Map<String, dynamic>>> getAvailableDonations() {
     return _fireStore
         .collection("donations")
-        .where("claimed", isEqualTo: false) //TODO : filter donations that are past the time to collect
+        .where("status", isEqualTo: "Unclaimed") //TODO : filter donations that are past the time to collect
         .snapshots();
   }
 
@@ -270,8 +270,9 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
       'time_created': donation.timeCreated,
       'collect_by': donation.collectBy,
       'description': donation.description,
-      'claimed': false,
+      'status': donation.status,
     }).then((value) {
+      donation.donationID = value.id;
       _fireStore
           .collection("donors")
           .doc(donation.donorID)
