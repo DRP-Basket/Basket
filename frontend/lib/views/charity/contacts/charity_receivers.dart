@@ -47,6 +47,8 @@ class _ReceiversListState extends State<ReceiversList> {
             var receivers = snapshot.data!.docs;
             return FloatingSearchBar(
               controller: controller,
+              clearQueryOnClose: false,
+              autocorrect: false,
               actions: [
                 FloatingSearchBarAction.searchToClear(),
               ],
@@ -114,10 +116,12 @@ class _ReceiversListState extends State<ReceiversList> {
                   ),
                 );
               },
-              onSubmitted: (query) {
+              onQueryChanged: (query) {
                 setState(() {
                   searchQuery = query;
                 });
+              },
+              onSubmitted: (query) {
                 controller.close();
               },
             );
