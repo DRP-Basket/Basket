@@ -96,4 +96,8 @@ class Donation {
   static String _curDonorID() {
     return 'wy-test-donor';
   }
+
+  bool hasPendingRequest() {
+    return false;
+  }
 }

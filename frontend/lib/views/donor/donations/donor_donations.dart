@@ -100,30 +100,67 @@ class _DonorDonationsPageState extends State<DonorDonationsPage> {
           ),
         ),
       ),
-      collapsed: Container(
-        child: ListTile(
-          title: Text('Status'),
-          subtitle: Text(donation.status),
-        ),
+      collapsed: ListTile(
+        title: Text('Status'),
+        subtitle: Text(donation.status),
+        trailing: donation.hasPendingRequest() ? Icon(Icons.mail_sharp) : null,
       ),
-      expanded: Column(
-        children: [
-          ListTile(
-            title: Text('Status'),
-            subtitle: Text(donation.status),
-          ),
-          ListTile(
-            title: Text('Description'),
-            subtitle: Text(
-                donation.description == null ? '-' : donation.description!),
-          ),
-          ListTile(
-            title: Text('Collect by'),
-            subtitle: Text(donation.collectBy == null
-                ? '-'
-                : donation.collectBy.toString()),
-          ),
-        ],
+      expanded: DefaultTabController(
+        length: 2,
+        child: Column(
+          children: [
+            ListTile(
+              title: Text('Status: ${donation.status}'),
+            ),
+            Divider(),
+            Container(
+              child: TabBar(
+                tabs: [
+                  Tab(
+                    icon: Icon(
+                      Icons.info_sharp,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  Tab(
+                    icon: Icon(
+                      Icons.mail_sharp,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              height: MediaQuery.of(context).size.height / 3,
+              child: TabBarView(
+                children: [
+                  SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        ListTile(
+                          title: Text('Description'),
+                          subtitle: Text(donation.description == null
+                              ? '-'
+                              : donation.description!),
+                        ),
+                        ListTile(
+                          title: Text('Collect by'),
+                          subtitle: Text(donation.collectBy == null
+                              ? '-'
+                              : donation.collectBy.toString()),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SingleChildScrollView(
+                    child: Column(),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
