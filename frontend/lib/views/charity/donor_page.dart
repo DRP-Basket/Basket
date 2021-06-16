@@ -4,6 +4,7 @@ import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface
 import 'package:drp_basket_app/locator.dart';
 import 'package:drp_basket_app/views/charity/charity_donor.dart';
 import 'package:drp_basket_app/views/charity/donor_request_end.dart';
+import 'package:drp_basket_app/views/charity/utilities.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -38,58 +39,7 @@ class _DonorPageState extends State<DonorPage> with TickerProviderStateMixin {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Row(
-              children: [
-                Spacer(),
-                Expanded(
-                  flex: 30,
-                  child: Container(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(vertical: 15),
-                      child: CircleAvatar(
-                        backgroundImage: donorModel.image,
-                        radius: 75,
-                      ),
-                    ),
-                  ),
-                ),
-                Spacer(
-                  flex: 2,
-                ),
-                Expanded(
-                  flex: 35,
-                  child: Container(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          donorModel.name,
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(bottom: 2),
-                          child: Text(
-                            '${donorModel.address}',
-                            style: TextStyle(
-                              color: third_color,
-                            ),
-                          ),
-                        ),
-                        Text(
-                          '${donorModel.contactNumber}',
-                          style: TextStyle(
-                            color: third_color,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            DonorPageUtilities.introRow(donorModel),
             Container(
               decoration: BoxDecoration(
                 border: Border(
@@ -113,10 +63,8 @@ class _DonorPageState extends State<DonorPage> with TickerProviderStateMixin {
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  _getRequests(),
-                  Center(
-                    child: Text('Location'),
-                  ),
+                  _getRequests(false),
+                  _getRequests(true),
                 ],
               ),
             ),
@@ -154,7 +102,7 @@ class _DonorPageState extends State<DonorPage> with TickerProviderStateMixin {
     );
   }
 
-  Widget _getRequests() {
+  Widget _getRequests(bool past) {
     final Stream<DocumentSnapshot> _requestsStream =
         locator<FirebaseFirestoreInterface>()
             .getCollection("charities")
@@ -162,6 +110,7 @@ class _DonorPageState extends State<DonorPage> with TickerProviderStateMixin {
             .collection("donors")
             .doc(donorModel.uid)
             .snapshots();
+    String query = past ? "past_requests" : "ongoing_requests";
 
     return StreamBuilder(
       stream: _requestsStream,
@@ -169,7 +118,7 @@ class _DonorPageState extends State<DonorPage> with TickerProviderStateMixin {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Container();
         }
-        if (snapshot.data.data()["requests"] == null) {
+        if (snapshot.data.data()[query] == null) {
           return Center(
             child: Text(
               "No requests",
@@ -181,7 +130,7 @@ class _DonorPageState extends State<DonorPage> with TickerProviderStateMixin {
           );
         }
         List<Future> futures = [];
-        snapshot.data.data()["requests"].forEach((id) {
+        snapshot.data.data()[query].forEach((id) {
           futures.add(_getReqDetails(donorModel.uid, id));
         });
         return FutureBuilder(
@@ -199,27 +148,207 @@ class _DonorPageState extends State<DonorPage> with TickerProviderStateMixin {
                   "No requests",
                   style: TextStyle(
                     color: third_color,
+                    fontSize: 24,
                   ),
                 ),
               );
             }
             List<Widget> children = [];
             reqIDs = [];
+            String sortValue = past ? "completion_time" : "create_time";
             snapshot.data!.sort((a, b) {
-              Timestamp aTime = a.data()["create_time"];
-              Timestamp bTime = b.data()["create_time"];
+              Timestamp aTime = a.data()[sortValue];
+              Timestamp bTime = b.data()[sortValue];
               return bTime.compareTo(aTime);
             });
             snapshot.data!.forEach((req) {
               reqIDs.add(req.id);
-              children.add(_buildReqCard(req.data()));
+              children.add(_buildReqCard(req.id, req.data(), past));
             });
             // Prevent send request before reqIDs initialised
             canSendReq = true;
+            if (reqIDs.isEmpty) {
+              return Center(
+                child: Text(
+                  "No requests",
+                  style: TextStyle(
+                    color: third_color,
+                    fontSize: 24,
+                  ),
+                ),
+              );
+            }
             return ListView(children: children);
           },
         );
       },
+    );
+  }
+
+  Widget _buildReqCard(
+      dynamic reqID, Map<String, dynamic> requestData, bool past) {
+    String status = requestData["status"];
+    Widget icon = _getIcon(status);
+
+    Widget card = Card(
+      child: ListTile(
+        leading: icon,
+        title: Text(
+          _getTitle(status, requestData),
+          style: TextStyle(
+            fontSize: 18,
+          ),
+        ),
+        subtitle: Text(
+          _getSubtitle(status, requestData),
+        ),
+      ),
+    );
+    return _buildReqCardRedirect(status, reqID, requestData, card);
+  }
+
+  Widget _getIcon(String status) {
+    if (status == "pending") {
+      return Icon(
+        Icons.pending_actions_outlined,
+        color: Colors.orange,
+        size: 40,
+      );
+    } else if (status == "confirmed") {
+      return Icon(
+        Icons.gpp_good_outlined,
+        color: Colors.green,
+        size: 40,
+      );
+    } else if (status == "successful") {
+      return Icon(
+        Icons.tag_faces_outlined,
+        color: Colors.green,
+        size: 40,
+      );
+    } else {
+      //Unsuccessful
+      return Icon(
+        Icons.cancel_outlined,
+        color: Colors.red,
+        size: 40,
+      );
+    }
+  }
+
+  String _getTitle(String status, Map<String, dynamic> requestData) {
+    String mapValue = (status == "pending" || status == "confirmed")
+        ? "create_time"
+        : "completion_time";
+    String prefix = (status == "pending" || status == "confirmed")
+        ? "Sent"
+        : (status == "successful" ? "Completed" : "Closed");
+
+    return prefix +
+        " at ${DonorPageUtilities.getTimeString(requestData[mapValue])}";
+  }
+
+  String _getSubtitle(String status, Map<String, dynamic> requestData) {
+    if (status == "confirmed") {
+      return 'Collect by ${requestData["collect_time"]} on ${requestData["collect_date"]}';
+    } else if (status == "pending") {
+      return "No response yet";
+    } else {
+      return "";
+    }
+  }
+
+  Widget _buildReqCardRedirect(String status, dynamic reqID,
+      Map<String, dynamic> requestData, Widget card) {
+    if (status == "confirmed") {
+      return GestureDetector(
+        onTap: () => {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  DonorRequestEnd(donorModel, reqID, requestData),
+            ),
+          )
+        },
+        child: card,
+      );
+    } else if (status == "successful" || status == "unsuccessful") {
+      String displayStatus = status[0].toUpperCase() + status.substring(1);
+      return GestureDetector(
+        onTap: () => {
+          showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                    title: Text("$displayStatus request"),
+                    content: _getHistoryDialogContent(status, requestData),
+                  ))
+        },
+        child: card,
+      );
+    } else {
+      // pending
+      return card;
+    }
+  }
+
+  Widget _getHistoryDialogContent(
+      String status, Map<String, dynamic> requestData) {
+    List<Widget> children = [
+      _thirdColorText(
+          "Sent at ${DonorPageUtilities.getTimeString(requestData["create_time"])}"),
+    ];
+    if (status == "unsuccessful") {
+      children.add(_thirdColorText(
+          "Closed at ${DonorPageUtilities.getTimeString(requestData["completion_time"])}"));
+      children.add(
+        Padding(
+          padding: EdgeInsets.only(top: 20),
+          child: Text(
+            "Message",
+            style: TextStyle(
+              fontSize: 20,
+            ),
+          ),
+        ),
+      );
+      if (requestData["message"] != null) {
+        children.add(_thirdColorText(requestData["message"]));
+      } else {
+        children.add(_thirdColorText("N/A"));
+      }
+    } else {
+      // successful
+      children.add(_thirdColorText(
+          "Completed at ${DonorPageUtilities.getTimeString(requestData["completion_time"])}"));
+      children.add(
+        Padding(
+          padding: EdgeInsets.only(top: 20),
+          child: Text(
+            "Donation Information",
+            style: TextStyle(
+              fontSize: 20,
+            ),
+          ),
+        ),
+      );
+      children.add(_thirdColorText(requestData["items"]));
+      children.add(_thirdColorText(requestData["portions"] + " portions"));
+      children.add(_thirdColorText(requestData["options"]));
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: children,
+    );
+  }
+
+  Widget _thirdColorText(String text) {
+    return Text(
+      text,
+      style: TextStyle(
+        color: third_color,
+      ),
     );
   }
 
@@ -230,62 +359,6 @@ class _DonorPageState extends State<DonorPage> with TickerProviderStateMixin {
         .collection("requests")
         .doc(reqID)
         .get();
-  }
-
-  Widget _buildReqCard(Map<String, dynamic> requestData) {
-    String status = requestData["status"];
-    Widget icon;
-    if (status == "pending") {
-      icon = Icon(
-        Icons.pending_actions_outlined,
-        color: Colors.orange,
-        size: 40,
-      );
-    } else {
-      icon = Icon(
-        Icons.gpp_good_outlined,
-        color: Colors.green,
-        size: 40,
-      );
-    }
-    List<String> timeStrings = DateTime.fromMicrosecondsSinceEpoch(
-            requestData["create_time"].microsecondsSinceEpoch)
-        .toString()
-        .split(':');
-    Widget card = Card(
-      child: ListTile(
-        leading: icon,
-        title: Text(
-          'Sent at ${timeStrings[0]}:${timeStrings[1]}',
-          style: TextStyle(
-            fontSize: 18,
-          ),
-        ),
-        subtitle: Text(
-          status == "confirmed"
-              ? 'Collect by ${requestData["collect_time"]} on ${requestData["collect_date"]}'
-              : "No response yet",
-        ),
-      ),
-    );
-    if (status == "confirmed") {
-      return GestureDetector(
-        onTap: () => {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => Provider<Map<String, dynamic>>(
-                create: (context) => requestData,
-                child: DonorRequestEnd(),
-              ),
-            ),
-          )
-        },
-        child: card,
-      );
-    } else {
-      return card;
-    }
   }
 
   Future<void> _sendNewReq() async {
@@ -304,6 +377,6 @@ class _DonorPageState extends State<DonorPage> with TickerProviderStateMixin {
         .doc("ex-charity")
         .collection("donors")
         .doc(donorModel.uid)
-        .update({"requests": reqIDs});
+        .update({"ongoing_requests": reqIDs});
   }
 }
