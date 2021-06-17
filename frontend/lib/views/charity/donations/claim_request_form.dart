@@ -116,4 +116,27 @@ class ClaimRequest {
     _req.requestID = id;
     return _req;
   }
+
+  static Widget? getIcon(String _status) {
+    var status = _status.toLowerCase();
+    return (status == 'pending')
+        ? Icon(
+            Icons.pending_actions_outlined,
+            color: Colors.orange,
+            size: 40,
+          )
+        : (status == 'accepted')
+            ? Icon(
+                Icons.gpp_good_outlined,
+                color: Colors.green,
+                size: 40,
+              )
+            : (status == 'declined')
+                ? Icon(
+                    Icons.cancel_outlined,
+                    color: Colors.red,
+                    size: 40,
+                  )
+                : null;
+  }
 }

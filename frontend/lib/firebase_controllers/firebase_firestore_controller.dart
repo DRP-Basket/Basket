@@ -278,7 +278,7 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
           .doc(donation.donorID)
           .collection("donations")
           .doc(value.id)
-          .set({});
+          .set({'time_created': donation.timeCreated});
       print('Donation Added');
     }).catchError((err) => print("Failed to add donation: $err"));
   }

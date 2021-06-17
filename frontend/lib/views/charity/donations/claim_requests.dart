@@ -86,7 +86,7 @@ class _ClaimRequestsState extends State<ClaimRequests> {
         return GestureDetector(
           child: Card(
             child: ListTile(
-              leading: _getIcon(request.status),
+              leading: ClaimRequest.getIcon(request.status),
               title: Text(
                 donor.name,
                 style: TextStyle(
@@ -110,26 +110,4 @@ class _ClaimRequestsState extends State<ClaimRequests> {
     );
   }
 
-  Widget? _getIcon(String _status) {
-    var status = _status.toLowerCase();
-    return (status == 'pending')
-        ? Icon(
-            Icons.pending_actions_outlined,
-            color: Colors.orange,
-            size: 40,
-          )
-        : (status == 'accepted')
-            ? Icon(
-                Icons.gpp_good_outlined,
-                color: Colors.green,
-                size: 40,
-              )
-            : (status == 'declined')
-                ? Icon(
-                    Icons.cancel_outlined,
-                    color: Colors.red,
-                    size: 40,
-                  )
-                : null;
-  }
 }
