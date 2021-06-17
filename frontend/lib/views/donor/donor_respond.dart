@@ -88,9 +88,9 @@ class _DonorRespondState extends State<DonorRespond> {
                     style: TextStyle(fontSize: 16)),
                 padding: EdgeInsets.only(top: 5),
               ),
-            if (requestModel.charityData["email_address"] != null)
+            if (requestModel.charityData["email"] != null)
               Container(
-                child: Text(requestModel.charityData["email_address"],
+                child: Text(requestModel.charityData["email"],
                     style: TextStyle(fontSize: 16)),
                 padding: EdgeInsets.only(top: 2.5),
               ),
