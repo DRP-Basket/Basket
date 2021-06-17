@@ -1,7 +1,9 @@
 // Form when making claim requests
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:drp_basket_app/views/charity/events/charity_events_page.dart';
 import 'package:drp_basket_app/views/charity/utilities/form_utilities.dart';
+import 'package:drp_basket_app/views/charity/utilities/utilities.dart';
 import 'package:drp_basket_app/views/donor/donations/donor_donation_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -17,7 +19,6 @@ class ClaimRequestForm extends StatefulWidget {
 }
 
 class _ClaimRequestFormState extends State<ClaimRequestForm> {
-  
   final Donation donation;
   final _formKey = GlobalKey<FormBuilderState>();
 
@@ -51,7 +52,7 @@ class _ClaimRequestFormState extends State<ClaimRequestForm> {
     if (_formKey.currentState!.validate()) {
       var request = _formKey.currentState!.fields;
       ClaimRequest.sendClaimRequest(donation, request[eta]!.value);
-      Navigator.popUntil(context, ModalRoute.withName(DonationsMain.id));
+      Navigator.popUntil(context, ModalRoute.withName(CharityEventsPage.id));
     }
   }
 }
@@ -105,8 +106,9 @@ class ClaimRequest {
     return 'wy-test-charity';
   }
 
-  static ClaimRequest buildFromMap(String id, Map<String, dynamic> req, Donation donation) {
-    var _req =  ClaimRequest(
+  static ClaimRequest buildFromMap(
+      String id, Map<String, dynamic> req, Donation donation) {
+    var _req = ClaimRequest(
       donation: donation,
       charityID: _curCharityID(),
       eta: req['eta'].toDate(),
@@ -138,5 +140,39 @@ class ClaimRequest {
                     size: 40,
                   )
                 : null;
+  }
+
+  Widget showStatus() {
+    return ListTile(
+      title: Text(
+        'Status: $status',
+        style: TextStyle(
+          fontSize: 24,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  Widget showTimeCreated() {
+    return Card(
+      child: ListTile(
+        leading: Icon(Icons.send_sharp),
+        title: Text('Sent at'),
+        subtitle: Text(
+          formatDateTime(timeCreated, format: 'd/MM/yy hh:mm aa'),
+        ),
+      ),
+    );
+  }
+
+    Widget showETA() {
+    return Card(
+      child: ListTile(
+        leading: Icon(Icons.watch_later_sharp),
+        title: Text('Estimated Time of Arrival'),
+        subtitle: Text(formatDateTime(eta)),
+      ),
+    );
   }
 }

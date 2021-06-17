@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:drp_basket_app/views/charity/utilities/form_utilities.dart';
+import 'package:drp_basket_app/views/charity/utilities/utilities.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
@@ -106,5 +107,37 @@ class Donation {
         .doc(id)
         .get()
         .then((ds) => buildFromMap(id, ds.data()!));
+  }
+
+  Widget donationInfo() {
+    return Card(
+      child: Column(
+        children: [
+          ListTile(
+            title: Text('Donation Info'),
+          ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.watch_later_sharp),
+            title: Text('Collect By'),
+            subtitle: Text(formatDateTime(collectBy)),
+          ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.description_sharp),
+            title: Text('Description'),
+            subtitle: Text(description == null
+                ? '(empty)'
+                : description!),
+          ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.add),
+            title: Text('Time Posted'),
+            subtitle: Text(formatDateTime(timeCreated)),
+          ),
+        ],
+      ),
+    );
   }
 }

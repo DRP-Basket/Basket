@@ -20,7 +20,7 @@ class DonorDrawer extends StatelessWidget {
     var curUserName = "Donor"; // TEST USER NAME
     var curUserPhoneNumber = "0123456789"; // TEST PHONE NUMBER
     return donorDrawer(
-        context, Donor(curUID, curUserName, curUserEmail, curUserPhoneNumber));
+        context, Donor(curUID, curUserName, curUserEmail, curUserPhoneNumber, '-'));
     // return FutureBuilder<DocumentSnapshot>(
     //     future: snapshot,
     //     builder:
