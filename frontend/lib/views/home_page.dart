@@ -7,7 +7,7 @@ import 'package:drp_basket_app/views/donor/donor_home_page.dart';
 import 'package:flutter/material.dart';
 
 import 'charity/events/charity_events_page.dart';
-import 'donor/dart_stats_screen.dart';
+import 'donor/donor_stats_screen.dart';
 import 'donor/donor_main.dart';
 
 class HomePage extends StatelessWidget {

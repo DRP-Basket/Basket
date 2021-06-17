@@ -1,7 +1,7 @@
 import 'package:drp_basket_app/views/auth/register_choice_screen.dart';
 import 'package:drp_basket_app/views/charity/events/charity_events_page.dart';
 import 'package:drp_basket_app/views/charity/contacts/charity_receivers.dart';
-import 'package:drp_basket_app/views/donor/dart_stats_screen.dart';
+import 'package:drp_basket_app/views/donor/donor_stats_screen.dart';
 import 'package:drp_basket_app/views/donor/donor_home_page.dart';
 import 'package:drp_basket_app/views/donor/donor_profile_page.dart';
 import 'package:drp_basket_app/views/home_page.dart';

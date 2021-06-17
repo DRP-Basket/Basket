@@ -38,7 +38,7 @@ class _DonorMainState extends State<DonorMain> {
 
     // TODO: LINK TO FIREBASE ACCOUNT
     donorInformationModel = DonorInformationModel(
-        curUser.uid, "Vincent", "vincent@basket.com", "0123456789");
+        curUser.uid, "Vincent", "vincent@basket.com", "0123456789", 8000);
   }
 
   @override
