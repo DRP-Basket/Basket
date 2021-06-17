@@ -1,4 +1,3 @@
-import 'package:drp_basket_app/constants.dart';
 import 'package:drp_basket_app/locator.dart';
 import 'package:drp_basket_app/view_controllers/image_picker_controller.dart';
 import 'package:flutter/material.dart';

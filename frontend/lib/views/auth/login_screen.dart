@@ -12,7 +12,6 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import '../../constants.dart';
 import '../../locator.dart';
 import '../../user_type.dart';
-import '../home_page.dart';
 import 'forgot_password_screen.dart';
 
 class LoginScreen extends StatefulWidget {
