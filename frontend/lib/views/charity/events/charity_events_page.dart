@@ -7,6 +7,7 @@ import 'package:drp_basket_app/views/charity/charity_donor.dart';
 import 'package:drp_basket_app/views/charity/charity_profile_page.dart';
 import 'package:drp_basket_app/views/charity/contacts/charity_receiver_form.dart';
 import 'package:drp_basket_app/views/charity/contacts/charity_receivers.dart';
+import 'package:drp_basket_app/views/welcome_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -14,7 +15,6 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:intl/intl.dart';
 
 import '../../../constants.dart';
-import '../../home_page.dart';
 import 'charity_event_form.dart';
 import 'charity_event_page.dart';
 
@@ -39,7 +39,7 @@ class _CharityEventsPageState extends State<CharityEventsPage> {
   final List<Widget> _widgets = [];
   int _currentIndex = 0;
   late User curUser;
-  late final CharityInformationModel charityInformationModel;
+  CharityInformationModel? charityInformationModel = null;
 
   @override
   void initState() {
@@ -50,9 +50,21 @@ class _CharityEventsPageState extends State<CharityEventsPage> {
     _widgets.add(CharityProfilePage());
     curUser = locator<UserController>().curUser()!;
 
-    // TODO: LINK TO FIREBASE ACCOUNT
-    charityInformationModel = CharityInformationModel(curUser.uid,
-        "Green Hour Foundation", "info@greenhourhk.com", "0123456789");
+    locator<FirebaseFirestoreInterface>()
+        .getCollection("charities")
+        .doc(curUser.uid)
+        .get()
+        .then((value) {
+      Map<String, dynamic> charityData = value.data();
+      setState(() {
+        charityInformationModel = CharityInformationModel(
+            curUser.uid,
+            charityData["name"],
+            charityData["email"],
+            charityData["contact_number"],
+            charityData["description"]);
+      });
+    });
   }
 
   String donationEventMsg(Map<String, dynamic> donation) {
@@ -106,7 +118,12 @@ class _CharityEventsPageState extends State<CharityEventsPage> {
             IconButton(
               onPressed: () {
                 locator<UserController>().userSignOut();
-                Navigator.pushReplacementNamed(context, HomePage.id);
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => WelcomeScreen(),
+                    ),
+                    (route) => false);
               },
               icon: Icon(Icons.logout),
             )
@@ -144,9 +161,13 @@ class _CharityEventsPageState extends State<CharityEventsPage> {
         },
       ),
       floatingActionButton: renderActionButton(),
-      body: Provider<CharityInformationModel>(
-          create: (context) => charityInformationModel,
-          child: _widgets[_currentIndex]),
+      body: charityInformationModel != null
+          ? Provider<CharityInformationModel>(
+              create: (context) => charityInformationModel!,
+              child: _widgets[_currentIndex])
+          : Center(
+              child: CircularProgressIndicator(),
+            ),
     );
   }
 
@@ -262,9 +283,11 @@ class CharityInformationModel {
   final String name;
   final String email;
   final String contactNumber;
+  final String description;
   ImageProvider? imageProvider = null;
 
-  CharityInformationModel(this.uid, this.name, this.email, this.contactNumber);
+  CharityInformationModel(
+      this.uid, this.name, this.email, this.contactNumber, this.description);
 
   void updateImage(ImageProvider imageProvider) {
     this.imageProvider = imageProvider;
