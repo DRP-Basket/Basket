@@ -3,6 +3,8 @@ import 'package:drp_basket_app/constants.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:drp_basket_app/views/charity/utilities/utilities.dart';
 import 'package:drp_basket_app/views/donor/donations/donor_donation_form.dart';
+import 'package:drp_basket_app/views/donor/rank.dart';
+import 'package:drp_basket_app/views/donor/rank_explaination_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../../locator.dart';
@@ -73,6 +75,18 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
         Card(
           child: ListTile(
               leading: Icon(Icons.home), title: Text(donor['address'])),
+        ),
+        GestureDetector(
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => RankExplanationScreen()),
+          ),
+          child: Card(
+            child: ListTile(
+              leading: Icon(Icons.star),
+              title: Text(rankString[getRank(donor['donation_count'])]!),
+            ),
+          ),
         ),
       ],
     );
