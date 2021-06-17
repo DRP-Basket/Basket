@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/views/donor/donations/donor_donation_form.dart';
+import 'package:drp_basket_app/views/donor/rank.dart';
 import 'package:flutter/material.dart';
 
 import '../../../locator.dart';
 import '../../../firebase_controllers/firebase_firestore_interface.dart';
-import '../charity_drawer.dart';
 import '../utilities/utilities.dart';
 import 'donation_page.dart';
 
@@ -41,12 +41,13 @@ class _CharityDonationsPageState extends State<CharityDonationsPage> {
                           child: Card(
                             child: Container(
                               padding: EdgeInsets.all(10),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  _donationTile(donation), // TODO: encapsulate card into this method coz it looks ugly af when loading
-                                ],
-                              ),
+                              // child: Column(
+                              //   crossAxisAlignment: CrossAxisAlignment.start,
+                              //   children: [
+                              child: _donationTile(donation),
+                                  // TODO: encapsulate card into this method coz it looks ugly af when loading
+                                // ],
+                              // ),
                             ),
                           ),
                           onTap: () => {
@@ -92,6 +93,11 @@ class _CharityDonationsPageState extends State<CharityDonationsPage> {
                 dense: true,
                 leading: Icon(Icons.home),
                 title: Text(donor['address']),
+              ),
+              ListTile(
+                dense: true,
+                leading: Icon(Icons.star),
+                title: Text(rankString[getRank(donor['donation_count'])]!),
               ),
               ListTile(
                 dense: true,

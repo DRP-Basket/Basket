@@ -7,6 +7,7 @@ import 'package:drp_basket_app/views/charity/charity_donor.dart';
 import 'package:drp_basket_app/views/charity/charity_profile_page.dart';
 import 'package:drp_basket_app/views/charity/contacts/charity_receiver_form.dart';
 import 'package:drp_basket_app/views/charity/contacts/charity_receivers.dart';
+import 'package:drp_basket_app/views/charity/donations/donations_main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -34,6 +35,7 @@ class _CharityEventsPageState extends State<CharityEventsPage> {
   final List<String> _titles = [
     "Donation Events",
     "Receivers",
+    "",
     "Donors",
     "Your Profile",
   ];
@@ -47,6 +49,7 @@ class _CharityEventsPageState extends State<CharityEventsPage> {
     super.initState();
     _widgets.add(_buildCharityEventsPage());
     _widgets.add(ReceiversList());
+    _widgets.add(DonationsMain());
     _widgets.add(CharityDonor());
     _widgets.add(CharityProfilePage());
     curUser = locator<UserController>().curUser()!;
@@ -100,7 +103,7 @@ class _CharityEventsPageState extends State<CharityEventsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: _currentIndex != 2 ? AppBar(
           title: Text(_titles[_currentIndex]),
           toolbarHeight: MediaQuery.of(context).size.height / 12,
           actions: [
@@ -111,7 +114,7 @@ class _CharityEventsPageState extends State<CharityEventsPage> {
               },
               icon: Icon(Icons.logout),
             )
-          ]),
+          ]) : null,
       drawer: CharityDrawer(),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
@@ -129,6 +132,10 @@ class _CharityEventsPageState extends State<CharityEventsPage> {
           BottomNavigationBarItem(
             label: "Receivers",
             icon: Icon(Icons.group),
+          ),
+          BottomNavigationBarItem(
+            label: "Requests",
+            icon: Icon(Icons.restaurant_menu),
           ),
           BottomNavigationBarItem(
             label: "Donors",
