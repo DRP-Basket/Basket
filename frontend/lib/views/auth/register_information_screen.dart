@@ -8,8 +8,6 @@ import 'package:drp_basket_app/view_controllers/validator_controller.dart';
 import 'package:drp_basket_app/views/auth/auth_view_interface.dart';
 import 'package:drp_basket_app/views/charity/events/charity_events_page.dart';
 import 'package:drp_basket_app/views/donor/donor_main.dart';
-import 'package:drp_basket_app/views/home_page.dart';
-import 'package:drp_basket_app/views/receivers/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
