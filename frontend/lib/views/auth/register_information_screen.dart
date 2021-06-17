@@ -1,10 +1,13 @@
 import 'package:drp_basket_app/components/avatar.dart';
 import 'package:drp_basket_app/components/long_button.dart';
+import 'package:drp_basket_app/constants.dart';
 import 'package:drp_basket_app/locator.dart';
 import 'package:drp_basket_app/view_controllers/image_picker_controller.dart';
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:drp_basket_app/view_controllers/validator_controller.dart';
 import 'package:drp_basket_app/views/auth/auth_view_interface.dart';
+import 'package:drp_basket_app/views/charity/events/charity_events_page.dart';
+import 'package:drp_basket_app/views/donor/donor_main.dart';
 import 'package:drp_basket_app/views/home_page.dart';
 import 'package:drp_basket_app/views/receivers/home_screen.dart';
 import 'package:flutter/material.dart';
@@ -30,26 +33,37 @@ class _RegisterInformationScreenState extends State<RegisterInformationScreen>
   final _formKey = GlobalKey<FormState>();
   bool showSpinner = false;
   bool uploadedImage = false;
-  late String name;
-  late String contactNumber;
+
+  String name = "";
+  String contactNumber = "";
   String address = "";
+  String description = "";
 
   void upload() async {
     uploadedImage = await locator<ImagePickerController>().pickImage();
-    setState(() {
-    });
+    setState(() {});
   }
 
-  void submit() {
+  Future<void> submit() async {
     if (_formKey.currentState!.validate() && uploadedImage) {
-      locator<UserController>().uploadUserInformation(this, widget.userType, name, contactNumber, address: address);
-    }
-    else if (!uploadedImage) {
-      if (widget.userType == UserType.RECEIVER) {
-        locator<UserController>().uploadUserInformation(this, widget.userType, name, contactNumber, containsImage: false);
+      if (widget.userType == UserType.DONOR) {
+        await locator<UserController>().uploadUserInformation(
+            this, widget.userType, name, contactNumber,
+            address: address);
       } else {
-        updateUIAuthFail("Image not uploaded", "Please upload an image");
+        await locator<UserController>().uploadUserInformation(
+            this, widget.userType, name, contactNumber,
+            description: description);
       }
+    } else if (!uploadedImage) {
+      updateUIAuthFail("Image not uploaded", "Please upload an image");
+      // if (widget.userType == UserType.RECEIVER) {
+      //   locator<UserController>().uploadUserInformation(
+      //       this, widget.userType, name, contactNumber,
+      //       containsImage: false);
+      // } else {
+      //   updateUIAuthFail("Image not uploaded", "Please upload an image");
+      // }
     }
   }
 
@@ -80,6 +94,7 @@ class _RegisterInformationScreenState extends State<RegisterInformationScreen>
               "Try Again",
               style: TextStyle(color: Colors.white, fontSize: 20),
             ),
+            color: Colors.deepOrange,
             onPressed: () => Navigator.pop(context),
           ),
         ]).show();
@@ -87,7 +102,11 @@ class _RegisterInformationScreenState extends State<RegisterInformationScreen>
 
   @override
   void updateUISuccess() {
-    widget.userType == UserType.RECEIVER ? Navigator.pushNamed(context, ReceiverHomeScreen.id) : Navigator.pushNamed(context, HomePage.id);
+    widget.userType == UserType.CHARITY
+        ? Navigator.pushNamedAndRemoveUntil(
+            context, CharityEventsPage.id, (route) => false)
+        : Navigator.pushNamedAndRemoveUntil(
+            context, DonorMain.id, (route) => false);
   }
 
   @override
@@ -101,76 +120,117 @@ class _RegisterInformationScreenState extends State<RegisterInformationScreen>
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text("User Information"),
+        title: Text("${userTypeString[widget.userType]} Information"),
         backgroundColor: _colorTheme,
       ),
-      body: ModalProgressHUD(
-        inAsyncCall: showSpinner,
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 50.0),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Avatar(
-                  uploaded: uploadedImage,
-                  onTap: upload,
-                ),
-                SizedBox(
-                  height: 20.0,
-                ),
-                Form(
-                  key: _formKey,
-                  child: Column(
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: ModalProgressHUD(
+          inAsyncCall: showSpinner,
+          child: Padding(
+            padding: EdgeInsets.only(
+              left: 24.0,
+              right: 24,
+              top: 30,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Avatar(
+                    uploaded: uploadedImage,
+                    onTap: upload,
+                  ),
+                  SizedBox(
+                    height: 45,
+                  ),
+                  Row(
                     children: [
-                      TextFormField(
-                        validator: (value) =>
-                            ValidatorController.validateName(value!),
-                        decoration: InputDecoration(
-                          labelText: 'Enter your name',
+                      Text(
+                        "All fields are required",
+                        style: TextStyle(
+                          color: Colors.red[800],
                         ),
-                        onChanged: (value) => name = value,
-                      ),
-                      SizedBox(
-                        height: 10.0,
-                      ),
-                      TextFormField(
-                        validator: (value) =>
-                            ValidatorController.validateContactNumber(value!),
-                        decoration: InputDecoration(
-                          labelText: 'Enter your contact number',
-                        ),
-                        onChanged: (value) => contactNumber = value,
-                      ),
-                      SizedBox(
-                        height: 10.0,
-                      ),
-                      widget.userType != UserType.RECEIVER ? TextFormField(
-                        validator: (value) =>
-                            ValidatorController.validateLocation(value!),
-                        decoration: InputDecoration(
-                          labelText: 'Enter your donor address',
-                        ),
-                        onChanged: (value) => address = value,
-                      ) : SizedBox(
-                        height: 10.0,
-                      ),
+                      )
                     ],
                   ),
-                ),
-                SizedBox(
-                  height: 30.0,
-                ),
-                LongButton(
-                  text: "Submit",
-                  onPressed: submit,
-                  backgroundColor: _colorTheme,
-                  textColor: Colors.white,
-                ),
-              ],
+                  SizedBox(
+                    height: 2.5,
+                  ),
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          validator: (value) =>
+                              ValidatorController.validateName(value!),
+                          decoration: _getInputDecoration("Name"),
+                          onChanged: (value) => name = value,
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        TextFormField(
+                          validator: (value) =>
+                              ValidatorController.validateContactNumber(value!),
+                          decoration: _getInputDecoration("Contact Number"),
+                          onChanged: (value) => contactNumber = value,
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        widget.userType == UserType.DONOR
+                            ? TextFormField(
+                                validator: (value) =>
+                                    ValidatorController.validateAddress(value!),
+                                decoration: _getInputDecoration("Address"),
+                                onChanged: (value) => address = value,
+                              )
+                            : TextFormField(
+                                validator: (value) =>
+                                    ValidatorController.validateDescription(
+                                        value!),
+                                decoration: _getInputDecoration("Description"),
+                                onChanged: (value) => description = value,
+                                keyboardType: TextInputType.multiline,
+                                maxLines: 5,
+                              ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20.0,
+                  ),
+                  LongButton(
+                    text: "Submit",
+                    onPressed: submit,
+                    backgroundColor: _colorTheme,
+                    textColor: Colors.white,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  InputDecoration _getInputDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      filled: true,
+      fillColor: Colors.grey[250],
+      enabledBorder: OutlineInputBorder(
+        borderSide: BorderSide(width: 0),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: secondary_color, width: 2.0),
       ),
     );
   }

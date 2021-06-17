@@ -59,7 +59,8 @@ class _RegisterScreenState extends State<RegisterScreen>
     emailController.clear();
     passwordController1.clear();
     passwordController2.clear();
-    Navigator.pushNamed(context, RegisterChoiceScreen.id);
+    Navigator.pushNamedAndRemoveUntil(
+        context, RegisterChoiceScreen.id, (route) => false);
   }
 
   @override

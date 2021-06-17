@@ -62,7 +62,8 @@ class _LoginScreenState extends State<LoginScreen>
     // Navigator.pushNamed(context, HomePage.id);
     UserType userType = await locator<UserController>().checkUserType();
     userType == UserType.CHARITY
-        ? Navigator.pushReplacementNamed(context, CharityEventsPage.id)
+        ? Navigator.pushNamedAndRemoveUntil(
+            context, CharityEventsPage.id, (route) => false)
         : Navigator.pushNamedAndRemoveUntil(
             context, DonorMain.id, (route) => false);
   }

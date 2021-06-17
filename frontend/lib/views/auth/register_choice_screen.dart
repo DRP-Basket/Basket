@@ -25,47 +25,41 @@ class _RegisterChoiceScreenState extends State<RegisterChoiceScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                ChoiceButton(
-                  icon: RESTAURANT_IMAGE_PATH,
-                  text: "Donor",
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => RegisterInformationScreen(
-                        userType: UserType.DONOR,
+                Spacer(),
+                Expanded(
+                  flex: 6,
+                  child: ChoiceButton(
+                    icon: RESTAURANT_IMAGE_PATH,
+                    text: "Businesses",
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RegisterInformationScreen(
+                          userType: UserType.DONOR,
+                        ),
                       ),
                     ),
                   ),
                 ),
-                ChoiceButton(
-                  icon: RECEIVER_IMAGE_PATH,
-                  text: "Receiver",
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => RegisterInformationScreen(
-                        userType: UserType.RECEIVER,
+                Spacer(),
+                Expanded(
+                  flex: 6,
+                  child: ChoiceButton(
+                    icon: FOOD_BANK_IMAGE_PATH,
+                    text: "Charities",
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RegisterInformationScreen(
+                          userType: UserType.CHARITY,
+                        ),
                       ),
                     ),
                   ),
                 ),
+                Spacer(),
               ],
             ),
-            // SizedBox(
-            //   height: 100.0,
-            // ),
-            // ChoiceButton(
-            //   icon: FOOD_BANK_IMAGE_PATH,
-            //   text: "Food Bank",
-            //   onTap: () => Navigator.push(
-            //     context,
-            //     MaterialPageRoute(
-            //       builder: (context) => RegisterInformationScreen(
-            //         userType: UserType.FOOD_BANK,
-            //       ),
-            //     ),
-            //   ),
-            // ),
           ],
         ),
       ),
