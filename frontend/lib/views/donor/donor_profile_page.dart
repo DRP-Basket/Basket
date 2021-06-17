@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../locator.dart';
+import 'donor_stats_screen.dart';
 
 class DonorProfilePage extends StatefulWidget {
   static const String id = "DonorProfilePage";
@@ -44,6 +45,14 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
                     accountInfo(
                         'Contact Number', donorInformationModel.contactNumber),
                     accountInfo('Address', donorInformationModel.address),
+                    GestureDetector(
+                      onTap: () =>
+                          Navigator.pushNamed(context, DonorStatsPage.id),
+                      child: accountInfo(
+                        'Statistics',
+                        'More info',
+                      ),
+                    ),
                   ],
                 ),
               ),

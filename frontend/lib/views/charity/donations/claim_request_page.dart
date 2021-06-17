@@ -4,28 +4,83 @@ import 'package:flutter/material.dart';
 import 'claim_request_form.dart';
 
 class ClaimRequestPage extends StatefulWidget {
-
   final ClaimRequest request;
   final Donor donor;
 
-  const ClaimRequestPage(this.request, this.donor, { Key? key }) : super(key: key);
+  const ClaimRequestPage(this.request, this.donor, {Key? key})
+      : super(key: key);
 
   @override
-  _ClaimRequestPageState createState() => _ClaimRequestPageState(request, donor);
+  _ClaimRequestPageState createState() =>
+      _ClaimRequestPageState(request, donor);
 }
 
 class _ClaimRequestPageState extends State<ClaimRequestPage> {
-  
   final ClaimRequest request;
   final Donor donor;
 
   _ClaimRequestPageState(this.request, this.donor);
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      body: Text('TODO : display appropriate donor info and claim request info'),
+      appBar: AppBar(
+        title: Text(
+          'Request to Claim Donation',
+        ),
+      ),
+      body: Container(
+        padding: EdgeInsets.all(20),
+        child: ListView(
+          children: [
+            request.showStatus(),
+            _showDonorName(),
+            request.showETA(),
+            request.showTimeCreated(),
+            _showContactNumber(),
+            _showAddress(),
+            request.donation.donationInfo(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _showDonorName() {
+    return Container(
+      padding: EdgeInsets.only(bottom: 20),
+      child: Text(
+        donor.name,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 48,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  Widget _showContactNumber() {
+    return Card(
+      child: ListTile(
+        leading: Icon(Icons.call),
+        title: Text('Contact Number'),
+        subtitle: Text(
+          donor.contact,
+        ),
+      ),
+    );
+  }
+
+  Widget _showAddress() {
+    return Card(
+      child: ListTile(
+        leading: Icon(Icons.home),
+        title: Text('Address'),
+        subtitle: Text(
+          donor.address,
+        ),
+      ),
     );
   }
 }

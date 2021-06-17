@@ -246,10 +246,10 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
     return _fireStore.collection(collectionName);
   }
 
-  Future<int> getDonation() async {
+  Future<int> getDonationCount(String donorID) async {
     DocumentSnapshot ds =
-        await _fireStore.collection("donors").doc("testing_donor").get();
-    int donations = ((ds.data() as Map<String, dynamic>)["donations"] as int);
+        await _fireStore.collection("donors").doc(donorID).get();
+    int donations = ((ds.data() as Map<String, dynamic>)["donation_count"] as int);
     return donations;
   }
 
@@ -283,7 +283,7 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
           .doc(donation.donorID)
           .collection("donations")
           .doc(value.id)
-          .set({});
+          .set({'time_created': donation.timeCreated});
       print('Donation Added');
     }).catchError((err) => print("Failed to add donation: $err"));
   }

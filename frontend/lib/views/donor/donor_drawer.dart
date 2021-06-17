@@ -1,4 +1,4 @@
-import 'package:drp_basket_app/views/donor/dart_stats_screen.dart';
+import 'package:drp_basket_app/views/donor/donor_stats_screen.dart';
 import 'package:drp_basket_app/views/donor/donor_requests.dart';
 import 'package:drp_basket_app/views/home_page.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +20,7 @@ class DonorDrawer extends StatelessWidget {
     var curUserName = "Donor"; // TEST USER NAME
     var curUserPhoneNumber = "0123456789"; // TEST PHONE NUMBER
     return donorDrawer(
-        context, Donor(curUID, curUserName, curUserEmail, curUserPhoneNumber));
+        context, Donor(curUID, curUserName, curUserEmail, curUserPhoneNumber, '-'));
     // return FutureBuilder<DocumentSnapshot>(
     //     future: snapshot,
     //     builder:

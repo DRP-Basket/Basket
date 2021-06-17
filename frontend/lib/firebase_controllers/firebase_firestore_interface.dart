@@ -47,7 +47,7 @@ class FirebaseFirestoreInterface {
   donationsClaimed(String receiverID) {}
   getCollection(String collectionName) {}
 
-  getDonation() {}
+  getDonationCount(String donorID) {}
 
   getAvailableDonations() {}
 
