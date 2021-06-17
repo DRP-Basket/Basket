@@ -42,3 +42,4 @@ const String ID = "ID";
 const String CHARITIES = "charities";
 const String REDEEM = "redeem";
 const String CONTACT_LIST = "contact_list";
+const String DONATION_COUNT = "donation_count";

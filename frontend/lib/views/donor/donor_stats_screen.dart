@@ -1,5 +1,6 @@
 import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:drp_basket_app/locator.dart';
+import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:drp_basket_app/views/donor/rank.dart';
 import 'package:drp_basket_app/views/donor/rank_explaination_screen.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +25,8 @@ class _DonorStatsPageState extends State<DonorStatsPage>
 
   void initDonation() async {
     // TODO when implemented login stuff, use user controller to get stats
-    donations = await locator<FirebaseFirestoreInterface>().getDonationCount("testing_donor");
+    String userID = locator<UserController>().curUser()!.uid;
+    donations = await locator<FirebaseFirestoreInterface>().getDonationCount(userID);
     rank = getRank(donations);
     loading = false;
     progressPercent = getProgressPercent(rank, donations);

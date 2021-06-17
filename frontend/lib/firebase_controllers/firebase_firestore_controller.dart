@@ -32,6 +32,7 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
         CONTACT_NUMBER: contactNumber,
         EMAIL: user.email,
         ADDRESS: address,
+        DONATION_COUNT: 0,
       });
     }
   }
