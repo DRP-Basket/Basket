@@ -1,10 +1,10 @@
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:drp_basket_app/views/donor/donor_home_page.dart';
+import 'package:drp_basket_app/views/welcome_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../locator.dart';
-import '../home_page.dart';
 
 class DonorProfilePage extends StatefulWidget {
   static const String id = "DonorProfilePage";
@@ -75,7 +75,10 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
     return IconButton(
       onPressed: () {
         locator<UserController>().userSignOut();
-        Navigator.pushReplacementNamed(context, HomePage.id);
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => WelcomeScreen()),
+            (route) => false);
       },
       icon: Icon(Icons.logout),
     );
