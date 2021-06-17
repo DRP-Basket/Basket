@@ -141,8 +141,6 @@ class _CharityEventsPageState extends State<CharityEventsPage> {
         ],
         onTap: (index) {
           setState(() {
-            print(_widgets.length);
-            print(index);
             _currentIndex = index;
           });
         },

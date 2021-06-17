@@ -57,6 +57,11 @@ class UserController {
         "donor@basket.com", "basket123");
   }
 
+  Future<void> testLogInCharityWithEmailAndPassword() async {
+    _currentUser = await _firebaseAuthController.loginWithEmailAndPassword(
+        "test2@basket.com", "basket123");
+  }
+
   void logInWithEmailAndPassword(
       AuthViewInterface loginScreen, String email, String password) async {
     loginScreen.updateUILoading();
