@@ -52,4 +52,6 @@ class FirebaseFirestoreInterface {
   getAvailableDonations() {}
 
   getDonor(String donorID) {}
+
+  addDonationCount(String donorID, int addCount) {}
 }
