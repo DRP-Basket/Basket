@@ -36,7 +36,6 @@ class UserController {
       try {
         _currentUser = await _firebaseAuthController
             .createUserWithEmailAndPassword(email, password1);
-        // print(_currentUser.user!.email);
         registerScreen.updateUISuccess();
       } on FirebaseAuthException catch (e) {
         if (e.code == "email-already-in-use") {
@@ -46,7 +45,6 @@ class UserController {
           registerScreen.updateUIAuthFail(
               _registrationFailed, "Please enter a valid email address.");
         }
-      } finally {
         registerScreen.resetSpinner();
       }
     }
@@ -86,33 +84,33 @@ class UserController {
     await _firebaseAuthController.forgotPassword(email);
   }
 
-  void uploadUserInformation(AuthViewInterface registerScreen,
+  Future<void> uploadUserInformation(AuthViewInterface registerScreen,
       UserType userType, String name, String contactNumber,
-      {containsImage = true, address = ""}) async {
+      {String? address, String? description}) async {
     registerScreen.updateUILoading();
-    if (containsImage) {
-      File image = locator<ImagePickerController>().getImage();
-      String destination =
-          cloudProfileFilePath[userType]! + "${_currentUser!.user!.uid}";
-      try {
-        await _firebaseStorageController.uploadFile(destination, image);
-      } catch (exception) {
-        print(exception);
-      } finally {
-        registerScreen.resetSpinner();
-      }
-    } else {
-      assert(userType == UserType.RECEIVER);
+    File image = locator<ImagePickerController>().getImage();
+    String destination =
+        cloudProfileFilePath[userType]! + "${_currentUser!.user!.uid}";
+    try {
+      await _firebaseStorageController.uploadFile(destination, image);
+    } catch (exception) {
+      print(exception);
+      registerScreen.resetSpinner();
     }
 
     try {
-      await _firebaseFirestoreController.addNewUserInformation(
-          userType, _currentUser!.user!.uid, name, contactNumber,
-          location: address);
+      if (userType == UserType.DONOR) {
+        await _firebaseFirestoreController.addNewUserInformation(
+            userType, _currentUser!.user!, name, contactNumber,
+            address: address);
+      } else {
+        await _firebaseFirestoreController.addNewUserInformation(
+            userType, _currentUser!.user!, name, contactNumber,
+            description: description);
+      }
       registerScreen.updateUISuccess();
     } catch (exception) {
       print(exception);
-    } finally {
       registerScreen.resetSpinner();
     }
   }

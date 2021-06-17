@@ -1,13 +1,14 @@
 import 'package:drp_basket_app/views/donor/donations/donor_donation_form.dart';
 import 'package:drp_basket_app/views/charity/events/charity_event.dart';
 import 'package:drp_basket_app/views/charity/contacts/charity_receiver.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../user_type.dart';
 
 class FirebaseFirestoreInterface {
   Future<void> addNewUserInformation(
-      UserType userType, String user, String name, String contactNumber,
-      {String location = ""}) async {}
+      UserType userType, User user, String name, String contactNumber,
+      {String? address, String? description}) async {}
 
   getDonors() {}
 
