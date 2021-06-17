@@ -242,7 +242,7 @@ class _DonorPageState extends State<DonorPage> with TickerProviderStateMixin {
         : "completion_time";
     String prefix = (status == "pending" || status == "confirmed")
         ? "Sent"
-        : (status == "successful" ? "Completed" : "Closed");
+        : (status == "successful" ? "Completed" : "Cancelled");
 
     return prefix +
         " at ${DonorPageUtilities.getTimeString(requestData[mapValue])}";

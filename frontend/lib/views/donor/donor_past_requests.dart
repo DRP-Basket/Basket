@@ -49,6 +49,11 @@ class DonorPastRequests extends StatelessWidget {
           );
         }
 
+        response = response
+            .where((x) =>
+                (x["status"] == "successful" || x["status"] == "unsuccessful"))
+            .toList();
+
         // Sort to display most recently completed request first
         response.sort((a, b) {
           Timestamp aTime = a.data()["completion_time"];

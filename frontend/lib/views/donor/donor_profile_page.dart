@@ -1,10 +1,12 @@
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:drp_basket_app/views/donor/donor_home_page.dart';
+import 'package:drp_basket_app/views/donor/rank.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../locator.dart';
 import '../home_page.dart';
+import 'donor_stats_screen.dart';
 
 class DonorProfilePage extends StatefulWidget {
   static const String id = "DonorProfilePage";
@@ -41,6 +43,14 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
                     accountInfo('Email', donorInformationModel.email),
                     accountInfo(
                         'Contact Number', donorInformationModel.contactNumber),
+                    GestureDetector(
+                      onTap: () =>
+                          Navigator.pushNamed(context, DonorStatsPage.id),
+                      child: accountInfo(
+                        'Statistics',
+                        'More info',
+                      ),
+                    ),
                   ],
                 ),
               ),
