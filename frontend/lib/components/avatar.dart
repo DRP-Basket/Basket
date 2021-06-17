@@ -1,3 +1,4 @@
+import 'package:drp_basket_app/constants.dart';
 import 'package:drp_basket_app/locator.dart';
 import 'package:drp_basket_app/view_controllers/image_picker_controller.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,7 @@ class Avatar extends StatelessWidget {
         child: !uploaded
             ? CircleAvatar(
                 radius: 50.0,
+                backgroundColor: Colors.blue[200],
                 child: Icon(Icons.photo_camera),
               )
             : CircleAvatar(
