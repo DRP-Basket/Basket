@@ -40,8 +40,8 @@ class _DonorHomePageState extends State<DonorHomePage> {
     curUser = locator<UserController>().curUser()!;
 
     // TODO: LINK TO FIREBASE ACCOUNT
-    donorInformationModel = DonorInformationModel(
-        curUser.uid, "Vincent", "vincent@basket.com", "0123456789");
+    donorInformationModel = DonorInformationModel(curUser.uid, "Vincent",
+        "vincent@basket.com", "180 Queen's Gate", "0123456789");
   }
 
   @override
@@ -149,10 +149,12 @@ class DonorInformationModel {
   final String uid;
   final String name;
   final String email;
+  final String address;
   final String contactNumber;
   ImageProvider? imageProvider = null;
 
-  DonorInformationModel(this.uid, this.name, this.email, this.contactNumber);
+  DonorInformationModel(
+      this.uid, this.name, this.email, this.address, this.contactNumber);
 
   void updateImage(ImageProvider imageProvider) {
     this.imageProvider = imageProvider;
