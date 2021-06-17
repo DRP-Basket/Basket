@@ -12,7 +12,7 @@ class Utilities {
   }
 }
 
-String formatDateTime(DateTime dateTime) {
-  DateFormat df = DateFormat('EEE, d MMM yyyy, hh:mm aaa');
+String formatDateTime(DateTime dateTime, {String format: 'EEE, d MMM yyyy, hh:mm aaa'}) {
+  DateFormat df = DateFormat(format);
   return df.format(dateTime);
 }

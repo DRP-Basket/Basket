@@ -3,9 +3,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/views/charity/charity_drawer.dart';
 import 'package:drp_basket_app/views/charity/utilities/utilities.dart';
+import 'package:drp_basket_app/views/donor/donations/donor_donation_form.dart';
+import 'package:drp_basket_app/views/donor/donor.dart';
 import 'package:flutter/material.dart';
 
 import 'claim_request_form.dart';
+import 'claim_request_page.dart';
 
 class ClaimRequests extends StatefulWidget {
   const ClaimRequests({Key? key}) : super(key: key);
@@ -15,20 +18,16 @@ class ClaimRequests extends StatefulWidget {
 }
 
 class _ClaimRequestsState extends State<ClaimRequests> {
+  final store = FirebaseFirestore.instance;
   @override
   Widget build(BuildContext context) {
-    var store = FirebaseFirestore.instance;
     var claimReqs = store
         .collection('charities')
         .doc('wy-test-charity') //TODO change to cur charityID
         .collection('requests')
         .snapshots();
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Claim Requests'),
-      ),
-      drawer: CharityDrawer(),
-      body: StreamBuilder(
+    return Container(
+      child: StreamBuilder(
         stream: claimReqs,
         builder: (BuildContext ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (!snapshot.hasData) {
@@ -40,35 +39,97 @@ class _ClaimRequestsState extends State<ClaimRequests> {
                   child: Text('No Requests Made'),
                 )
               : ListView(
-                  children: claimRequests.map((DocumentSnapshot ds) {
-                    var claimRequest = ClaimRequest.buildFromMap(
-                        ds.reference.id, ds.data() as Map<String, dynamic>);
-                    return GestureDetector(
-                      child: Card(
-                        child: ListTile(
-                          leading: _getIcon(claimRequest.status),
-                          title: _getDonorName(claimRequest.donationID),
-                          subtitle: Row(
-                            children: [
-                              Text('Status: ${claimRequest.status}'),
-                              Text(formatDateTime(claimRequest.timeCreated)),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
+                  children: claimRequests.map(
+                    (DocumentSnapshot ds) {
+                      var reqID = ds.reference.id;
+                      var reqMap = ds.data() as Map<String, dynamic>;
+                      return _buildRequestTile(reqID, reqMap);
+                    },
+                  ).toList(),
                 );
         },
       ),
     );
   }
 
-  Widget _getDonorName(donationID) {
-    return Text('TODO: get donor name');
+  Widget _buildRequestTile(String requestID, Map<String, dynamic> requestMap) {
+    var donationID = requestMap['donation_id'];
+    var donationStream =
+        store.collection('donations').doc(donationID).snapshots();
+    return StreamBuilder(
+      stream: donationStream,
+      builder: (BuildContext ctx, AsyncSnapshot<DocumentSnapshot> snapshot) {
+        if (!snapshot.hasData) {
+          return Container();
+        }
+        var donationMap = snapshot.data!.data() as Map<String, dynamic>;
+        Donation donation = Donation.buildFromMap(donationID, donationMap);
+        ClaimRequest req =
+            ClaimRequest.buildFromMap(requestID, requestMap, donation);
+        return _buildFromRequest(req);
+      },
+    );
   }
 
-  Widget _getIcon(status) {
-    return Text('TODO: ICON');
+  Widget _buildFromRequest(ClaimRequest request) {
+    var donorStream =
+        store.collection('donors').doc(request.donation.donorID).snapshots();
+    return StreamBuilder(
+      stream: donorStream,
+      builder: (BuildContext ctx, AsyncSnapshot<DocumentSnapshot> snapshot) {
+        if (!snapshot.hasData) {
+          return Container();
+        }
+        var donorID = snapshot.data!.reference.id;
+        var donorMap = snapshot.data!.data();
+        Donor donor = Donor.buildFromMap(donorID, donorMap);
+        return GestureDetector(
+          child: Card(
+            child: ListTile(
+              leading: _getIcon(request.status),
+              title: Text(
+                donor.name,
+                style: TextStyle(
+                  fontSize: 18,
+                ),
+              ),
+              subtitle: Text('Status: ${request.status}'),
+              trailing: Text(formatDateTime(request.timeCreated,
+                  format: 'd/MM/yy hh:mm aa')),
+            ),
+          ),
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (ctx) => ClaimRequestPage(request, donor),
+                ));
+          },
+        );
+      },
+    );
+  }
+
+  Widget? _getIcon(String _status) {
+    var status = _status.toLowerCase();
+    return (status == 'pending')
+        ? Icon(
+            Icons.pending_actions_outlined,
+            color: Colors.orange,
+            size: 40,
+          )
+        : (status == 'accepted')
+            ? Icon(
+                Icons.gpp_good_outlined,
+                color: Colors.green,
+                size: 40,
+              )
+            : (status == 'declined')
+                ? Icon(
+                    Icons.cancel_outlined,
+                    color: Colors.red,
+                    size: 40,
+                  )
+                : null;
   }
 }

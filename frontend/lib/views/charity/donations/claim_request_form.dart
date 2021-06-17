@@ -6,6 +6,8 @@ import 'package:drp_basket_app/views/donor/donations/donor_donation_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
+import 'donations_main.dart';
+
 class ClaimRequestForm extends StatefulWidget {
   final Donation donation;
   const ClaimRequestForm(this.donation, {Key? key}) : super(key: key);
@@ -49,7 +51,7 @@ class _ClaimRequestFormState extends State<ClaimRequestForm> {
     if (_formKey.currentState!.validate()) {
       var request = _formKey.currentState!.fields;
       ClaimRequest.sendClaimRequest(donation, request[eta]!.value);
-      Navigator.pop(context);
+      Navigator.popUntil(context, ModalRoute.withName(DonationsMain.id));
     }
   }
 }
@@ -103,12 +105,12 @@ class ClaimRequest {
     return 'wy-test-charity';
   }
 
-  static Future<ClaimRequest> buildFromMap(String id, Map<String, dynamic> req) async {
+  static ClaimRequest buildFromMap(String id, Map<String, dynamic> req, Donation donation) {
     var _req =  ClaimRequest(
-      donation: await Donation.buildFromID(req['donation_id']),
+      donation: donation,
       charityID: _curCharityID(),
-      eta: req['eta'],
-      timeCreated: req['time_created'],
+      eta: req['eta'].toDate(),
+      timeCreated: req['time_created'].toDate(),
       status: req['status'],
     );
     _req.requestID = id;

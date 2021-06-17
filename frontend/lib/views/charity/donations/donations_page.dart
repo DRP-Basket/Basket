@@ -11,8 +11,6 @@ import 'donation_page.dart';
 // Page displaying donations posted by donor
 
 class CharityDonationsPage extends StatefulWidget {
-  static String id = "CharityDonationsPage";
-
   const CharityDonationsPage({Key? key}) : super(key: key);
 
   @override
@@ -22,49 +20,50 @@ class CharityDonationsPage extends StatefulWidget {
 class _CharityDonationsPageState extends State<CharityDonationsPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(title: Text('Browse Donations')),
-        drawer: CharityDrawer(),
-        body: StreamBuilder(
-            stream:
-                locator<FirebaseFirestoreInterface>().getAvailableDonations(),
-            builder: (BuildContext ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
-              if (!snapshot.hasData) {
-                return Utilities.loading();
-              } else {
-                var donations = snapshot.data!.docs;
-                return donations.isEmpty
-                    ? Center(
-                        child: Text('No Donations Currently'),
-                      )
-                    : ListView(
-                        children: donations.map((DocumentSnapshot ds) {
-                          var donation = Donation.buildFromMap(ds.reference.id,
-                              ds.data() as Map<String, dynamic>);
-                          return GestureDetector(
-                            child: Card(
-                              child: Container(
-                                padding: EdgeInsets.all(10),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    _donationTile(donation),
-                                  ],
-                                ),
+    return Container(
+      child: StreamBuilder(
+        stream: locator<FirebaseFirestoreInterface>().getAvailableDonations(),
+        builder: (BuildContext ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (!snapshot.hasData) {
+            return Utilities.loading();
+          } else {
+            var donations = snapshot.data!.docs;
+            return donations.isEmpty
+                ? Center(
+                    child: Text('No Donations Currently'),
+                  )
+                : ListView(
+                    children: donations.map(
+                      (DocumentSnapshot ds) {
+                        var donation = Donation.buildFromMap(
+                            ds.reference.id, ds.data() as Map<String, dynamic>);
+                        return GestureDetector(
+                          child: Card(
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _donationTile(donation), // TODO: encapsulate card into this method coz it looks ugly af when loading
+                                ],
                               ),
                             ),
-                            onTap: () => {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          CharityDonationPage(donation)))
-                            },
-                          );
-                        }).toList(),
-                      );
-              }
-            }));
+                          ),
+                          onTap: () => {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        CharityDonationPage(donation)))
+                          },
+                        );
+                      },
+                    ).toList(),
+                  );
+          }
+        },
+      ),
+    );
   }
 
   // TODO : info about portion and donor ranking
@@ -73,7 +72,7 @@ class _CharityDonationsPageState extends State<CharityDonationsPage> {
       stream: locator<FirebaseFirestoreInterface>().getDonor(donation.donorID),
       builder: (BuildContext ctx, AsyncSnapshot<DocumentSnapshot> snapshot) {
         if (!snapshot.hasData) {
-          return Utilities.loading();
+          return Container();
         }
         var donor = snapshot.data!.data() as Map<String, dynamic>;
         return Container(

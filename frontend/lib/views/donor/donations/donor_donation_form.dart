@@ -19,7 +19,8 @@ class _DonorDonationFormState extends State<DonorDonationForm> {
   static const String collectBy = 'Time to collect by';
   static const String addDonation = 'Donate Today';
 
-  FormBuilderDateTimePicker dateTimePicker = FormUtilities.dateTimePicker(collectBy);
+  FormBuilderDateTimePicker dateTimePicker =
+      FormUtilities.dateTimePicker(collectBy);
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +51,6 @@ class _DonorDonationFormState extends State<DonorDonationForm> {
       _formKey.currentState!.reset();
     }
   }
-
 }
 
 class Donation {
@@ -101,6 +101,10 @@ class Donation {
   }
 
   static Future<Donation> buildFromID(String id) {
-    return FirebaseFirestore.instance.collection('donations').doc(id).get().then((ds) => buildFromMap(id, ds.data()!));
+    return FirebaseFirestore.instance
+        .collection('donations')
+        .doc(id)
+        .get()
+        .then((ds) => buildFromMap(id, ds.data()!));
   }
 }
