@@ -4,6 +4,7 @@ import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface
 import 'package:drp_basket_app/views/charity/utilities/utilities.dart';
 import 'package:drp_basket_app/views/donor/donations/donor_donation_form.dart';
 import 'package:drp_basket_app/views/donor/rank.dart';
+import 'package:drp_basket_app/views/donor/rank_explaination_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../../locator.dart';
@@ -75,10 +76,16 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
           child: ListTile(
               leading: Icon(Icons.home), title: Text(donor['address'])),
         ),
-        Card(
-          child: ListTile(
-            leading: Icon(Icons.star),
-            title: Text(rankString[getRank(donor['donation_count'])]!),
+        GestureDetector(
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => RankExplanationScreen()),
+          ),
+          child: Card(
+            child: ListTile(
+              leading: Icon(Icons.star),
+              title: Text(rankString[getRank(donor['donation_count'])]!),
+            ),
           ),
         ),
       ],
