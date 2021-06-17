@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:drp_basket_app/firebase_controllers/firebase_storage_interface.dart';
+import 'package:drp_basket_app/user_type.dart';
 import 'package:drp_basket_app/views/donor/donations/donor_donation_form.dart';
 import 'package:drp_basket_app/views/donor/rank.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +20,32 @@ class CharityDonationsPage extends StatefulWidget {
 }
 
 class _CharityDonationsPageState extends State<CharityDonationsPage> {
+  Future<Widget> _getImage(Donation donation) async {
+    String downloadUrl = await locator<FirebaseStorageInterface>()
+        .getImageUrl(UserType.DONOR, donation.donorID);
+
+    return Container(
+      padding: EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          // image:
+          image: NetworkImage(downloadUrl),
+          colorFilter: new ColorFilter.mode(
+              Colors.black.withOpacity(0.3), BlendMode.dstATop),
+          fit: BoxFit.fitWidth,
+          alignment: Alignment.topCenter,
+        ),
+      ),
+      // child: Column(
+      //   crossAxisAlignment: CrossAxisAlignment.start,
+      //   children: [
+      child: _donationTile(donation),
+      // TODO: encapsulate card into this method coz it looks ugly af when loading
+      // ],
+      // ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -37,17 +65,14 @@ class _CharityDonationsPageState extends State<CharityDonationsPage> {
                       (DocumentSnapshot ds) {
                         var donation = Donation.buildFromMap(
                             ds.reference.id, ds.data() as Map<String, dynamic>);
+                        print(donation.donorID);
                         return GestureDetector(
                           child: Card(
-                            child: Container(
-                              padding: EdgeInsets.all(10),
-                              // child: Column(
-                              //   crossAxisAlignment: CrossAxisAlignment.start,
-                              //   children: [
-                              child: _donationTile(donation),
-                                  // TODO: encapsulate card into this method coz it looks ugly af when loading
-                                // ],
-                              // ),
+                            child: FutureBuilder(
+                              future: _getImage(donation),
+                              builder: (BuildContext context, snapshot) {
+                                return snapshot.hasData ? snapshot.data as Widget : Container();
+                              },
                             ),
                           ),
                           onTap: () => {
