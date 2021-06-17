@@ -52,7 +52,7 @@ class UserController {
     }
   }
 
-  final String _loginFailed = "Login failed";
+  final String _loginFailed = "Login Failed";
 
   Future<void> testLogInWithEmailAndPassword() async {
     _currentUser = await _firebaseAuthController.loginWithEmailAndPassword(
@@ -74,8 +74,10 @@ class UserController {
       } else if (e.code == 'wrong-password') {
         loginScreen.updateUIAuthFail(
             _loginFailed, "Password input is incorrect.");
+      } else if (e.code == "invalid-email") {
+        loginScreen.updateUIAuthFail(
+            _loginFailed, "Please input a valid email address.");
       }
-    } finally {
       loginScreen.resetSpinner();
     }
   }
