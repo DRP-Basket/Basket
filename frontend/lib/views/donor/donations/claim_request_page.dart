@@ -34,11 +34,11 @@ class _DonorClaimRequestPageState extends State<DonorClaimRequestPage> {
         padding: EdgeInsets.all(20),
         child: ListView(
           children: [
-            _showStatus(),
+            request.showStatus(),
             _showCharityName(),
-            _showTimeOfRequest(),
+            request.showTimeCreated(),
             _showContactNumber(),
-            _showETA(),
+            request.showETA(),
             _showCharityDesc(),
             request.status == 'Pending' ? _respondButtons() : Container(),
           ],
@@ -73,18 +73,6 @@ class _DonorClaimRequestPageState extends State<DonorClaimRequestPage> {
     );
   }
 
-  Widget _showTimeOfRequest() {
-    return Card(
-      child: ListTile(
-        leading: Icon(Icons.send_sharp),
-        title: Text('Sent at'),
-        subtitle: Text(
-          formatDateTime(request.timeCreated, format: 'd/MM/yy hh:mm aa'),
-        ),
-      ),
-    );
-  }
-
   Widget _showCharityDesc() {
     return Card(
       child: Column(
@@ -101,28 +89,6 @@ class _DonorClaimRequestPageState extends State<DonorClaimRequestPage> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _showETA() {
-    return Card(
-      child: ListTile(
-        leading: Icon(Icons.watch_later_sharp),
-        title: Text('Estimated Time of Arrival'),
-        subtitle: Text(formatDateTime(request.eta)),
-      ),
-    );
-  }
-
-  Widget _showStatus() {
-    return ListTile(
-      title: Text(
-        'Status: ${request.status}',
-        style: TextStyle(
-          fontSize: 24,
-        ),
-        textAlign: TextAlign.center,
       ),
     );
   }

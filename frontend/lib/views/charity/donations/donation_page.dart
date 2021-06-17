@@ -43,7 +43,7 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
               child: Column(
                 children: [
                   _donorInfo(donor),
-                  _donationInfo(),
+                  donation.donationInfo(),
                   SizedBox(
                     height: 20,
                   ),
@@ -89,38 +89,6 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _donationInfo() {
-    return Card(
-      child: Column(
-        children: [
-          ListTile(
-            title: Text('Donation Info'),
-          ),
-          Divider(),
-          ListTile(
-            leading: Icon(Icons.watch_later_sharp),
-            title: Text('Collect By'),
-            subtitle: Text(formatDateTime(donation.collectBy)),
-          ),
-          Divider(),
-          ListTile(
-            leading: Icon(Icons.description_sharp),
-            title: Text('Description'),
-            subtitle: Text(donation.description == null
-                ? '(empty)'
-                : donation.description!),
-          ),
-          Divider(),
-          ListTile(
-            leading: Icon(Icons.add),
-            title: Text('Time Posted'),
-            subtitle: Text(formatDateTime(donation.timeCreated)),
-          ),
-        ],
-      ),
     );
   }
 
