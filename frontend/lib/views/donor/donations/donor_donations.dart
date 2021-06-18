@@ -4,10 +4,11 @@ import 'package:drp_basket_app/views/charity/donations/claim_request_form.dart';
 import 'package:drp_basket_app/views/charity/utilities/utilities.dart';
 import 'package:drp_basket_app/views/donations/donation.dart';
 import 'package:drp_basket_app/views/donations/donation_form.dart';
+import 'package:drp_basket_app/views/requests/request.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import '../../../locator.dart';
-import 'claim_request_page.dart';
+import 'request_page.dart';
 
 class DonorDonations extends StatelessWidget {
   const DonorDonations({Key? key}) : super(key: key);
@@ -197,13 +198,13 @@ class _DonorDonationsPageState extends State<DonorDonationsPage> {
               return Container();
             }
             var reqMap = snapshot.data!.data() as Map<String, dynamic>;
-            ClaimRequest req =
-                ClaimRequest.buildFromMap(reqID, reqMap, donation);
+            Request req =
+                Request.buildFromMap(reqID, reqMap, donation);
             return GestureDetector(
               child: Column(
                 children: [
                   ListTile(
-                    leading: ClaimRequest.getIcon(req.status),
+                    leading: req.getIconFromStatus(),
                     title: Text(
                       charity['name'],
                       style: TextStyle(
@@ -225,7 +226,7 @@ class _DonorDonationsPageState extends State<DonorDonationsPage> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (ctx) => DonorClaimRequestPage(req, charity)));
+                        builder: (ctx) => RequestPage(req, charity)));
               },
             );
           },

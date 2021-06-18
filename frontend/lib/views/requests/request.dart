@@ -44,6 +44,19 @@ class Request {
   static const STATUS = 'status';
   static const TIME_CREATED = 'time_created';
 
+  static Request buildFromMap(
+      String id, Map<String, dynamic> req, Donation donation) {
+    Request request = Request(
+      charityID: req[CHARITY_ID],
+      donorID: req[DONOR_ID],
+      donation: donation,
+      timeCreated: req[TIME_CREATED],
+      status: req[STATUS],
+    );
+    request.id = id;
+    return request;
+  }
+
   static Request sendRequest({required String donorID, Donation? donation}) {
     Request req = Request(
       charityID: curUser.uid,
@@ -97,15 +110,6 @@ class Request {
         .update(fields);
   }
 
-  void respond(Donation donation) {
-    assert(status == PING_CHARITY_WAITING);
-    fsUpdate({
-      DONATION_ID: donation.id,
-      STATUS: PING_DONOR_WAITING,
-    });
-    addRequestToDonation(donation);
-  }
-
   void addRequestToDonation(Donation donation) {
     _store
         .collection('donors')
@@ -118,6 +122,16 @@ class Request {
       CHARITY_ID: charityID,
       TIME_CREATED: timeCreated,
     });
+  }
+
+  // Donor Actions ------------------------------------------------------
+  void respond(Donation donation) {
+    assert(status == PING_CHARITY_WAITING);
+    fsUpdate({
+      DONATION_ID: donation.id,
+      STATUS: PING_DONOR_WAITING,
+    });
+    addRequestToDonation(donation);
   }
 
   void donorDecline() {
@@ -195,5 +209,45 @@ class Request {
         ),
       ),
     );
+  }
+
+  Widget? getIconFromStatus() {
+    switch (status) {
+      case PING_DONOR_WAITING:
+        return Icon(
+          Icons.pending_actions_outlined,
+          color: Colors.blue,
+          size: 40,
+        );
+      case PING_CHARITY_WAITING:
+      case POST_WAITING:
+        return Icon(
+          Icons.pending_actions_outlined,
+          color: Colors.orange,
+          size: 40,
+        );
+      case PING_ACCEPTED:
+      case POST_ACCEPTED:
+        return Icon(
+          Icons.gpp_good_outlined,
+          color: Colors.orange,
+          size: 40,
+        );
+      case PING_CLAIMED:
+      case POST_CLAIMED:
+        return Icon(
+          Icons.gpp_good_outlined,
+          color: Colors.green,
+          size: 40,
+        );
+      case PING_DONOR_DECLINED:
+      case PING_CHARITY_DECLINED:
+      case POST_DECLINED:
+        return Icon(
+          Icons.cancel_outlined,
+          color: Colors.red,
+          size: 40,
+        );
+    }
   }
 }

@@ -103,6 +103,7 @@ class Donation {
       collectTime: donation[COLLECT_TIME],
       assignedCharityID: donation[CHARITY_ID],
     );
+    _donation.id = donationID;
     return _donation;
   }
 
