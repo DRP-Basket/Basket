@@ -33,7 +33,7 @@ class _DonorRequestsState extends State<DonorRequests> {
     final Stream<QuerySnapshot> _requestStream =
         locator<FirebaseFirestoreInterface>()
             .getCollection("donors")
-            .doc(curUID)
+            .doc(curUID) 
             .collection("requests")
             .snapshots();
     return Scaffold(

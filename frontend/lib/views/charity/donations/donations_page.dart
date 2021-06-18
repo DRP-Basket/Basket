@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_storage_interface.dart';
 import 'package:drp_basket_app/user_type.dart';
-import 'package:drp_basket_app/views/donor/donations/donor_donation_form.dart';
+import 'package:drp_basket_app/views/donations/donation.dart';
 import 'package:drp_basket_app/views/donor/rank.dart';
 import 'package:flutter/material.dart';
 
@@ -128,7 +128,7 @@ class _CharityDonationsPageState extends State<CharityDonationsPage> {
                 dense: true,
                 leading: Icon(Icons.watch_later_sharp),
                 title: Text('Collect By:'),
-                subtitle: Text(formatDateTime(donation.collectBy)),
+                // TODO: subtitle: Text(formatDateTime(donation.collectBy)),
               ),
             ],
           ),

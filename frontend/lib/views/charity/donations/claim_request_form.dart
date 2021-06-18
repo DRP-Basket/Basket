@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/views/charity/events/charity_events_page.dart';
 import 'package:drp_basket_app/views/charity/utilities/form_utilities.dart';
 import 'package:drp_basket_app/views/charity/utilities/utilities.dart';
-import 'package:drp_basket_app/views/donor/donations/donor_donation_form.dart';
+import 'package:drp_basket_app/views/donations/donation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
@@ -84,7 +84,7 @@ class ClaimRequest {
         .doc(req.charityID)
         .collection('requests')
         .add({
-      'donation_id': req.donation.donationID,
+      'donation_id': req.donation.id,
       'eta': req.eta,
       'time_created': req.timeCreated,
       'status': req.status,
@@ -92,7 +92,7 @@ class ClaimRequest {
       req.requestID = value.id;
       store
           .collection('donations')
-          .doc(req.donation.donationID)
+          .doc(req.donation.id)
           .collection('requests')
           .doc(value.id)
           .set({'charity_id': req.charityID});

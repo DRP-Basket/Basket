@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/constants.dart';
 import 'package:drp_basket_app/views/charity/utilities/utilities.dart';
-import 'package:drp_basket_app/views/donor/donations/donor_donation_form.dart';
+import 'package:drp_basket_app/views/donations/donation.dart';
 import 'package:drp_basket_app/views/donor/rank.dart';
 import 'package:drp_basket_app/views/donor/rank_explaination_screen.dart';
 import 'package:flutter/material.dart';
@@ -40,7 +40,7 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
               child: Column(
                 children: [
                   _donorInfo(donor),
-                  donation.donationInfo(),
+                  // TODO: donation.donationInfo(),
                   SizedBox(
                     height: 20,
                   ),

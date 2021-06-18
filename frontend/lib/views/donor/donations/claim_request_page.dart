@@ -147,7 +147,7 @@ class _DonorClaimRequestPageState extends State<DonorClaimRequestPage> {
         if (newStatus == 'Accepted') {
           store
               .collection('donations')
-              .doc(request.donation.donationID)
+              .doc(request.donation.id)
               .update({'status': 'Claimed'});
         }
         Navigator.pop(context);

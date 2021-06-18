@@ -46,7 +46,7 @@ class _ClaimRequestPageState extends State<ClaimRequestPage> {
             request.showTimeCreated(),
             _showContactNumber(),
             _showAddress(),
-            request.donation.donationInfo(),
+            // TODO: request.donation.donationInfo(),
             FormUtilities.addButton(_collectedDonation, "Collected")
           ],
         ),
