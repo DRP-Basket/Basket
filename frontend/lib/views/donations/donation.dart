@@ -66,11 +66,7 @@ class Donation {
 
   void fsAddDonation() {
     // Save donation in donor's donations collection
-    _store
-        .collection('donors')
-        .doc(donorID)
-        .collection('donation_list')
-        .add({
+    _store.collection('donors').doc(donorID).collection('donation_list').add({
       'donor_id': donorID,
       'status': status,
       'items': items,
@@ -110,7 +106,7 @@ class Donation {
     return _donation;
   }
 
-  Widget display() {
+  Widget display({bool showCharity: true}) {
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -119,7 +115,9 @@ class Donation {
           displayField('Collect before',
               nullOrAlt(collectDate) + nullOrAlt(collectTime)),
           displayField('Options', options),
-          assignedCharityID == null ? Container() : getCharityName(),
+          (!showCharity || (assignedCharityID == null))
+              ? Container()
+              : getCharityName(),
         ],
       ),
     );
