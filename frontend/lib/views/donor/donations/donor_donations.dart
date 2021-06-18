@@ -7,7 +7,7 @@ import 'package:drp_basket_app/views/utilities/utilities.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import '../../../locator.dart';
-import 'request_page.dart';
+import '../requests/request_page.dart';
 
 class DonorDonations extends StatelessWidget {
   const DonorDonations({Key? key}) : super(key: key);
@@ -57,7 +57,7 @@ class _DonorDonationsPageState extends State<DonorDonationsPage> {
       stream: _store
           .collection('donors')
           .doc(curUser.uid)
-          .collection('donations')
+          .collection('donation_list')
           .orderBy('time_created', descending: true)
           .snapshots(),
       builder: (BuildContext ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -149,7 +149,7 @@ class _DonorDonationsPageState extends State<DonorDonationsPage> {
     var reqStream = _store
         .collection('donors')
         .doc(curUser.uid)
-        .collection('donations')
+        .collection('donation_list')
         .doc(donation.id)
         .collection('requests')
         .snapshots();
@@ -186,7 +186,7 @@ class _DonorDonationsPageState extends State<DonorDonationsPage> {
         var requestStream = _store
             .collection('charities')
             .doc(charityID)
-            .collection('requests')
+            .collection('request_list')
             .doc(reqID)
             .snapshots();
         return StreamBuilder(
@@ -197,8 +197,7 @@ class _DonorDonationsPageState extends State<DonorDonationsPage> {
               return Container();
             }
             var reqMap = snapshot.data!.data() as Map<String, dynamic>;
-            Request req =
-                Request.buildFromMap(reqID, reqMap, donation);
+            Request req = Request.buildFromMap(reqID, reqMap, donation);
             return GestureDetector(
               child: Column(
                 children: [
@@ -211,7 +210,7 @@ class _DonorDonationsPageState extends State<DonorDonationsPage> {
                       ),
                     ),
                     subtitle: Text(
-                      'Status: ${req.status}',
+                      req.getStatusText(true),
                     ),
                     trailing: Text(
                       formatDateTime(req.timeCreated,

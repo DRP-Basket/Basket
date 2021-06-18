@@ -1,3 +1,4 @@
+import 'package:drp_basket_app/views/donor/donor_main.dart';
 import 'package:drp_basket_app/views/requests/request.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -246,9 +247,7 @@ class _DonationFormState extends State<DonationForm> {
                       ),
                       child: Center(
                           child: ElevatedButton(
-                        onPressed: () {
-                          _confirmTap();
-                        },
+                        onPressed: _confirmTap,
                         child: Text(
                           "Confirm & Send",
                           style: TextStyle(fontSize: 20),
@@ -266,8 +265,8 @@ class _DonationFormState extends State<DonationForm> {
     );
   }
 
-  void _confirmTap() {
-    Donation donation = Donation.addNewDonation(
+  Future<void> _confirmTap() async {
+    Donation donation = await Donation.addNewDonation(
       items: _foodItemsEditingController.text,
       portions: int.parse(_portionNumberEditingController.text),
       options: _dietaryOptionsEditingController.text,
@@ -276,5 +275,6 @@ class _DonationFormState extends State<DonationForm> {
       charityID: request?.charityID,
     );
     request?.respond(donation);
+    Navigator.popUntil(context, ModalRoute.withName(DonorMain.id));
   }
 }

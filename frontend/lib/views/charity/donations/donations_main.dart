@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 
 import '../../../locator.dart';
 import '../../home_page.dart';
+import '../charity_donor.dart';
+import '../donor_page.dart';
 import 'donations_page.dart';
 
 class DonationsMain extends StatelessWidget {
@@ -17,30 +19,21 @@ class DonationsMain extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-            title: Text('Donations'),
-            bottom: TabBar(
-              tabs: [
-                Tab(
-                  text: 'Browse',
-                ),
-                Tab(
-                  text: 'My Requests',
-                ),
-              ],
-            ),
-            actions: [
-              IconButton(
-                onPressed: () {
-                  locator<UserController>().userSignOut();
-                  Navigator.pushReplacementNamed(context, HomePage.id);
-                },
-                icon: Icon(Icons.logout),
-              )
-            ]),
+          title: TabBar(
+            tabs: [
+              Tab(
+                text: 'Browse Donations',
+              ),
+              Tab(
+                text: 'Find Donors',
+              ),
+            ],
+          ),
+        ),
         body: TabBarView(
           children: [
             CharityDonationsPage(),
-            RequestsPage(),
+            CharityDonor(),
           ],
         ),
       ),

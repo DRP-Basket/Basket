@@ -63,7 +63,6 @@ class _RequestPageState extends State<RequestPage> {
       child: Column(
         children: [
           ListTile(
-            leading: Icon(Icons.info_sharp),
             title: Text('About the Charity'),
           ),
           Divider(),
@@ -78,6 +77,7 @@ class _RequestPageState extends State<RequestPage> {
           Padding(
             padding: EdgeInsets.all(8),
             child: ListTile(
+              leading: Icon(Icons.info_sharp),
               title: Text('Description'),
               subtitle: Text(charity['description']),
             ),
@@ -138,6 +138,7 @@ class _RequestPageState extends State<RequestPage> {
       color: Colors.green,
       onPressed: () {
         request.donorAccept();
+        Navigator.pop(context);
       },
     );
   }
@@ -149,6 +150,7 @@ class _RequestPageState extends State<RequestPage> {
       color: Colors.red,
       onPressed: () {
         request.donorDecline();
+        Navigator.pop(context);
       },
     );
   }

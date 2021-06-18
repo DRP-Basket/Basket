@@ -10,6 +10,7 @@ import 'donations/donor_donations.dart';
 import 'donor_home_page.dart';
 import 'donor_profile_page.dart';
 import 'donor_requests.dart';
+import 'requests/requests_page.dart';
 
 class DonorMain extends StatefulWidget {
   static const String id = "DonorMain";
@@ -25,7 +26,7 @@ class _DonorMainState extends State<DonorMain> {
 
   final List<Widget> _widgets = [
     DonorDonations(),
-    DonorRequests(),
+    RequestsPage(),
     DonorProfilePage(),
   ];
 

@@ -6,6 +6,7 @@ import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:drp_basket_app/views/charity/charity_donor.dart';
 import 'package:drp_basket_app/views/charity/donor_request_end.dart';
 import 'package:drp_basket_app/views/charity/utilities.dart';
+import 'package:drp_basket_app/views/requests/request.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -79,6 +80,9 @@ class _DonorPageState extends State<DonorPage> with TickerProviderStateMixin {
           if (!canSendReq) {
             return;
           }
+          // TODO: CHANGED FROM HERE
+          Request.sendRequest(donorID: donorModel.uid);
+          return;
           showDialog(
             context: context,
             builder: (context) => AlertDialog(

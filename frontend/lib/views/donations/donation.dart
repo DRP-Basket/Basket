@@ -31,13 +31,13 @@ class Donation {
       this.collectDate,
       this.collectTime});
 
-  static Donation addNewDonation(
+  static Future<Donation> addNewDonation (
       {required String items,
       required int portions,
       String? options,
       String? collectDate,
       String? collectTime,
-      String? charityID}) {
+      String? charityID}) async {
     // Initialise fields
     Donation donation = Donation(
       donorID: curUser.uid,
@@ -51,7 +51,7 @@ class Donation {
       assignedCharityID: charityID,
     );
     // Add to firestore
-    donation.fsAddDonation();
+    await donation.fsAddDonation();
     return donation;
   }
 
@@ -65,9 +65,9 @@ class Donation {
   static const COLLECT_TIME = 'collect_time';
   static const CHARITY_ID = 'charity_id';
 
-  void fsAddDonation() {
+  Future<void> fsAddDonation() async {
     // Save donation in donor's donations collection
-    _store.collection('donors').doc(donorID).collection('donation_list').add({
+    await _store.collection('donors').doc(donorID).collection('donation_list').add({
       'donor_id': donorID,
       'status': status,
       'items': items,
@@ -90,6 +90,15 @@ class Donation {
     });
   }
 
+  void fsUpdate(Map<String, dynamic> fields) {
+    _store
+        .collection('donors')
+        .doc(donorID)
+        .collection('donation_list')
+        .doc(id)
+        .update(fields);
+  }
+
   static Donation buildFromMap(
       String donationID, Map<String, dynamic> donation) {
     // Initialise fields
@@ -98,7 +107,7 @@ class Donation {
       status: donation[STATUS],
       items: donation[ITEMS],
       portions: donation[PORTIONS],
-      timeCreated: donation[TIME_CREATED],
+      timeCreated: donation[TIME_CREATED].toDate(),
       options: donation[OPTIONS],
       collectDate: donation[COLLECT_DATE],
       collectTime: donation[COLLECT_TIME],
@@ -191,5 +200,19 @@ class Donation {
         content,
       ),
     );
+  }
+
+  void claimed() {
+    fsUpdate({
+      STATUS: 'Claimed',
+    });
+  }
+
+  void assignToCharity(String charityID) {
+    fsUpdate({
+      STATUS: 'Assigned',
+      CHARITY_ID: charityID,
+    });
+    _store.collection('available_donations').doc(id).delete();
   }
 }

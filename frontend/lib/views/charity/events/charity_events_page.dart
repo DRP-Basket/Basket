@@ -7,6 +7,7 @@ import 'package:drp_basket_app/views/charity/charity_donor.dart';
 import 'package:drp_basket_app/views/charity/charity_profile_page.dart';
 import 'package:drp_basket_app/views/charity/contacts/charity_receiver_form.dart';
 import 'package:drp_basket_app/views/charity/contacts/charity_receivers.dart';
+import 'package:drp_basket_app/views/charity/requests/requests_page.dart';
 import 'package:drp_basket_app/views/welcome_page.dart';
 import 'package:drp_basket_app/views/charity/donations/donations_main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -48,8 +49,8 @@ class _CharityEventsPageState extends State<CharityEventsPage> {
     super.initState();
     _widgets.add(_buildCharityEventsPage());
     _widgets.add(ReceiversList());
+    _widgets.add(RequestsPage());
     _widgets.add(DonationsMain());
-    _widgets.add(CharityDonor());
     _widgets.add(CharityProfilePage());
     curUser = locator<UserController>().curUser()!;
 
@@ -223,11 +224,7 @@ class _CharityEventsPageState extends State<CharityEventsPage> {
             );
           }
           if (!snapshot.hasData) {
-            return Center(
-              child: CircularProgressIndicator(
-                backgroundColor: Colors.lightBlueAccent,
-              ),
-            );
+            return Container();
           }
           var donations = snapshot.data!.docs;
           donations.sort((a, b) {

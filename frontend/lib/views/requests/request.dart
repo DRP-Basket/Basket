@@ -8,12 +8,12 @@ import 'package:flutter/material.dart';
 import '../../locator.dart';
 
 class Request {
-  late final String id;
-  final String charityID;
-  final String donorID;
-  final Donation? donation;
-  final DateTime timeCreated;
-  final String status;
+  late String id;
+  String charityID;
+  String donorID;
+  Donation? donation;
+  DateTime timeCreated;
+  String status;
 
   Request({
     required this.charityID,
@@ -51,7 +51,7 @@ class Request {
       charityID: req[CHARITY_ID],
       donorID: req[DONOR_ID],
       donation: donation,
-      timeCreated: req[TIME_CREATED],
+      timeCreated: req[TIME_CREATED].toDate(),
       status: req[STATUS],
     );
     request.id = id;
@@ -157,6 +157,7 @@ class Request {
     fsUpdate({
       STATUS: POST_ACCEPTED,
     });
+    donation!.assignToCharity(charityID);
   }
 
   // Charity Actions ------------------------------------------------------
@@ -173,6 +174,7 @@ class Request {
     fsUpdate({
       STATUS: PING_CHARITY_DECLINED,
     });
+    // TODO : canceled status
   }
 
   void claimed() {
@@ -192,6 +194,7 @@ class Request {
     });
     locator<FirebaseFirestoreInterface>()
         .addDonationCount(donorID, donation!.portions);
+    donation!.claimed();
   }
 
   // UI -------------------------------------------------------------------

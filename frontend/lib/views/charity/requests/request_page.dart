@@ -33,7 +33,7 @@ class _RequestPageState extends State<RequestPage> {
         padding: EdgeInsets.all(20),
         child: ListView(
           children: [
-            request.showStatus(),
+            request.showStatus(isDonor: false),
             _showDonorName(),
             request.showTimeCreated(),
             _showContactNumber(),
@@ -76,6 +76,7 @@ class _RequestPageState extends State<RequestPage> {
       color: Colors.green,
       onPressed: () {
         request.claimed();
+        Navigator.pop(context);
       },
     );
   }
@@ -98,6 +99,7 @@ class _RequestPageState extends State<RequestPage> {
       color: Colors.green,
       onPressed: () {
         request.charityAccept();
+        Navigator.pop(context);
       },
     );
   }
@@ -109,6 +111,7 @@ class _RequestPageState extends State<RequestPage> {
       color: Colors.red,
       onPressed: () {
         request.charityDecline();
+        Navigator.pop(context);
       },
     );
   }
