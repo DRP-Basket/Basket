@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/constants.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
-import 'package:drp_basket_app/views/donor/donations/donor_donation_form.dart';
 import 'package:drp_basket_app/views/charity/events/charity_event.dart';
 import 'package:drp_basket_app/views/charity/contacts/charity_receiver.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -257,36 +256,14 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
   @override
   Stream<QuerySnapshot<Map<String, dynamic>>> getAvailableDonations() {
     return _fireStore
-        .collection("donations")
-        .where("status",
-            isEqualTo:
-                "Unclaimed") //TODO : filter donations that are past the time to collect
+        .collection("available_donations")
+        .orderBy('time_created', descending: true)
         .snapshots();
   }
 
   @override
   Stream<DocumentSnapshot<Map<String, dynamic>>> getDonor(String donorID) {
     return _fireStore.collection("donors").doc(donorID).snapshots();
-  }
-
-  Future<void> addDonation(Donation donation) async {
-    CollectionReference donations = _fireStore.collection('donations');
-    return donations.add({
-      'donor_id': donation.donorID,
-      'time_created': donation.timeCreated,
-      'collect_by': donation.collectBy,
-      'description': donation.description,
-      'status': donation.status,
-    }).then((value) {
-      donation.donationID = value.id;
-      _fireStore
-          .collection("donors")
-          .doc(donation.donorID)
-          .collection("donations")
-          .doc(value.id)
-          .set({'time_created': donation.timeCreated});
-      print('Donation Added');
-    }).catchError((err) => print("Failed to add donation: $err"));
   }
 
   Future<void> addDonationCount(String donorID, int addCount) async {

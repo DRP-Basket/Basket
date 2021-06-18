@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
+import 'package:drp_basket_app/views/utilities/utilities.dart';
 import 'package:flutter/material.dart';
 
 import '../../locator.dart';
@@ -124,6 +125,39 @@ class Donation {
     );
   }
 
+  Widget charityDisplay() {
+    return Card(
+      child: Column(
+        children: [
+          displayField('Items', items),
+          Divider(),
+          displayField('Portions', portions.toString()),
+          Divider(),
+          displayField('Date', nullOrAlt(collectDate)),
+          Divider(),
+          displayField('Collect by', nullOrAlt(collectTime)),
+          Divider(),
+          displayField('Dietary options', options),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.add),
+            title: Text('Time posted'),
+            subtitle: Text(formatDateTime(timeCreated)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget displaySummary() {
+    return Column(
+      children: [
+        Text('$portions portions'),
+        Text('Collect by: ${nullOrAlt(collectDate)} ${nullOrAlt(collectTime)}'),
+      ],
+    );
+  }
+
   var store = FirebaseFirestore.instance;
 
   Widget getCharityName() {
@@ -143,11 +177,13 @@ class Donation {
     return s == null ? alt : s;
   }
 
-  Widget displayField(String label, String? content) {
+  Widget displayField(String label, String? content,
+      {Icon? icon, bool card: false}) {
     if (content == null || content.isEmpty) {
       return Container();
     }
     return ListTile(
+      leading: icon,
       title: Text(
         label,
       ),

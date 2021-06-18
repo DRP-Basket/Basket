@@ -4,7 +4,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 import '../../../locator.dart';
 import 'charity_event.dart';
-import '../utilities/form_utilities.dart';
+import '../../utilities/form_utilities.dart';
 
 // Form to fill in when adding a new charity event
 

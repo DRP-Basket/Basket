@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:drp_basket_app/views/charity/requests/request_page.dart';
-import 'package:drp_basket_app/views/charity/utilities/utilities.dart';
 import 'package:drp_basket_app/views/donor/donor.dart';
 import 'package:drp_basket_app/views/requests/request.dart';
+import 'package:drp_basket_app/views/utilities/utilities.dart';
 import 'package:flutter/material.dart';
 
 import '../../../locator.dart';
@@ -31,7 +31,7 @@ class _RequestsPageState extends State<RequestsPage> {
       stream: reqStream,
       builder: (BuildContext ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (!snapshot.hasData) {
-          return Utilities.loading();
+          return loading();
         }
         var reqs = snapshot.data!.docs;
         return reqs.isEmpty

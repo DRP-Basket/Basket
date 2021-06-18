@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/constants.dart';
-import 'package:drp_basket_app/views/charity/utilities/utilities.dart';
 import 'package:drp_basket_app/views/donations/donation.dart';
 import 'package:drp_basket_app/views/donor/rank.dart';
 import 'package:drp_basket_app/views/donor/rank_explaination_screen.dart';
+import 'package:drp_basket_app/views/requests/request.dart';
+import 'package:drp_basket_app/views/utilities/utilities.dart';
 import 'package:flutter/material.dart';
-import 'claim_request_form.dart';
 
 class CharityDonationPage extends StatefulWidget {
   final Donation donation;
@@ -31,7 +31,7 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
         stream: _store.collection('donors').doc(donation.donorID).snapshots(),
         builder: (BuildContext ctx, AsyncSnapshot<DocumentSnapshot> snapshot) {
           if (!snapshot.hasData) {
-            return Utilities.loading();
+            return loading();
           }
           var donor = snapshot.data!.data() as Map<String, dynamic>;
           return Container(
@@ -40,7 +40,7 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
               child: Column(
                 children: [
                   _donorInfo(donor),
-                  // TODO: donation.donationInfo(),
+                  donation.charityDisplay(),
                   SizedBox(
                     height: 20,
                   ),
@@ -97,12 +97,11 @@ class _CharityDonationPageState extends State<CharityDonationPage> {
         padding: EdgeInsets.all(10),
         primary: primary_color,
       ),
-      onPressed: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ClaimRequestForm(donation)));
-      },
+      onPressed: () => Request.sendRequest(
+        donorID: donation.donorID,
+        donation: donation,
+        // TODO : confirmation dialog
+      ),
     );
   }
 }

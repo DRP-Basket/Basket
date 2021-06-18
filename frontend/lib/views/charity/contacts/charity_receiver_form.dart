@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 import '../../../locator.dart';
-import '../utilities/form_utilities.dart';
+import '../../utilities/form_utilities.dart';
 import 'charity_receiver.dart';
 
 // Form to be filled in when adding a receiver contact

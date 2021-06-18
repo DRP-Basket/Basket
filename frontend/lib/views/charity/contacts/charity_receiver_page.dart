@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:drp_basket_app/views/utilities/utilities.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../../locator.dart';
 import '../../../firebase_controllers/firebase_firestore_interface.dart';
-import '../utilities/utilities.dart';
 import 'charity_receiver.dart';
 
 // Page displaying information of a single receiver (name + contact + location + donations claimed)
@@ -78,7 +78,7 @@ class _ReceiverPageState extends State<ReceiverPage> {
                 .donationsClaimed(receiverID),
             builder: (BuildContext ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
               if (!snapshot.hasData) {
-                return Utilities.loading();
+                return loading();
               } else {
                 var donationsClaimed = snapshot.data!.docs;
                 return Column(
@@ -100,7 +100,7 @@ class _ReceiverPageState extends State<ReceiverPage> {
       stream: locator<FirebaseFirestoreInterface>().getDonationEvent(id),
       builder: (BuildContext ctx, AsyncSnapshot<DocumentSnapshot> snapshot) {
         if (!snapshot.hasData) {
-          return Utilities.loading();
+          return Container();
         } else {
           var donationEvent = snapshot.data!.data() as Map<String, dynamic>;
           return ListTile(

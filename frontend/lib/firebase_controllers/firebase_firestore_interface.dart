@@ -1,4 +1,3 @@
-import 'package:drp_basket_app/views/donor/donations/donor_donation_form.dart';
 import 'package:drp_basket_app/views/charity/events/charity_event.dart';
 import 'package:drp_basket_app/views/charity/contacts/charity_receiver.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -27,8 +26,6 @@ class FirebaseFirestoreInterface {
   getContactMap() {}
 
   getDonationList() {}
-
-  addDonation(Donation donation) {}
 
   addContact(String name, String contactNumber) {}
 
