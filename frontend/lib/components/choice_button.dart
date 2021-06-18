@@ -6,7 +6,8 @@ class ChoiceButton extends StatelessWidget {
   final String text;
   final onTap;
 
-  const ChoiceButton({required this.icon, required this.text, required this.onTap});
+  const ChoiceButton(
+      {required this.icon, required this.text, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -14,14 +15,13 @@ class ChoiceButton extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: EdgeInsets.all(30.0),
-        decoration:  BoxDecoration(
+        decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.only(
               topLeft: Radius.circular(10),
               topRight: Radius.circular(10),
               bottomLeft: Radius.circular(10),
-              bottomRight: Radius.circular(10)
-          ),
+              bottomRight: Radius.circular(10)),
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withOpacity(0.5),

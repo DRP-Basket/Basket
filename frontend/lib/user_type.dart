@@ -1,3 +1,4 @@
+import 'package:drp_basket_app/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -8,15 +9,21 @@ enum UserType {
   RECEIVER,
 }
 
+const Map<UserType, String> userTypeString = {
+  UserType.DONOR: "Business",
+  UserType.CHARITY: "Charity",
+  UserType.FOOD_BANK: "Food Bank",
+};
+
 const Map<UserType, Color> userColorTheme = {
-  UserType.DONOR: Colors.blueAccent,
-  UserType.CHARITY: Colors.greenAccent,
+  UserType.DONOR: secondary_color,
+  UserType.CHARITY: primary_color,
   UserType.FOOD_BANK: Colors.purpleAccent,
 };
 
 const Map<UserType, String> cloudCollection = {
   UserType.DONOR: "donors",
-  UserType.CHARITY: "charity",
+  UserType.CHARITY: "charities",
   UserType.RECEIVER: "receiver",
   UserType.FOOD_BANK: "foodbank",
 };

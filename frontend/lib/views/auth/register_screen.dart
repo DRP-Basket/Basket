@@ -59,7 +59,8 @@ class _RegisterScreenState extends State<RegisterScreen>
     emailController.clear();
     passwordController1.clear();
     passwordController2.clear();
-    Navigator.pushNamed(context, RegisterChoiceScreen.id);
+    Navigator.pushNamedAndRemoveUntil(
+        context, RegisterChoiceScreen.id, (route) => false);
   }
 
   @override
@@ -87,7 +88,11 @@ class _RegisterScreenState extends State<RegisterScreen>
       body: ModalProgressHUD(
         inAsyncCall: showSpinner,
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 50.0),
+          padding: EdgeInsets.only(
+            left: 24,
+            right: 24,
+            top: 75,
+          ),
           child: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -100,9 +105,6 @@ class _RegisterScreenState extends State<RegisterScreen>
                     child: Image.asset(LOGO_IMAGE_PATH),
                   ),
                 ),
-                SizedBox(
-                  height: 24.0,
-                ),
                 Form(
                   key: _formKey,
                   child: Column(
@@ -113,7 +115,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                         controller: emailController,
                         validator: (value) =>
                             ValidatorController.validateEmail(value),
-                        borderColor: border_color,
+                        borderColor: secondary_color,
                         textColor: text_color,
                       ),
                       SizedBox(
@@ -125,7 +127,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                         controller: passwordController1,
                         validator: (value) =>
                             ValidatorController.validatePassword(value),
-                        borderColor: border_color,
+                        borderColor: secondary_color,
                         textColor: text_color,
                         obscureText: true,
                       ),
@@ -138,7 +140,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                         controller: passwordController2,
                         validator: (value) =>
                             ValidatorController.validatePassword(value),
-                        borderColor: border_color,
+                        borderColor: secondary_color,
                         textColor: text_color,
                         obscureText: true,
                       ),
@@ -146,19 +148,19 @@ class _RegisterScreenState extends State<RegisterScreen>
                   ),
                 ),
                 SizedBox(
-                  height: 24.0,
+                  height: 20.0,
                 ),
                 LongButton(
                   text: REGISTER_TEXT,
                   onPressed: register,
                   backgroundColor: primary_color,
-                  textColor: text_color,
+                  textColor: Colors.white,
                 ),
                 LongButton(
                   text: BACK_TEXT,
                   onPressed: () => Navigator.pop(context),
                   backgroundColor: primary_color,
-                  textColor: text_color,
+                  textColor: Colors.white,
                 ),
               ],
             ),

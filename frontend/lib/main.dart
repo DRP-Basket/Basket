@@ -15,7 +15,6 @@ import 'constants.dart';
 import 'locator.dart';
 import 'views/charity/charity_home_page.dart';
 import 'views/charity/donations/donations_main.dart';
-import 'views/charity/donations/donations_page.dart';
 import 'views/donor/donor_main.dart';
 
 void main() async {
@@ -35,7 +34,7 @@ class Basket extends StatelessWidget {
             dialHandColor: fourth_color,
             hourMinuteTextColor: third_color,
           )),
-      home: HomePage(),
+      home: WelcomeScreen(),
       routes: {
         // General
         HomePage.id: (context) => HomePage(),

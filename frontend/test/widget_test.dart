@@ -12,11 +12,8 @@ import 'package:drp_basket_app/main.dart';
 
 void main() {
   test('random test', () {
-    expect('foo,bar,baz', allOf([
-      contains('foo'),
-      isNot(startsWith('bar')),
-      endsWith('baz')
-    ]));
+    expect('foo,bar,baz',
+        allOf([contains('foo'), isNot(startsWith('bar')), endsWith('baz')]));
   });
 
   // testWidgets('Counter increments smoke test', (WidgetTester tester) async {

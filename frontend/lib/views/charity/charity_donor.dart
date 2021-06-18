@@ -21,9 +21,7 @@ class _CharityDonorState extends State<CharityDonor> {
   Widget build(BuildContext context) {
     final Stream<QuerySnapshot> _donorsStream =
         locator<FirebaseFirestoreInterface>()
-            .getCollection("charities")
-            .doc("ex-charity")
-            .collection("donors")
+            .getCollection("donors")
             .snapshots();
 
     return StreamBuilder(
@@ -44,13 +42,14 @@ class _CharityDonorState extends State<CharityDonor> {
           );
         }
         List<String> donorIDs = [];
+        List<dynamic> donorDatas = [];
         snapshot.data.docs.forEach((doc) {
           donorIDs.add(doc.id);
+          donorDatas.add(doc.data());
         });
         // Each set will be donorData, donorImage
         List<Future> futures = [];
         donorIDs.forEach((req) {
-          futures.add(_getDonorData(req));
           futures.add(_getImage(req));
         });
         return FutureBuilder(
@@ -64,14 +63,13 @@ class _CharityDonorState extends State<CharityDonor> {
             }
             List<Widget> children = [];
             List<dynamic> data = snapshot.data!;
-            for (int i = 0; i < data.length; i += 2) {
-              Map<String, dynamic> curDonorData = data[i].data();
+            for (int i = 0; i < data.length; i++) {
               DonorModel curDonorModel = DonorModel(
-                  donorIDs[i ~/ 2],
-                  curDonorData["name"],
-                  curDonorData["address"],
-                  curDonorData["contact_number"],
-                  data[i + 1]);
+                  donorIDs[i],
+                  donorDatas[i]["name"],
+                  donorDatas[i]["address"],
+                  donorDatas[i]["contact_number"],
+                  data[i]);
               children.add(_buildCard(curDonorModel));
             }
             return ListView(
@@ -81,13 +79,6 @@ class _CharityDonorState extends State<CharityDonor> {
         );
       },
     );
-  }
-
-  Future<DocumentSnapshot> _getDonorData(String donorUID) {
-    return locator<FirebaseFirestoreInterface>()
-        .getCollection("donors")
-        .doc(donorUID)
-        .get();
   }
 
   Future<ImageProvider> _getImage(String uid) async {

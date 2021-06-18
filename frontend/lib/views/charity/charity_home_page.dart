@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'charity_drawer.dart';
 
 class CharityHomePage extends StatelessWidget {
   static const String id = "CharityHomePage";
@@ -10,7 +9,6 @@ class CharityHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("Charity Home Page")),
-      drawer: CharityDrawer(),
       body: Center(
         child: CircleAvatar(
           radius: 50.0,
@@ -21,7 +19,7 @@ class CharityHomePage extends StatelessWidget {
               color: Colors.white,
               size: 30.0,
             ),
-            onPressed: (){},// () => {SMSSender().sendSMS(context),}
+            onPressed: () {}, // () => {SMSSender().sendSMS(context),}
           ),
         ),
       ),

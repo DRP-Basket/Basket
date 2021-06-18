@@ -1,3 +1,4 @@
+import 'package:drp_basket_app/views/charity/utilities/form_utilities.dart';
 import 'package:drp_basket_app/views/donor/donor.dart';
 import 'package:flutter/material.dart';
 
@@ -23,6 +24,12 @@ class _ClaimRequestPageState extends State<ClaimRequestPage> {
 
   @override
   Widget build(BuildContext context) {
+
+    void _collectedDonation() {
+      String donorID = widget.donor.uid;
+
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -40,6 +47,7 @@ class _ClaimRequestPageState extends State<ClaimRequestPage> {
             _showContactNumber(),
             _showAddress(),
             request.donation.donationInfo(),
+            FormUtilities.addButton(_collectedDonation, "Collected")
           ],
         ),
       ),

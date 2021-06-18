@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/constants.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:drp_basket_app/locator.dart';
+import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:drp_basket_app/views/charity/charity_donor.dart';
 import 'package:drp_basket_app/views/charity/utilities.dart';
 import 'package:flutter/cupertino.dart';
@@ -149,32 +150,30 @@ class DonorRequestEnd extends StatelessWidget {
   }
 
   Widget _confirmDialog(BuildContext context, bool successful) {
-    TextEditingController _unsuccessfulMessage = TextEditingController();
+    TextEditingController _messageController = TextEditingController();
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
       },
       child: AlertDialog(
         title: Text('This request is ${!successful ? "un" : ""}successful'),
-        content: !successful
-            ? TextField(
-                decoration: InputDecoration(
-                  labelText: "Message (optional)",
-                  filled: true,
-                  fillColor: Colors.grey[250],
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(width: 0),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: secondary_color, width: 2.0),
-                  ),
-                  border: null,
-                ),
-                controller: _unsuccessfulMessage,
-                keyboardType: TextInputType.multiline,
-                maxLines: 3,
-              )
-            : null,
+        content: TextField(
+          decoration: InputDecoration(
+            labelText: "Message (optional)",
+            filled: true,
+            fillColor: Colors.grey[250],
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(width: 0),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: secondary_color, width: 2.0),
+            ),
+            border: null,
+          ),
+          controller: _messageController,
+          keyboardType: TextInputType.multiline,
+          maxLines: 3,
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -182,7 +181,7 @@ class DonorRequestEnd extends StatelessWidget {
           ),
           TextButton(
             onPressed: () async {
-              await _markNewStatus(successful, _unsuccessfulMessage);
+              await _markNewStatus(successful, _messageController);
               Navigator.pop(context);
               Navigator.pop(context);
             },
@@ -194,9 +193,13 @@ class DonorRequestEnd extends StatelessWidget {
   }
 
   Future<void> _markNewStatus(
-      bool successful, TextEditingController unsuccessfulMessage) async {
+      bool successful, TextEditingController messageController) async {
     String status = !successful ? "un" : "";
     status += "successful";
+
+    if (successful) {
+      locator<FirebaseFirestoreInterface>().addDonationCount(donorModel.uid, requestData["portions"]);
+    }
 
     DocumentReference reqRef = locator<FirebaseFirestoreInterface>()
         .getCollection("donors")
@@ -207,23 +210,26 @@ class DonorRequestEnd extends StatelessWidget {
       "status": status,
       "completion_time": Timestamp.now(),
     };
-    if (!successful && unsuccessfulMessage.text != "") {
-      updateMap["message"] = unsuccessfulMessage.text;
+    if (messageController.text != "") {
+      updateMap["message"] = messageController.text;
     }
     await reqRef.update(updateMap);
 
     DocumentReference charityRef = locator<FirebaseFirestoreInterface>()
-        .getCollection("charities")
-        .doc("ex-charity")
-        .collection("donors")
-        .doc(donorModel.uid);
+        .getCollection("donors")
+        .doc(donorModel.uid)
+        .collection("charities")
+        .doc(locator<UserController>().curUser()!.uid);
 
     var charityData = await charityRef.get();
     var charityMap = charityData.data() as Map<String, dynamic>;
 
     List<dynamic> ongoingReqIDs = charityMap["ongoing_requests"];
     ongoingReqIDs.remove(requestID);
-    List<dynamic> pastReqIDs = charityMap["past_requests"];
+    List<dynamic>? pastReqIDs = charityMap["past_requests"];
+    if (pastReqIDs == null) {
+      pastReqIDs = [];
+    }
     pastReqIDs.add(requestID);
 
     await charityRef.update({

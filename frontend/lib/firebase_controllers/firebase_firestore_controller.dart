@@ -1,34 +1,38 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/constants.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
-import 'package:drp_basket_app/gps_controllers/geocoding_controller.dart';
-import 'package:drp_basket_app/locator.dart';
 import 'package:drp_basket_app/views/donor/donations/donor_donation_form.dart';
 import 'package:drp_basket_app/views/charity/events/charity_event.dart';
 import 'package:drp_basket_app/views/charity/contacts/charity_receiver.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../user_type.dart';
 
 class FirebaseFirestoreController implements FirebaseFirestoreInterface {
   final _fireStore = FirebaseFirestore.instance;
 
   Future<void> addNewUserInformation(
-      UserType userType, String user, String name, String contactNumber,
-      {String location = ""}) async {
+      UserType userType, User user, String name, String contactNumber,
+      {String? address, String? description}) async {
     if (userType == UserType.CHARITY) {
-      await _fireStore.collection(cloudCollection[userType]!).doc(user).set({
+      await _fireStore
+          .collection(cloudCollection[userType]!)
+          .doc(user.uid)
+          .set({
         NAME: name,
         CONTACT_NUMBER: contactNumber,
+        EMAIL: user.email,
+        DESCRIPTION: description,
       });
     } else {
-      Map<String, double> results =
-          await locator<GeoCodingController>().getLatitudeLongitude(location);
-
-      await _fireStore.collection(cloudCollection[userType]!).doc(user).set({
+      await _fireStore
+          .collection(cloudCollection[userType]!)
+          .doc(user.uid)
+          .set({
         NAME: name,
         CONTACT_NUMBER: contactNumber,
-        LATITUDE: results[LATITUDE]!,
-        LONGITUDE: results[LONGITUDE]!,
-        ADDRESS: location,
+        EMAIL: user.email,
+        ADDRESS: address,
+        DONATION_COUNT: 0,
       });
     }
   }
@@ -254,7 +258,9 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
   Stream<QuerySnapshot<Map<String, dynamic>>> getAvailableDonations() {
     return _fireStore
         .collection("donations")
-        .where("status", isEqualTo: "Unclaimed") //TODO : filter donations that are past the time to collect
+        .where("status",
+            isEqualTo:
+                "Unclaimed") //TODO : filter donations that are past the time to collect
         .snapshots();
   }
 
@@ -281,5 +287,14 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
           .set({'time_created': donation.timeCreated});
       print('Donation Added');
     }).catchError((err) => print("Failed to add donation: $err"));
+  }
+
+  Future<void> addDonationCount(String donorID, int addCount) async {
+    DocumentSnapshot ds = await _fireStore.collection('donors').doc(donorID).get();
+    int count = (ds.data() as Map)[DONATION_COUNT];
+    count += addCount;
+    await _fireStore.collection('donors').doc(donorID).update({
+      DONATION_COUNT: count
+    });
   }
 }
