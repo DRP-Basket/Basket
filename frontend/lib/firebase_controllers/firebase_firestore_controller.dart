@@ -32,6 +32,7 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
         CONTACT_NUMBER: contactNumber,
         EMAIL: user.email,
         ADDRESS: address,
+        DONATION_COUNT: 0,
       });
     }
   }
@@ -286,5 +287,14 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
           .set({'time_created': donation.timeCreated});
       print('Donation Added');
     }).catchError((err) => print("Failed to add donation: $err"));
+  }
+
+  Future<void> addDonationCount(String donorID, int addCount) async {
+    DocumentSnapshot ds = await _fireStore.collection('donors').doc(donorID).get();
+    int count = (ds.data() as Map)[DONATION_COUNT];
+    count += addCount;
+    await _fireStore.collection('donors').doc(donorID).update({
+      DONATION_COUNT: count
+    });
   }
 }

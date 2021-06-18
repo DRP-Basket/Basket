@@ -197,6 +197,10 @@ class DonorRequestEnd extends StatelessWidget {
     String status = !successful ? "un" : "";
     status += "successful";
 
+    if (successful) {
+      locator<FirebaseFirestoreInterface>().addDonationCount(donorModel.uid, requestData["portions"]);
+    }
+
     DocumentReference reqRef = locator<FirebaseFirestoreInterface>()
         .getCollection("donors")
         .doc(donorModel.uid)
