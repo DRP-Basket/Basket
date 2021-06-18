@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:drp_basket_app/views/charity/utilities/utilities.dart';
 import 'package:drp_basket_app/views/donations/donation.dart';
@@ -156,6 +157,41 @@ class Request {
     fsUpdate({
       STATUS: POST_ACCEPTED,
     });
+  }
+
+  // Charity Actions ------------------------------------------------------
+
+  void charityAccept() {
+    assert(status == PING_DONOR_WAITING);
+    fsUpdate({
+      STATUS: PING_ACCEPTED,
+    });
+  }
+
+  void charityDecline() {
+    assert(status == PING_DONOR_WAITING);
+    fsUpdate({
+      STATUS: PING_CHARITY_DECLINED,
+    });
+  }
+
+  void claimed() {
+    String newStatus = '';
+    switch (status) {
+      case POST_ACCEPTED:
+        newStatus = POST_CLAIMED;
+        break;
+      case PING_ACCEPTED:
+        newStatus = PING_CLAIMED;
+        break;
+      default:
+        assert(false);
+    }
+    fsUpdate({
+      STATUS: newStatus,
+    });
+    locator<FirebaseFirestoreInterface>()
+        .addDonationCount(donorID, donation!.portions);
   }
 
   // UI -------------------------------------------------------------------

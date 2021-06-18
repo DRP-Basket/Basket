@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/views/donations/donation_form.dart';
 import 'package:drp_basket_app/views/requests/request.dart';
+import 'package:drp_basket_app/views/utilities/utilities.dart';
 import 'package:flutter/material.dart';
 
 class RequestPage extends StatefulWidget {
@@ -131,7 +132,7 @@ class _RequestPageState extends State<RequestPage> {
   }
 
   Widget _acceptButton() {
-    return _actionButton(
+    return actionButton(
       icon: Icons.check,
       label: 'Accept',
       color: Colors.green,
@@ -142,7 +143,7 @@ class _RequestPageState extends State<RequestPage> {
   }
 
   Widget _declineButton() {
-    return _actionButton(
+    return actionButton(
       icon: Icons.cancel_outlined,
       label: 'Decline',
       color: Colors.red,
@@ -153,7 +154,7 @@ class _RequestPageState extends State<RequestPage> {
   }
 
   Widget _donateButton() {
-    return _actionButton(
+    return actionButton(
       icon: Icons.volunteer_activism_sharp,
       label: 'Make a Donation',
       color: Colors.green,
@@ -168,21 +169,4 @@ class _RequestPageState extends State<RequestPage> {
     );
   }
 
-  Widget _actionButton(
-      {IconData? icon,
-      required String label,
-      required Color color,
-      required void Function() onPressed}) {
-    return ElevatedButton.icon(
-      icon: Icon(icon),
-      label: Text(label),
-      style: ElevatedButton.styleFrom(
-        primary: color,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
-        ),
-      ),
-      onPressed: onPressed,
-    );
-  }
 }

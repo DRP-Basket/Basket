@@ -9,7 +9,7 @@ class Donation {
   String donorID;
   String status;
   String items;
-  String portions;
+  int portions;
   DateTime timeCreated;
   String? assignedCharityID;
   String? options;
@@ -32,7 +32,7 @@ class Donation {
 
   static Donation addNewDonation(
       {required String items,
-      required String portions,
+      required int portions,
       String? options,
       String? collectDate,
       String? collectTime,
@@ -112,7 +112,7 @@ class Donation {
       child: Column(
         children: [
           displayField('Items', items),
-          displayField('Portions', portions),
+          displayField('Portions', portions.toString()),
           displayField('Collect before',
               nullOrAlt(collectDate) + nullOrAlt(collectTime)),
           displayField('Options', options),

@@ -269,7 +269,7 @@ class _DonationFormState extends State<DonationForm> {
   void _confirmTap() {
     Donation donation = Donation.addNewDonation(
       items: _foodItemsEditingController.text,
-      portions: _portionNumberEditingController.text,
+      portions: int.parse(_portionNumberEditingController.text),
       options: _dietaryOptionsEditingController.text,
       collectDate: date,
       collectTime: time?.format(context),
