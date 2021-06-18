@@ -46,7 +46,7 @@ class Request {
   static const TIME_CREATED = 'time_created';
 
   static Request buildFromMap(
-      String id, Map<String, dynamic> req, Donation donation) {
+      String id, Map<String, dynamic> req, Donation? donation) {
     Request request = Request(
       charityID: req[CHARITY_ID],
       donorID: req[DONOR_ID],
@@ -195,38 +195,33 @@ class Request {
   }
 
   // UI -------------------------------------------------------------------
-  Widget showStatus({bool isDonor = true}) {
-    String txt;
+  String getStatusText(bool isDonor) {
     switch (status) {
       case PING_CHARITY_WAITING:
       case POST_WAITING:
-        txt = 'Waiting for ${isDonor ? 'your' : 'their'} response';
-        break;
+        return'Waiting for ${isDonor ? 'your' : 'their'} response';
       case PING_DONOR_DECLINED:
       case POST_DECLINED:
-        txt = isDonor ? 'You declined the request' : 'Request was declined';
-        break;
+        return isDonor ? 'You declined the request' : 'Request was declined';
       case PING_ACCEPTED:
       case POST_ACCEPTED:
-        txt = 'Waiting for charity to claim donation';
-        break;
+        return 'Waiting for charity to claim donation';
       case PING_DONOR_WAITING:
-        txt = 'Waiting for ${isDonor ? 'their' : 'your'} response';
-        break;
+        return 'Waiting for ${isDonor ? 'their' : 'your'} response';
       case PING_CHARITY_DECLINED:
-        txt = isDonor ? 'Donation was declined' : 'You declined their donation';
-        break;
+        return isDonor ? 'Donation was declined' : 'You declined their donation';
       case PING_CLAIMED:
       case POST_CLAIMED:
-        txt = 'Donation claimed';
-        break;
+        return 'Donation claimed';
       default:
-        txt = 'Unknown';
+        return 'Unknown';
     }
+  }
 
+  Widget showStatus({bool isDonor = true}) { 
     return ListTile(
       title: Text(
-        txt,
+        getStatusText(isDonor),
         style: TextStyle(
           fontSize: 24,
         ),
