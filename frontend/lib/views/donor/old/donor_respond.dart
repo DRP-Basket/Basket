@@ -3,10 +3,10 @@ import 'package:drp_basket_app/constants.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_auth_interface.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:drp_basket_app/locator.dart';
-import 'package:drp_basket_app/views/donor/donor_message.dart';
+import 'package:drp_basket_app/views/donor/old/donor_message.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:drp_basket_app/views/donor/utilities.dart';
+import 'package:drp_basket_app/views/donor/old/utilities.dart';
 
 class DonorRespond extends StatefulWidget {
   const DonorRespond({Key? key}) : super(key: key);

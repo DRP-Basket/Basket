@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/constants.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:drp_basket_app/views/charity/events/charity_event.dart';
-import 'package:drp_basket_app/views/charity/contacts/charity_receiver.dart';
+import 'package:drp_basket_app/views/charity/receivers/charity_receiver.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../user_type.dart';
 

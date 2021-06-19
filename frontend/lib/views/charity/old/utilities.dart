@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/constants.dart';
-import 'package:drp_basket_app/views/charity/charity_donor.dart';
+import 'package:drp_basket_app/views/general/donor.dart';
 import 'package:flutter/material.dart';
 
 class DonorPageUtilities {
-  static Widget introRow(DonorModel donorModel) {
+  static Widget introRow(Donor donorModel) {
     return Row(
       children: [
         Spacer(),
@@ -14,7 +14,7 @@ class DonorPageUtilities {
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: 15),
               child: CircleAvatar(
-                backgroundImage: donorModel.image,
+                backgroundImage: donorModel.imageProvider,
                 radius: 75,
               ),
             ),

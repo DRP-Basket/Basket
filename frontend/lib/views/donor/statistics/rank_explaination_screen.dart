@@ -1,4 +1,4 @@
-import 'package:drp_basket_app/views/donor/rank.dart';
+import 'package:drp_basket_app/views/donor/statistics/rank.dart';
 import 'package:flutter/material.dart';
 
 class RankExplanationScreen extends StatelessWidget {

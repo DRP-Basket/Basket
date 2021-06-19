@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../../locator.dart';
 import '../../../firebase_controllers/firebase_firestore_interface.dart';
-import '../contacts/charity_receiver_page.dart';
+import '../receivers/charity_receiver_page.dart';
 
 // Page displaying details of charity event: confirmed & pending list of receivers attending the event
 

@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:drp_basket_app/views/donations/donation_form.dart';
-import 'package:drp_basket_app/views/requests/request.dart';
+import 'package:drp_basket_app/views/donor/donations/donation_form.dart';
+import 'package:drp_basket_app/views/general/request.dart';
 import 'package:drp_basket_app/views/utilities/utilities.dart';
 import 'package:flutter/material.dart';
+
+// Page displaying info about a single request
 
 class RequestPage extends StatefulWidget {
   final Request request;

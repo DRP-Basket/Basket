@@ -1,11 +1,13 @@
 import 'package:drp_basket_app/views/donor/donor_main.dart';
-import 'package:drp_basket_app/views/requests/request.dart';
+import 'package:drp_basket_app/views/general/request.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
-import '../../constants.dart';
-import 'donation.dart';
+import '../../../constants.dart';
+import '../../general/donation.dart';
+
+// Form to fill in when making a donation
 
 class DonationForm extends StatefulWidget {
   final Request? request;

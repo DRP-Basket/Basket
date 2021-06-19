@@ -1,11 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/constants.dart';
-import 'package:drp_basket_app/views/donations/donation.dart';
-import 'package:drp_basket_app/views/donor/rank.dart';
-import 'package:drp_basket_app/views/donor/rank_explaination_screen.dart';
-import 'package:drp_basket_app/views/requests/request.dart';
+import 'package:drp_basket_app/views/general/donation.dart';
+import 'package:drp_basket_app/views/donor/statistics/rank.dart';
+import 'package:drp_basket_app/views/donor/statistics/rank_explaination_screen.dart';
+import 'package:drp_basket_app/views/general/request.dart';
 import 'package:drp_basket_app/views/utilities/utilities.dart';
 import 'package:flutter/material.dart';
+
+// Page displaying info about a specific donation, request to claim donation from here
 
 class CharityDonationPage extends StatefulWidget {
   final Donation donation;

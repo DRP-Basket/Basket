@@ -1,9 +1,11 @@
-import 'package:drp_basket_app/views/donor/donor.dart';
-import 'package:drp_basket_app/views/requests/request.dart';
+import 'package:drp_basket_app/views/general/donor.dart';
+import 'package:drp_basket_app/views/general/request.dart';
 import 'package:drp_basket_app/views/utilities/utilities.dart';
 import 'package:flutter/material.dart';
 
 import '../../../constants.dart';
+
+// Page displaying info about a specific request 
 
 class RequestPage extends StatefulWidget {
   final Request request;
@@ -136,7 +138,7 @@ class _RequestPageState extends State<RequestPage> {
         leading: Icon(Icons.call),
         title: Text('Contact Number'),
         subtitle: Text(
-          donor.contact,
+          donor.contactNumber,
         ),
       ),
     );

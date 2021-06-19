@@ -1,44 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
-import 'package:drp_basket_app/views/donations/donation.dart';
-import 'package:drp_basket_app/views/donations/donation_form.dart';
-import 'package:drp_basket_app/views/requests/request.dart';
+import 'package:drp_basket_app/views/general/donation.dart';
+import 'package:drp_basket_app/views/donor/donations/donation_form.dart';
+import 'package:drp_basket_app/views/general/request.dart';
 import 'package:drp_basket_app/views/utilities/utilities.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import '../../../locator.dart';
 import '../requests/request_page.dart';
 
-class DonorDonations extends StatelessWidget {
-  const DonorDonations({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-          appBar: AppBar(
-            title: Text('Donations'),
-            bottom: TabBar(
-              tabs: [
-                Tab(
-                  text: "Donate",
-                ),
-                Tab(
-                  text: "History",
-                ),
-              ],
-            ),
-          ),
-          body: TabBarView(
-            children: [
-              DonationForm(),
-              DonorDonationsPage(),
-            ],
-          )),
-    );
-  }
-}
+// Displays all donations made 
 
 class DonorDonationsPage extends StatefulWidget {
   const DonorDonationsPage({Key? key}) : super(key: key);

@@ -3,13 +3,15 @@ import 'package:drp_basket_app/constants.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:drp_basket_app/locator.dart';
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
-import 'package:drp_basket_app/views/charity/charity_donor.dart';
-import 'package:drp_basket_app/views/charity/donor_request_end.dart';
-import 'package:drp_basket_app/views/charity/utilities.dart';
-import 'package:drp_basket_app/views/requests/request.dart';
+import 'package:drp_basket_app/views/charity/old/donor_request_end.dart';
+import 'package:drp_basket_app/views/charity/old/utilities.dart';
+import 'package:drp_basket_app/views/general/donor.dart';
+import 'package:drp_basket_app/views/general/request.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+// Page displaying information related to a specific donor, ping donor from here
 
 class DonorPage extends StatefulWidget {
   const DonorPage({Key? key}) : super(key: key);
@@ -20,7 +22,7 @@ class DonorPage extends StatefulWidget {
 
 class _DonorPageState extends State<DonorPage> with TickerProviderStateMixin {
   late TabController _tabController;
-  late DonorModel donorModel;
+  late Donor donorModel;
   late List<dynamic> reqIDs;
   late bool canSendReq;
 

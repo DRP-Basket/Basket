@@ -6,11 +6,12 @@ import 'package:provider/provider.dart';
 
 import '../../constants.dart';
 import '../../locator.dart';
-import 'donations/donor_donations.dart';
-import 'donor_home_page.dart';
+import '../general/donor.dart';
+import 'donations/donations_main.dart';
 import 'donor_profile_page.dart';
-import 'donor_requests.dart';
 import 'requests/requests_page.dart';
+
+// Controls bottom nav bar for donor view
 
 class DonorMain extends StatefulWidget {
   static const String id = "DonorMain";
@@ -25,13 +26,13 @@ class _DonorMainState extends State<DonorMain> {
   int _currentIndex = 0;
 
   final List<Widget> _widgets = [
-    DonorDonations(),
+    DonationsMain(),
     RequestsPage(),
     DonorProfilePage(),
   ];
 
   late User curUser;
-  DonorInformationModel? donorInformationModel = null;
+  Donor? donorInformationModel = null;
 
   @override
   void initState() {
@@ -45,7 +46,7 @@ class _DonorMainState extends State<DonorMain> {
         .then((value) {
       Map<String, dynamic> donorData = value.data();
       setState(() {
-        donorInformationModel = DonorInformationModel(
+        donorInformationModel = Donor(
             curUser.uid,
             donorData["name"],
             donorData["email"],
@@ -92,7 +93,7 @@ class _DonorMainState extends State<DonorMain> {
           ? Center(
               child: CircularProgressIndicator(),
             )
-          : Provider<DonorInformationModel>(
+          : Provider<Donor>(
               create: (context) => donorInformationModel!,
               child: _widgets[_currentIndex],
             ),

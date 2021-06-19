@@ -3,13 +3,13 @@ import 'package:drp_basket_app/constants.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:drp_basket_app/locator.dart';
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
-import 'package:drp_basket_app/views/charity/charity_donor.dart';
-import 'package:drp_basket_app/views/charity/utilities.dart';
+import 'package:drp_basket_app/views/charity/old/utilities.dart';
+import 'package:drp_basket_app/views/general/donor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class DonorRequestEnd extends StatelessWidget {
-  final DonorModel donorModel;
+  final Donor donorModel;
   final dynamic requestID;
   final Map<String, dynamic> requestData;
   const DonorRequestEnd(this.donorModel, this.requestID, this.requestData,

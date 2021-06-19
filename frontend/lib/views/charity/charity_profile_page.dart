@@ -7,6 +7,8 @@ import 'package:provider/provider.dart';
 
 import '../../locator.dart';
 
+// Charity profile page
+
 class CharityProfilePage extends StatefulWidget {
   static const String id = "CharityProfilePage";
 

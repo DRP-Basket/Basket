@@ -1,12 +1,9 @@
-import 'package:drp_basket_app/view_controllers/user_controller.dart';
-import 'package:drp_basket_app/views/charity/requests/requests_page.dart';
 import 'package:flutter/material.dart';
 
-import '../../../locator.dart';
-import '../../home_page.dart';
-import '../charity_donor.dart';
-import '../donor_page.dart';
+import 'donors_page.dart';
 import 'donations_page.dart';
+
+// Controls tabs under <Donations> category
 
 class DonationsMain extends StatelessWidget {
   static String id = "CharityDonationsMain";
@@ -33,7 +30,7 @@ class DonationsMain extends StatelessWidget {
         body: TabBarView(
           children: [
             CharityDonationsPage(),
-            CharityDonor(),
+            DonorsPage(),
           ],
         ),
       ),

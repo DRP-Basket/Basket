@@ -4,19 +4,22 @@ import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface
 import 'package:drp_basket_app/firebase_controllers/firebase_storage_interface.dart';
 import 'package:drp_basket_app/locator.dart';
 import 'package:drp_basket_app/user_type.dart';
-import 'package:drp_basket_app/views/charity/donor_page.dart';
+import 'package:drp_basket_app/views/charity/donations/donor_page.dart';
+import 'package:drp_basket_app/views/general/donor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class CharityDonor extends StatefulWidget {
-  const CharityDonor({Key? key}) : super(key: key);
+// Page displaying list of donors (onTap -> `donor_page`)
+
+class DonorsPage extends StatefulWidget {
+  const DonorsPage({Key? key}) : super(key: key);
 
   @override
-  _CharityDonorState createState() => _CharityDonorState();
+  _DonorsPageState createState() => _DonorsPageState();
 }
 
-class _CharityDonorState extends State<CharityDonor> {
+class _DonorsPageState extends State<DonorsPage> {
   @override
   Widget build(BuildContext context) {
     final Stream<QuerySnapshot> _donorsStream =
@@ -64,12 +67,14 @@ class _CharityDonorState extends State<CharityDonor> {
             List<Widget> children = [];
             List<dynamic> data = snapshot.data!;
             for (int i = 0; i < data.length; i++) {
-              DonorModel curDonorModel = DonorModel(
+              Donor curDonorModel = Donor(
                   donorIDs[i],
                   donorDatas[i]["name"],
+                  donorDatas[i]["email"],
                   donorDatas[i]["address"],
                   donorDatas[i]["contact_number"],
-                  data[i]);
+                  donorDatas[i]["donation_count"],
+                  imageProvider: data[i]);
               children.add(_buildCard(curDonorModel));
             }
             return ListView(
@@ -87,13 +92,13 @@ class _CharityDonorState extends State<CharityDonor> {
     return NetworkImage(downloadUrl);
   }
 
-  Widget _buildCard(DonorModel donorModel) {
+  Widget _buildCard(Donor donorModel) {
     return GestureDetector(
       onTap: () => {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (BuildContext context) => Provider<DonorModel>(
+                builder: (BuildContext context) => Provider<Donor>(
                       create: (context) => donorModel,
                       child: DonorPage(),
                     )))
@@ -109,7 +114,7 @@ class _CharityDonorState extends State<CharityDonor> {
                   child: Padding(
                     padding: EdgeInsets.symmetric(vertical: 5),
                     child: CircleAvatar(
-                      backgroundImage: donorModel.image,
+                      backgroundImage: donorModel.imageProvider,
                       radius: 50,
                     ),
                   ),
@@ -154,14 +159,4 @@ class _CharityDonorState extends State<CharityDonor> {
           )),
     );
   }
-}
-
-class DonorModel {
-  final String uid;
-  final String name;
-  final String address;
-  final String contactNumber;
-  final ImageProvider image;
-
-  DonorModel(this.uid, this.name, this.address, this.contactNumber, this.image);
 }

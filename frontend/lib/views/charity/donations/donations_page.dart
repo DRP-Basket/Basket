@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_storage_interface.dart';
 import 'package:drp_basket_app/user_type.dart';
-import 'package:drp_basket_app/views/donations/donation.dart';
-import 'package:drp_basket_app/views/donor/rank.dart';
+import 'package:drp_basket_app/views/general/donation.dart';
+import 'package:drp_basket_app/views/donor/statistics/rank.dart';
 import 'package:drp_basket_app/views/utilities/utilities.dart';
 import 'package:flutter/material.dart';
 
@@ -10,7 +10,7 @@ import '../../../locator.dart';
 import '../../../firebase_controllers/firebase_firestore_interface.dart';
 import 'donation_page.dart';
 
-// Page displaying donations posted by donor
+// Page displaying currently available donations (onTap -> `donation_page`)
 
 class CharityDonationsPage extends StatefulWidget {
   const CharityDonationsPage({Key? key}) : super(key: key);

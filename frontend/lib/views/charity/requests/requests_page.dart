@@ -1,13 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:drp_basket_app/views/charity/requests/request_page.dart';
-import 'package:drp_basket_app/views/donations/donation.dart';
-import 'package:drp_basket_app/views/donor/donor.dart';
-import 'package:drp_basket_app/views/requests/request.dart';
+import 'package:drp_basket_app/views/general/donation.dart';
+import 'package:drp_basket_app/views/general/donor.dart';
+import 'package:drp_basket_app/views/general/request.dart';
 import 'package:drp_basket_app/views/utilities/utilities.dart';
 import 'package:flutter/material.dart';
 
 import '../../../locator.dart';
+
+// Page displaying all requests the charity makes (onTap goes to `request_page`)
 
 class RequestsPage extends StatefulWidget {
   const RequestsPage({Key? key}) : super(key: key);
@@ -64,7 +66,7 @@ class _RequestsPageState extends State<RequestsPage> {
         if (!snapshot.hasData) {
           return Container();
         }
-        var donorMap = snapshot.data!.data();
+        var donorMap = snapshot.data!.data() as Map<String, dynamic>;
         Donor donor = Donor.buildFromMap(req.donorID, donorMap);
         Widget tileContent = Card(
           child: ListTile(

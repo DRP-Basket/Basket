@@ -1,5 +1,5 @@
 import 'package:drp_basket_app/views/charity/events/charity_event.dart';
-import 'package:drp_basket_app/views/charity/contacts/charity_receiver.dart';
+import 'package:drp_basket_app/views/charity/receivers/charity_receiver.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../user_type.dart';

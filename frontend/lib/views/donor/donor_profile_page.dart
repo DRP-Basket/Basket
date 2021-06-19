@@ -1,13 +1,15 @@
 import 'package:drp_basket_app/firebase_controllers/firebase_storage_interface.dart';
 import 'package:drp_basket_app/user_type.dart';
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
-import 'package:drp_basket_app/views/donor/donor_home_page.dart';
+import 'package:drp_basket_app/views/general/donor.dart';
 import 'package:drp_basket_app/views/welcome_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../locator.dart';
-import 'donor_stats_screen.dart';
+import 'statistics/donor_stats_screen.dart';
+
+// Donor Profile Page
 
 class DonorProfilePage extends StatefulWidget {
   static const String id = "DonorProfilePage";
@@ -17,11 +19,11 @@ class DonorProfilePage extends StatefulWidget {
 }
 
 class _DonorProfilePageState extends State<DonorProfilePage> {
-  late DonorInformationModel donorInformationModel;
+  late Donor donorInformationModel;
 
   @override
   Widget build(BuildContext context) {
-    donorInformationModel = Provider.of<DonorInformationModel>(context);
+    donorInformationModel = Provider.of<Donor>(context);
 
     return Scaffold(
       resizeToAvoidBottomInset: false,

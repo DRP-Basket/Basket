@@ -1,8 +1,8 @@
 import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:drp_basket_app/locator.dart';
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
-import 'package:drp_basket_app/views/donor/rank.dart';
-import 'package:drp_basket_app/views/donor/rank_explaination_screen.dart';
+import 'package:drp_basket_app/views/donor/statistics/rank.dart';
+import 'package:drp_basket_app/views/donor/statistics/rank_explaination_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 

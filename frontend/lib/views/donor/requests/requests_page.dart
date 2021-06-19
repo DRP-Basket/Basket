@@ -1,12 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
-import 'package:drp_basket_app/views/donations/donation.dart';
-import 'package:drp_basket_app/views/requests/request.dart';
+import 'package:drp_basket_app/views/general/donation.dart';
+import 'package:drp_basket_app/views/general/request.dart';
 import 'package:drp_basket_app/views/utilities/utilities.dart';
 import 'package:flutter/material.dart';
 
 import '../../../locator.dart';
 import 'request_page.dart';
+
+// Page displaying all requests sent to donor
 
 class RequestsPage extends StatefulWidget {
   const RequestsPage({Key? key}) : super(key: key);
