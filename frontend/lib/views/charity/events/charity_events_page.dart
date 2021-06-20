@@ -6,7 +6,7 @@ import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:drp_basket_app/views/charity/charity_profile_page.dart';
 import 'package:drp_basket_app/views/charity/receivers/charity_receiver_form.dart';
 import 'package:drp_basket_app/views/charity/receivers/charity_receivers.dart';
-import 'package:drp_basket_app/views/charity/requests/requests_page.dart';
+import 'package:drp_basket_app/views/charity/requests/requests_main.dart';
 import 'package:drp_basket_app/views/welcome_page.dart';
 import 'package:drp_basket_app/views/charity/donations/donations_main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -48,7 +48,7 @@ class _CharityEventsPageState extends State<CharityEventsPage> {
     super.initState();
     _widgets.add(_buildCharityEventsPage());
     _widgets.add(ReceiversList());
-    _widgets.add(RequestsPage());
+    _widgets.add(RequestsMain());
     _widgets.add(DonationsMain());
     _widgets.add(CharityProfilePage());
     curUser = locator<UserController>().curUser()!;
@@ -155,7 +155,7 @@ class _CharityEventsPageState extends State<CharityEventsPage> {
             icon: Icon(Icons.restaurant_menu),
           ),
           BottomNavigationBarItem(
-            label: "Donors",
+            label: "Donations",
             icon: Icon(Icons.store),
           ),
           BottomNavigationBarItem(
@@ -222,8 +222,12 @@ class _CharityEventsPageState extends State<CharityEventsPage> {
               ),
             );
           }
-          if (!snapshot.hasData) {
-            return Container();
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return Center(
+              child: Text(
+                'No Events Posted Yet',
+              ),
+            );
           }
           var donations = snapshot.data!.docs;
           donations.sort((a, b) {

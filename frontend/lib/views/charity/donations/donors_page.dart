@@ -6,6 +6,7 @@ import 'package:drp_basket_app/locator.dart';
 import 'package:drp_basket_app/user_type.dart';
 import 'package:drp_basket_app/views/charity/donations/donor_page.dart';
 import 'package:drp_basket_app/views/general/donor.dart';
+import 'package:drp_basket_app/views/utilities/utilities.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -31,16 +32,12 @@ class _DonorsPageState extends State<DonorsPage> {
       stream: _donorsStream,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Container();
+          return loading();
         }
         if (snapshot.data.docs.isEmpty) {
           return Center(
             child: Text(
-              "No donors",
-              style: TextStyle(
-                color: third_color,
-                fontSize: 24,
-              ),
+              "No Donors Yet",
             ),
           );
         }

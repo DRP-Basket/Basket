@@ -11,15 +11,21 @@ import 'request_page.dart';
 // Page displaying all requests sent to donor
 
 class RequestsPage extends StatefulWidget {
-  const RequestsPage({Key? key}) : super(key: key);
+  final bool ongoing;
+
+  const RequestsPage({Key? key, bool this.ongoing: true}) : super(key: key);
 
   @override
-  _RequestsPageState createState() => _RequestsPageState();
+  _RequestsPageState createState() => _RequestsPageState(ongoing);
 }
 
 class _RequestsPageState extends State<RequestsPage> {
+  final bool ongoing;
+
   static var curUser = locator<UserController>().curUser()!;
   var _store = FirebaseFirestore.instance;
+
+  _RequestsPageState(this.ongoing);
 
   @override
   Widget build(BuildContext context) {
@@ -27,30 +33,34 @@ class _RequestsPageState extends State<RequestsPage> {
         .collection('donors')
         .doc(curUser.uid)
         .collection('request_list')
+        .where(Request.CLOSED, isEqualTo: !ongoing)
+        .orderBy(Request.TIME_CREATED)
         .snapshots();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Charity Requests'),
-      ),
-      body: StreamBuilder(
-          stream: reqStream,
-          builder: (BuildContext ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
-            if (!snapshot.hasData) {
-              return loading();
-            }
-            var reqs = snapshot.data!.docs;
-            return ListView(
-              children: reqs.map(
-                (DocumentSnapshot ds) {
-                  var reqID = ds.reference.id;
-                  var req = ds.data() as Map<String, dynamic>;
-                  return _requestTile(reqID, req[Request.CHARITY_ID]);
-                },
-              ).toList(),
+    return StreamBuilder(
+        stream: reqStream,
+        builder: (BuildContext ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return loading();
+          }
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return Center(
+              child: Text(
+                'No ${ongoing ? 'Ongoing' : 'Past'} Requests',
+              ),
             );
-          }),
-    );
+          }
+          var reqs = snapshot.data!.docs;
+          return ListView(
+            children: reqs.map(
+              (DocumentSnapshot ds) {
+                var reqID = ds.reference.id;
+                var req = ds.data() as Map<String, dynamic>;
+                return _requestTile(reqID, req[Request.CHARITY_ID]);
+              },
+            ).toList(),
+          );
+        });
   }
 
   Widget _requestTile(String reqID, String charityID) {
@@ -67,7 +77,7 @@ class _RequestsPageState extends State<RequestsPage> {
           return Container();
         }
         var reqMap = snapshot.data!.data() as Map<String, dynamic>;
-        Request req = Request.buildFromMap(reqID, reqMap, null);
+        Request req = Request.buildFromMap(id: reqID, req: reqMap);
         return StreamBuilder(
           stream: _store.collection('charities').doc(charityID).snapshots(),
           builder:

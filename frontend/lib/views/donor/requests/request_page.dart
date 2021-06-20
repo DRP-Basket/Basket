@@ -4,6 +4,8 @@ import 'package:drp_basket_app/views/general/request.dart';
 import 'package:drp_basket_app/views/utilities/utilities.dart';
 import 'package:flutter/material.dart';
 
+import '../../../constants.dart';
+
 // Page displaying info about a single request
 
 class RequestPage extends StatefulWidget {
@@ -40,6 +42,7 @@ class _RequestPageState extends State<RequestPage> {
             request.showTimeCreated(),
             _showCharityInfo(),
             _showDonationInfo(),
+            request.endState() ? _closeButton() : Container(),
           ],
         ),
       ),
@@ -173,4 +176,13 @@ class _RequestPageState extends State<RequestPage> {
     );
   }
 
+  Widget _closeButton() {
+    return actionButton(
+        label: 'Close Request',
+        color: primary_color,
+        onPressed: () {
+          request.donorClose();
+          Navigator.pop(context);
+        });
+  }
 }

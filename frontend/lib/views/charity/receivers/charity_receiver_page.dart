@@ -77,8 +77,18 @@ class _ReceiverPageState extends State<ReceiverPage> {
             stream: locator<FirebaseFirestoreInterface>()
                 .donationsClaimed(receiverID),
             builder: (BuildContext ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
-              if (!snapshot.hasData) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
                 return loading();
+              }
+              if (!snapshot.hasData) {
+                return Center(
+                  child: Text(
+                    'No Receivers Yet',
+                    style: TextStyle(
+                      fontSize: 36,
+                    ),
+                  ),
+                );
               } else {
                 var donationsClaimed = snapshot.data!.docs;
                 return Column(

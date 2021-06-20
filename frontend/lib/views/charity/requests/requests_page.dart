@@ -12,53 +12,67 @@ import '../../../locator.dart';
 // Page displaying all requests the charity makes (onTap goes to `request_page`)
 
 class RequestsPage extends StatefulWidget {
-  const RequestsPage({Key? key}) : super(key: key);
+  final bool ongoing;
+  final String? donorID;
+  RequestsPage({Key? key, bool this.ongoing: true, String? this.donorID})
+      : super(key: key);
 
   @override
-  _RequestsPageState createState() => _RequestsPageState();
+  _RequestsPageState createState() => _RequestsPageState(ongoing, donorID);
 }
 
 class _RequestsPageState extends State<RequestsPage> {
+  final bool ongoing;
+  final String? donorID;
+
   static var curUser = locator<UserController>().curUser()!;
   var _store = FirebaseFirestore.instance;
 
+  _RequestsPageState(this.ongoing, this.donorID);
+
   @override
   Widget build(BuildContext context) {
-    var reqStream = _store
+    var allReq = _store
         .collection('charities')
         .doc(curUser.uid)
-        .collection('request_list')
-        .snapshots();
+        .collection('request_list');
+    var filtered = donorID == null
+        ? allReq.where(Request.CLOSED, isEqualTo: !ongoing)
+        : allReq.where(Request.DONOR_ID, isEqualTo: donorID);
+    var reqStream =
+        filtered.orderBy(Request.TIME_CREATED, descending: true).snapshots();
 
-    return Scaffold(
-      appBar: AppBar(title: Text('My Requests'),),
-      body: StreamBuilder(
-        stream: reqStream,
-        builder: (BuildContext ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (!snapshot.hasData) {
-            return loading();
-          }
-          var reqs = snapshot.data!.docs;
-          return reqs.isEmpty
-              ? Center(
-                  child: Text('No Requests Made'),
-                )
-              : ListView(
-                  children: reqs.map(
-                    (DocumentSnapshot ds) {
-                      var reqID = ds.reference.id;
-                      var reqMap = ds.data() as Map<String, dynamic>;
-                      return _buildRequestTile(reqID, reqMap);
-                    },
-                  ).toList(),
-                );
-        },
-      ),
+    return StreamBuilder(
+      stream: reqStream,
+      builder: (BuildContext ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return loading();
+        }
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return Center(
+            child: Text(
+              'No ${ongoing ? 'Ongoing' : 'Past'} Requests',
+            ),
+          );
+        }
+        var reqs = snapshot.data!.docs;
+        return ListView(
+          // Build each request to diplay as tile
+          children: reqs.map(
+            (DocumentSnapshot ds) {
+              var reqID = ds.reference.id;
+              var reqMap = ds.data() as Map<String, dynamic>;
+              return _buildRequestTile(reqID, reqMap);
+            },
+          ).toList(),
+        );
+      },
     );
   }
 
   Widget _buildRequestTile(String requestID, Map<String, dynamic> requestMap) {
-    Request req = Request.buildFromMap(requestID, requestMap, null);
+    // Collect request information
+    Request req = Request.buildFromMap(id: requestID, req: requestMap);
     var donorStream = _store.collection('donors').doc(req.donorID).snapshots();
     return StreamBuilder(
       stream: donorStream,
@@ -66,6 +80,7 @@ class _RequestsPageState extends State<RequestsPage> {
         if (!snapshot.hasData) {
           return Container();
         }
+        // Collect donor information
         var donorMap = snapshot.data!.data() as Map<String, dynamic>;
         Donor donor = Donor.buildFromMap(req.donorID, donorMap);
         Widget tileContent = Card(
@@ -87,12 +102,20 @@ class _RequestsPageState extends State<RequestsPage> {
         if (requestMap[Request.DONATION_ID] == null) {
           return _make(tileContent, req, donor);
         }
+        // Collect donation information if available
         return StreamBuilder(
-          stream: _store.collection('donors').doc(req.donorID).collection('donation_list').doc(requestMap[Request.DONATION_ID]).snapshots(),
-          builder: (BuildContext ctx, AsyncSnapshot<DocumentSnapshot> snapshot) {
+          stream: _store
+              .collection('donors')
+              .doc(req.donorID)
+              .collection('donation_list')
+              .doc(requestMap[Request.DONATION_ID])
+              .snapshots(),
+          builder:
+              (BuildContext ctx, AsyncSnapshot<DocumentSnapshot> snapshot) {
             if (!snapshot.hasData) return Container();
             var donMap = snapshot.data!.data() as Map<String, dynamic>;
-            Donation don = Donation.buildFromMap(requestMap[Request.DONATION_ID], donMap);
+            Donation don =
+                Donation.buildFromMap(requestMap[Request.DONATION_ID], donMap);
             req.donation = don;
             return _make(tileContent, req, donor);
           },

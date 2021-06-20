@@ -5,11 +5,15 @@ import 'package:drp_basket_app/locator.dart';
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:drp_basket_app/views/charity/old/donor_request_end.dart';
 import 'package:drp_basket_app/views/charity/old/utilities.dart';
+import 'package:drp_basket_app/views/charity/requests/requests_page.dart';
 import 'package:drp_basket_app/views/general/donor.dart';
 import 'package:drp_basket_app/views/general/request.dart';
+import 'package:drp_basket_app/views/utilities/utilities.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import 'donations_page.dart';
 
 // Page displaying information related to a specific donor, ping donor from here
 
@@ -59,8 +63,8 @@ class _DonorPageState extends State<DonorPage> with TickerProviderStateMixin {
                 labelColor: third_color,
                 unselectedLabelColor: Colors.black,
                 tabs: [
-                  Tab(text: "Ongoing"),
-                  Tab(text: "History"),
+                  Tab(text: "Donations Available"),
+                  Tab(text: "Requests"),
                 ],
               ),
             ),
@@ -68,8 +72,10 @@ class _DonorPageState extends State<DonorPage> with TickerProviderStateMixin {
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  _getRequests(false),
-                  _getRequests(true),
+                  // Changed here
+                  CharityDonationsPage(donorID: donorModel.uid),
+                  RequestsPage(donorID: donorModel.uid),
+                  // To here
                 ],
               ),
             ),
@@ -79,12 +85,13 @@ class _DonorPageState extends State<DonorPage> with TickerProviderStateMixin {
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: secondary_color,
         onPressed: () {
-          if (!canSendReq) {
-            return;
-          }
+          // if (!canSendReq) {
+          //   return;
+          // }
           // TODO: CHANGED FROM HERE
           Request.sendRequest(donorID: donorModel.uid);
           return;
+          // UNTIL HERE
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
@@ -110,7 +117,8 @@ class _DonorPageState extends State<DonorPage> with TickerProviderStateMixin {
     );
   }
 
-  Widget _getRequests(bool past) {
+  // old
+  Widget __getRequests(bool past) {
     final Stream<DocumentSnapshot> _requestsStream =
         locator<FirebaseFirestoreInterface>()
             .getCollection("donors")

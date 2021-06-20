@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import '../../../locator.dart';
 import '../requests/request_page.dart';
 
-// Displays all donations made 
+// Displays all donations made
 
 class DonorDonationsPage extends StatefulWidget {
   const DonorDonationsPage({Key? key}) : super(key: key);
@@ -32,8 +32,15 @@ class _DonorDonationsPageState extends State<DonorDonationsPage> {
           .orderBy('time_created', descending: true)
           .snapshots(),
       builder: (BuildContext ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (!snapshot.hasData) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return loading();
+        }
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return Center(
+            child: Text(
+              'No Donations Posted Yet',
+            ),
+          );
         }
         var donations = snapshot.data!.docs;
         return ListView(
@@ -168,7 +175,8 @@ class _DonorDonationsPageState extends State<DonorDonationsPage> {
               return Container();
             }
             var reqMap = snapshot.data!.data() as Map<String, dynamic>;
-            Request req = Request.buildFromMap(reqID, reqMap, donation);
+            Request req = Request.buildFromMap(
+                id: reqID, req: reqMap, donation: donation);
             return GestureDetector(
               child: Column(
                 children: [
