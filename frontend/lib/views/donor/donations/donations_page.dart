@@ -32,8 +32,19 @@ class _DonorDonationsPageState extends State<DonorDonationsPage> {
           .orderBy('time_created', descending: true)
           .snapshots(),
       builder: (BuildContext ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (!snapshot.hasData) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return loading();
+        }
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return Center(
+            child: Text(
+              'No Donations Posted Yet',
+              style: TextStyle(
+                color: third_color,
+                fontSize: 24,
+              ),
+            ),
+          );
         }
         var donations = snapshot.data!.docs;
         List<Widget> children = donations.map(
@@ -45,17 +56,6 @@ class _DonorDonationsPageState extends State<DonorDonationsPage> {
             return _displayDonation(donation);
           },
         ).toList();
-        if (children.isEmpty) {
-          return Center(
-            child: Text(
-              "Empty",
-              style: TextStyle(
-                color: third_color,
-                fontSize: 24,
-              ),
-            ),
-          );
-        }
         return ListView(
           children: children,
         );
@@ -180,7 +180,8 @@ class _DonorDonationsPageState extends State<DonorDonationsPage> {
               return Container();
             }
             var reqMap = snapshot.data!.data() as Map<String, dynamic>;
-            Request req = Request.buildFromMap(reqID, reqMap, donation);
+            Request req = Request.buildFromMap(
+                id: reqID, req: reqMap, donation: donation);
             return GestureDetector(
               child: Column(
                 children: [

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/constants.dart';
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
+import 'package:drp_basket_app/views/utilities/utilities.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
@@ -38,12 +39,18 @@ class _ReceiversListState extends State<ReceiversList> {
   Widget build(BuildContext context) {
     return StreamBuilder(
         stream: locator<FirebaseFirestoreInterface>()
-            .getContactList(uid, sortByLastClaimed: sortByLastClaimed),
+            .getContactList(sortByLastClaimed: sortByLastClaimed),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return loading();
+          }
           if (!snapshot.hasData) {
             return Center(
-              child: CircularProgressIndicator(
-                backgroundColor: Colors.lightBlueAccent,
+              child: Text(
+                'No Receivers Yet',
+                style: TextStyle(
+                  fontSize: 36,
+                ),
               ),
             );
           } else {
@@ -65,57 +72,72 @@ class _ReceiversListState extends State<ReceiversList> {
               autocorrect: false,
               actions: [
                 FloatingSearchBarAction.searchToClear(),
+                GestureDetector(
+                  child: Icon(Icons.sort),
+                  onTap: () {
+                    setState(() {
+                      sortByLastClaimed = !sortByLastClaimed;
+                    });
+                  },
+                ),
               ],
               hint: 'Search for a receiver…',
               body: FloatingSearchBarScrollNotifier(
-                child: ListView(
-                  padding: EdgeInsets.only(top: 56),
-                  children: receivers.map((DocumentSnapshot ds) {
-                    var receiverID = ds.reference.id;
-                    var receiverMap = ds.data() as Map<String, dynamic>;
-                    var receiver = Receiver.buildFromMap(receiverMap);
-                    var relatedToQuery =
-                        (receiver.name + receiver.contact + receiver.location)
-                            .toLowerCase()
-                            .contains(searchQuery.toLowerCase());
-                    return relatedToQuery
-                        ? GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (ctx) =>
-                                          ReceiverPage(receiverID)));
-                            },
-                            child: Card(
-                              child: Container(
-                                padding: EdgeInsets.all(20),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          receiver.name,
-                                          style: TextStyle(
-                                            fontSize: 20,
+                child: receivers.isEmpty
+                    ? Center(
+                        child: Text(
+                          'No Receivers Yet',
+                        ),
+                      )
+                    : ListView(
+                        padding: EdgeInsets.only(top: 56),
+                        children: receivers.map((DocumentSnapshot ds) {
+                          var receiverID = ds.reference.id;
+                          var receiverMap = ds.data() as Map<String, dynamic>;
+                          var receiver = Receiver.buildFromMap(receiverMap);
+                          var relatedToQuery = (receiver.name +
+                                  receiver.contact +
+                                  receiver.location)
+                              .toLowerCase()
+                              .contains(searchQuery.toLowerCase());
+                          return relatedToQuery
+                              ? GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (ctx) =>
+                                                ReceiverPage(receiverID)));
+                                  },
+                                  child: Card(
+                                    child: Container(
+                                      padding: EdgeInsets.all(20),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                receiver.name,
+                                                style: TextStyle(
+                                                  fontSize: 20,
+                                                ),
+                                              ),
+                                              _displayLastClaimed(receiver),
+                                            ],
                                           ),
-                                        ),
-                                        _displayLastClaimed(receiver),
-                                      ],
+                                          Text(receiver.contact),
+                                        ],
+                                      ),
                                     ),
-                                    Text(receiver.contact),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          )
-                        : Container();
-                  }).toList(),
-                ),
+                                  ),
+                                )
+                              : Container();
+                        }).toList(),
+                      ),
               ),
               builder: (BuildContext context, Animation<double> transition) {
                 return Container(
@@ -148,11 +170,4 @@ class _ReceiversListState extends State<ReceiversList> {
     return Text(
         'Last Claimed: ${receiver.lastClaimed == null ? '-' : dateFormat.format(receiver.lastClaimed!)}');
   }
-
-// Widget _getSortedReceivers() {
-//   if (sortByLastClaimed) {
-
-//   }
-// }
-
 }

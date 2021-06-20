@@ -1,5 +1,6 @@
 import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
+import 'package:drp_basket_app/views/donor/requests/requests_main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -9,7 +10,6 @@ import '../../locator.dart';
 import '../general/donor.dart';
 import 'donations/donations_main.dart';
 import 'donor_profile_page.dart';
-import 'requests/requests_page.dart';
 
 // Controls bottom nav bar for donor view
 
@@ -27,7 +27,7 @@ class _DonorMainState extends State<DonorMain> {
 
   final List<Widget> _widgets = [
     DonationsMain(),
-    RequestsPage(),
+    RequestsMain(),
     DonorProfilePage(),
   ];
 

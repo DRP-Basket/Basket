@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/constants.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
+import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:drp_basket_app/views/charity/events/charity_event.dart';
 import 'package:drp_basket_app/views/charity/receivers/charity_receiver.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../locator.dart';
 import '../user_type.dart';
 
 class FirebaseFirestoreController implements FirebaseFirestoreInterface {
@@ -85,7 +87,7 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
   }
 
   Future<DocumentSnapshot<Map<String, dynamic>>> charityFromID(String id) {
-    return getCharity(id).get();
+    return _fireStore.collection("charities").doc(id).get();
   }
 
   Future<void> assignNewRedeemCode(
@@ -96,23 +98,32 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
         .set({"user": uid, "donation_event": donationID});
   }
 
-  Stream<Object> getContactList(String uid, {bool sortByLastClaimed: false}) {
-    var receivers = getCharity(uid).collection("receivers_list");
+  Stream<Object> getContactList({bool sortByLastClaimed: false}) {
+    var curUser = locator<UserController>().curUser()!;
+    var receivers = _fireStore
+        .collection("charities")
+        .doc(curUser.uid)
+        .collection("receivers_list");
     if (sortByLastClaimed) {
       return receivers.orderBy('last_claimed').snapshots();
     }
     return receivers.orderBy('name').snapshots();
   }
 
-  Future<List> getContactMap(String uid) async {
-    QuerySnapshot querySnapshot =
-        await getCharity(uid).collection("receivers_list").get();
+  Future<List> getContactMap() async {
+    var curUser = locator<UserController>().curUser()!;
+    QuerySnapshot querySnapshot = await _fireStore
+        .collection("charities")
+        .doc(curUser.uid)
+        .collection("receivers_list")
+        .get();
 
     return querySnapshot.docs;
   }
 
   Future<void> addContactToPending(
-      String uid, String donationEventID, List contacts) async {
+      String donationEventID, List contacts) async {
+    var curUser = locator<UserController>().curUser()!;
     List<Map<String, String>> contactData = [];
 
     for (DocumentSnapshot contactDS in contacts) {
@@ -126,7 +137,7 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
 
     _fireStore
         .collection(CHARITIES)
-        .doc(uid)
+        .doc(curUser.uid)
         .collection("donation_events")
         .doc(donationEventID)
         .update({
@@ -135,12 +146,20 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
     });
   }
 
-  Stream<QuerySnapshot<Object?>> getDonationList(String uid) {
-    return getCharity(uid).collection('donation_events').snapshots();
+  Stream<QuerySnapshot<Object?>>? getDonationList() {
+    var curUser = locator<UserController>().curUser()!;
+    return _fireStore
+        .collection('charities')
+        .doc(curUser.uid)
+        .collection('donation_events')
+        .snapshots();
   }
 
-  Future<void> addDonationEvent(String uid, DonationEvent de) {
-    return getCharity(uid)
+  Future<void> addDonationEvent(DonationEvent de) {
+    var curUser = locator<UserController>().curUser()!;
+    return _fireStore
+        .collection("charities")
+        .doc(curUser.uid)
         .collection("donation_events")
         .add({
           'event_name': de.name,
@@ -155,9 +174,10 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
   }
 
   // Currently unused
-  Future<void> addContact(String uid, String name, String contactNumber) async {
+  Future<void> addContact(String name, String contactNumber) async {
+    var curUser = locator<UserController>().curUser()!;
     DocumentSnapshot ds =
-        await _fireStore.collection("charities").doc(uid).get();
+        await _fireStore.collection("charities").doc(curUser.uid).get();
 
     List contactList =
         (ds.data() as Map<String, dynamic>)["contact_list"] as List;
@@ -176,11 +196,17 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
       "uid": receiverID
     });
 
-    getCharity(uid).update({"contact_list": contactList});
+    _fireStore
+        .collection("charities")
+        .doc(curUser.uid)
+        .update({"contact_list": contactList});
   }
 
-  Future<void> addReceiver(String uid, Receiver receiver) async {
-    return getCharity(uid)
+  Future<void> addReceiver(Receiver receiver) async {
+    var curUser = locator<UserController>().curUser()!;
+    return _fireStore
+        .collection("charities")
+        .doc(curUser.uid)
         .collection("receivers_list")
         .add({
           'name': receiver.name,
@@ -193,23 +219,36 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
         .catchError((err) => print("Failed to add receiver: $err"));
   }
 
-  DocumentReference<Map<String, dynamic>> getCharity(String uid) {
-    return _fireStore.collection('charities').doc(uid);
+  DocumentReference<Map<String, dynamic>> getCurrentCharity() {
+    var curUser = locator<UserController>().curUser()!;
+    return _fireStore.collection('charities').doc(curUser.uid);
   }
 
   Stream<DocumentSnapshot<Map<String, dynamic>>> getReceiver(
       String uid, String id) {
-    return getCharity(uid).collection('receivers_list').doc(id).snapshots();
+    return _fireStore
+        .collection("charities")
+        .doc(uid)
+        .collection('receivers_list')
+        .doc(id)
+        .snapshots();
   }
 
   Stream<DocumentSnapshot<Map<String, dynamic>>> getDonationEvent(
       String uid, String id) {
-    return getCharity(uid).collection('donation_events').doc(id).snapshots();
+    return _fireStore
+        .collection("charities")
+        .doc(uid)
+        .collection('donation_events')
+        .doc(id)
+        .snapshots();
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> donationsClaimed(
       String uid, String receiverID) {
-    return getCharity(uid)
+    return _fireStore
+        .collection("charities")
+        .doc(uid)
         .collection('receivers_list')
         .doc(receiverID)
         .collection('donations_claimed')
@@ -217,8 +256,11 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
         .snapshots();
   }
 
-  Stream<Object> getDonationEventSnapshot(String uid, String donationEventID) {
-    return getCharity(uid)
+  Stream<Object> getDonationEventSnapshot(String donationEventID) {
+    var curUser = locator<UserController>().curUser()!;
+    return _fireStore
+        .collection("charities")
+        .doc(curUser.uid)
         .collection("donation_events")
         .doc(donationEventID)
         .snapshots();

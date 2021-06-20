@@ -32,12 +32,6 @@ class HomePage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // LongButton(
-          //   text: "Test Firebase Connection",
-          //   onPressed: getName,
-          //   backgroundColor: Colors.pinkAccent,
-          //   textColor: Colors.white,
-          // ),
           LongButton(
             text: "Donor",
             onPressed: () => {

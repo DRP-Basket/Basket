@@ -22,13 +22,13 @@ class SMSController {
     return url;
   }
 
-  Future<bool> sendSMS(String uid, String donationID, {msgContent = ''}) async {
+  Future<bool> sendSMS(String donationID, {msgContent = ''}) async {
     bool? permissionsGranted = await telephony.requestPhoneAndSmsPermissions;
     if (permissionsGranted!) {
       List contacts =
-          await locator<FirebaseFirestoreInterface>().getContactMap(uid);
+          await locator<FirebaseFirestoreInterface>().getContactMap();
       await locator<FirebaseFirestoreInterface>()
-          .addContactToPending(uid, donationID, contacts);
+          .addContactToPending(donationID, contacts);
       for (DocumentSnapshot contactDS in contacts) {
         var contactInfo = (contactDS.data() as Map<String, dynamic>);
         String redemptionLink =

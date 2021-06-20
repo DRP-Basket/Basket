@@ -14,13 +14,20 @@ import 'donation_page.dart';
 // Page displaying currently available donations (onTap -> `donation_page`)
 
 class CharityDonationsPage extends StatefulWidget {
-  const CharityDonationsPage({Key? key}) : super(key: key);
+  final String? donorID;
+
+  CharityDonationsPage({Key? key, String? this.donorID}) : super(key: key);
 
   @override
-  _CharityDonationsPageState createState() => _CharityDonationsPageState();
+  _CharityDonationsPageState createState() =>
+      _CharityDonationsPageState(donorID);
 }
 
 class _CharityDonationsPageState extends State<CharityDonationsPage> {
+  final String? donorID;
+
+  _CharityDonationsPageState(this.donorID);
+
   Future<Widget> _getImage(Donation donation) async {
     String downloadUrl = await locator<FirebaseStorageInterface>()
         .getImageUrl(UserType.DONOR, donation.donorID);
@@ -42,68 +49,81 @@ class _CharityDonationsPageState extends State<CharityDonationsPage> {
 
   @override
   Widget build(BuildContext context) {
+    var _store = FirebaseFirestore.instance;
+
+    var all = _store.collection('available_donations');
+    var dons = donorID == null
+        ? all.orderBy(Donation.TIME_CREATED).snapshots()
+        : all
+            .where(Donation.DONOR_ID, isEqualTo: donorID)
+            .orderBy(Donation.TIME_CREATED)
+            .snapshots();
+
     return Container(
       child: StreamBuilder(
-        stream: locator<FirebaseFirestoreInterface>().getAvailableDonations(),
-        builder: (BuildContext ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (!snapshot.hasData) {
-            return loading();
-          } else {
-            var donations = snapshot.data!.docs;
-            return donations.isEmpty
-                ? Center(
-                    child: Text(
+          stream: dons,
+          builder: (BuildContext ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return loading();
+            } else {
+              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                return Center(
+                  child: Text(
                     'No Donations Currently',
                     style: TextStyle(
                       color: third_color,
                       fontSize: 24,
                     ),
-                  ))
-                : ListView(
-                    children: donations.map(
-                      (DocumentSnapshot ds) {
-                        var donationID = ds.reference.id;
-                        var donationMap = ds.data() as Map<String, dynamic>;
-                        var donorID = donationMap['donor_id'];
-                        return StreamBuilder(
-                          stream: FirebaseFirestore.instance
-                              .collection('donors')
-                              .doc(donorID)
-                              .collection('donation_list')
-                              .doc(donationID)
-                              .snapshots(),
-                          builder: (BuildContext ctx,
-                              AsyncSnapshot<DocumentSnapshot> snapshot) {
-                            if (!snapshot.hasData) return Container();
-                            var donation = Donation.buildFromMap(donationID,
-                                snapshot.data!.data() as Map<String, dynamic>);
-                            return GestureDetector(
-                              child: Card(
-                                child: FutureBuilder(
-                                  future: _getImage(donation),
-                                  builder: (BuildContext context, snapshot) {
-                                    return snapshot.hasData
-                                        ? snapshot.data as Widget
-                                        : Container();
-                                  },
-                                ),
-                              ),
-                              onTap: () => {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            CharityDonationPage(donation)))
+                  ),
+                );
+              }
+              var donations = snapshot.data!.docs;
+              return ListView(
+                children: donations.map(
+                  (DocumentSnapshot ds) {
+                    var donationID = ds.reference.id;
+                    var donationMap = ds.data() as Map<String, dynamic>;
+                    var donorID = donationMap['donor_id'];
+                    return StreamBuilder(
+                      stream: FirebaseFirestore.instance
+                          .collection('donors')
+                          .doc(donorID)
+                          .collection('donation_list')
+                          .doc(donationID)
+                          .snapshots(),
+                      builder: (BuildContext ctx,
+                          AsyncSnapshot<DocumentSnapshot> snapshot) {
+                        if (!snapshot.hasData) return Container();
+                        var donation = Donation.buildFromMap(donationID,
+                            snapshot.data!.data() as Map<String, dynamic>);
+                        return GestureDetector(
+                          child: Card(
+                            shadowColor: Colors.grey,
+                            elevation: 3,
+                            child: FutureBuilder(
+                              future: _getImage(donation),
+                              builder: (BuildContext context, snapshot) {
+                                return snapshot.hasData
+                                    ? snapshot.data as Widget
+                                    : Container();
                               },
-                            );
+                            ),
+                          ),
+                          onTap: () => {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        CharityDonationPage(donation)))
                           },
                         );
                       },
-                    ).toList(),
-                  );
-          }
-        },
-      ),
+                    );
+                  },
+                ).toList(),
+              );
+            }
+          }),
     );
   }
 

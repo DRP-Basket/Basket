@@ -44,9 +44,12 @@ class Request {
   static const DONATION_ID = 'donation_id';
   static const STATUS = 'status';
   static const TIME_CREATED = 'time_created';
+  static const CLOSED = 'closed';
 
   static Request buildFromMap(
-      String id, Map<String, dynamic> req, Donation? donation) {
+      {required String id,
+      required Map<String, dynamic> req,
+      Donation? donation}) {
     Request request = Request(
       charityID: req[CHARITY_ID],
       donorID: req[DONOR_ID],
@@ -58,7 +61,7 @@ class Request {
     return request;
   }
 
-  static Request sendRequest({required String donorID, Donation? donation}) {
+  static Future<Request> sendRequest({required String donorID, Donation? donation}) async {
     Request req = Request(
       charityID: curUser.uid,
       donorID: donorID,
@@ -66,13 +69,13 @@ class Request {
       timeCreated: DateTime.now(),
       status: donation == null ? PING_CHARITY_WAITING : POST_WAITING,
     );
-    req.fsSendRequest();
+    await req.fsSendRequest();
     return req;
   }
 
-  void fsSendRequest() {
+  Future<void> fsSendRequest() async {
     // Save request in charity's requests collection
-    _store
+    await _store
         .collection('charities')
         .doc(charityID)
         .collection('request_list')
@@ -82,11 +85,12 @@ class Request {
       DONATION_ID: donation?.id,
       TIME_CREATED: timeCreated,
       STATUS: status,
-    }).then((requestRef) {
+      CLOSED: false,
+    }).then((requestRef) async {
       // Save newly created request id
       id = requestRef.id;
       // Add to donor's side
-      _store
+      await _store
           .collection('donors')
           .doc(donorID)
           .collection('request_list')
@@ -94,16 +98,17 @@ class Request {
           .set({
         CHARITY_ID: charityID,
         TIME_CREATED: timeCreated,
+        CLOSED: false,
       });
       // Add to donation's list if present
       if (donation != null) {
-        addRequestToDonation(donation!);
+        await addRequestToDonation(donation!);
       }
     });
   }
 
-  void fsUpdate(Map<String, dynamic> fields) {
-    _store
+  Future<void> fsUpdate(Map<String, dynamic> fields) async {
+    await _store
         .collection('charities')
         .doc(charityID)
         .collection('request_list')
@@ -111,8 +116,8 @@ class Request {
         .update(fields);
   }
 
-  void addRequestToDonation(Donation donation) {
-    _store
+  Future<void> addRequestToDonation(Donation donation) async {
+    await _store
         .collection('donors')
         .doc(donorID)
         .collection('donation_list')
@@ -126,16 +131,16 @@ class Request {
   }
 
   // Donor Actions ------------------------------------------------------
-  void respond(Donation donation) {
+  Future<void> respond(Donation donation) async {
     assert(status == PING_CHARITY_WAITING);
-    fsUpdate({
+    await fsUpdate({
       DONATION_ID: donation.id,
       STATUS: PING_DONOR_WAITING,
     });
-    addRequestToDonation(donation);
+    await addRequestToDonation(donation);
   }
 
-  void donorDecline() {
+  Future<void> donorDecline() async {
     String newStatus = '';
     switch (status) {
       case POST_WAITING:
@@ -147,37 +152,48 @@ class Request {
       default:
         assert(false);
     }
-    fsUpdate({
+    await fsUpdate({
       STATUS: newStatus,
     });
   }
 
-  void donorAccept() {
+  Future<void> donorAccept() async {
     assert(status == POST_WAITING);
-    fsUpdate({
+    await fsUpdate({
       STATUS: POST_ACCEPTED,
     });
-    donation!.assignToCharity(charityID);
+    await donation!.assignToCharity(charityID);
+  }
+
+  Future<void> donorClose() async {
+    await _store
+        .collection('donors')
+        .doc(donorID)
+        .collection('request_list')
+        .doc(id)
+        .update({
+      CLOSED: true,
+    });
   }
 
   // Charity Actions ------------------------------------------------------
 
-  void charityAccept() {
+  Future<void> charityAccept() async {
     assert(status == PING_DONOR_WAITING);
-    fsUpdate({
+    await fsUpdate({
       STATUS: PING_ACCEPTED,
     });
   }
 
-  void charityDecline() {
+  Future<void> charityDecline() async {
     assert(status == PING_DONOR_WAITING);
-    fsUpdate({
+    await fsUpdate({
       STATUS: PING_CHARITY_DECLINED,
     });
     // TODO : canceled status
   }
 
-  void claimed() {
+  Future<void> claimed() async {
     String newStatus = '';
     switch (status) {
       case POST_ACCEPTED:
@@ -189,20 +205,39 @@ class Request {
       default:
         assert(false);
     }
-    fsUpdate({
+    await fsUpdate({
       STATUS: newStatus,
     });
+    await donation!.claimed();
     locator<FirebaseFirestoreInterface>()
         .addDonationCount(donorID, donation!.portions);
-    donation!.claimed();
+  }
+
+  Future<void> charityClose() async {
+    await fsUpdate({
+      CLOSED: true,
+    });
   }
 
   // UI -------------------------------------------------------------------
+  bool endState() {
+    switch (status) {
+      case PING_DONOR_DECLINED:
+      case POST_DECLINED:
+      case PING_CHARITY_DECLINED:
+      case PING_CLAIMED:
+      case POST_CLAIMED:
+        return true;
+      default:
+        return false;
+    }
+  }
+
   String getStatusText(bool isDonor) {
     switch (status) {
       case PING_CHARITY_WAITING:
       case POST_WAITING:
-        return'Waiting for ${isDonor ? 'your' : 'their'} response';
+        return 'Waiting for ${isDonor ? 'your' : 'their'} response';
       case PING_DONOR_DECLINED:
       case POST_DECLINED:
         return isDonor ? 'You declined the request' : 'Request was declined';
@@ -212,7 +247,9 @@ class Request {
       case PING_DONOR_WAITING:
         return 'Waiting for ${isDonor ? 'their' : 'your'} response';
       case PING_CHARITY_DECLINED:
-        return isDonor ? 'Donation was declined' : 'You declined their donation';
+        return isDonor
+            ? 'Donation was declined'
+            : 'You declined their donation';
       case PING_CLAIMED:
       case POST_CLAIMED:
         return 'Donation claimed';
@@ -221,7 +258,7 @@ class Request {
     }
   }
 
-  Widget showStatus({bool isDonor = true}) { 
+  Widget showStatus({bool isDonor = true}) {
     return ListTile(
       title: Text(
         getStatusText(isDonor),

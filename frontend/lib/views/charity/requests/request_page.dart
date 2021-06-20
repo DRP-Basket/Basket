@@ -44,6 +44,7 @@ class _RequestPageState extends State<RequestPage> {
                 ? Container()
                 : request.donation!.display(),
             _actionByStatus(),
+            request.endState() ? _closeButton() : Container(),
           ],
         ),
       ),
@@ -65,10 +66,21 @@ class _RequestPageState extends State<RequestPage> {
         );
       case Request.PING_CLAIMED:
       case Request.POST_CLAIMED:
-        return _rateButton();
+        // return _rateButton();
       default:
         return Container();
     }
+  }
+
+  Widget _closeButton() {
+    return actionButton(
+      label: 'Close Request', 
+      color: primary_color, 
+      onPressed: () {
+        request.charityClose();
+        Navigator.pop(context);
+      }
+    );
   }
 
   Widget _claimButton() {

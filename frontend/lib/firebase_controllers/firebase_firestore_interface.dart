@@ -21,25 +21,25 @@ class FirebaseFirestoreInterface {
 
   assignNewRedeemCode(String redeemCode, String uid, String donationID) {}
 
-  getContactList(String uid, {bool sortByLastClaimed: false}) {}
+  getContactList({bool sortByLastClaimed: false}) {}
 
-  getContactMap(String uid) {}
+  getContactMap() {}
 
-  getDonationList(String uid) {}
+  getDonationList() {}
 
-  addContact(String uid, String name, String contactNumber) {}
+  addContact(String name, String contactNumber) {}
 
-  addDonationEvent(String uid, DonationEvent de) {}
+  addDonationEvent(DonationEvent de) {}
 
-  addReceiver(String uid, Receiver receiverToAdd) {}
+  addReceiver(Receiver receiverToAdd) {}
 
   getReceiver(String uid, String id) {}
 
   getDonationEvent(String uid, String id) {}
 
-  getDonationEventSnapshot(String uid, String donationEventID) {}
+  getDonationEventSnapshot(String donationEventID) {}
 
-  addContactToPending(String uid, String donationEventID, List contacts) {}
+  addContactToPending(String donationEventID, List contacts) {}
 
   donationsClaimed(String uid, String receiverID) {}
 

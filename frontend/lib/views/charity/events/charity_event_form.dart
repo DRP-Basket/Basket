@@ -71,7 +71,7 @@ class _CharityEventFormState extends State<CharityEventForm> {
       setState(() {
         uploading = true;
       });
-      await locator<FirebaseFirestoreInterface>().addDonationEvent(uid, de);
+      await locator<FirebaseFirestoreInterface>().addDonationEvent(de);
       Navigator.pop(context);
     }
   }

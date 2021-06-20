@@ -54,8 +54,7 @@ class _ReceiverFormState extends State<ReceiverForm> {
       var receiver = _formKey.currentState!.fields;
       Receiver receiverToAdd = Receiver(receiver[name]!.value,
           receiver[contact]!.value, receiver[location]!.value);
-      locator<FirebaseFirestoreInterface>()
-          .addReceiver(locator<UserController>().curUser()!.uid, receiverToAdd);
+      locator<FirebaseFirestoreInterface>().addReceiver(receiverToAdd);
       Navigator.pop(context);
     }
   }

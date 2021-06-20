@@ -90,7 +90,7 @@ class Donation {
     });
   }
 
-  void fsUpdate(Map<String, dynamic> fields) {
+  Future<void> fsUpdate(Map<String, dynamic> fields) async {
     _store
         .collection('donors')
         .doc(donorID)
@@ -202,17 +202,18 @@ class Donation {
     );
   }
 
-  void claimed() {
-    fsUpdate({
+  Future<void> claimed() async {
+    await fsUpdate({
       STATUS: 'Claimed',
     });
   }
 
-  void assignToCharity(String charityID) {
-    fsUpdate({
+  Future<void> assignToCharity(String charityID) async {
+    await fsUpdate({
       STATUS: 'Assigned',
       CHARITY_ID: charityID,
     });
     _store.collection('available_donations').doc(id).delete();
   }
+
 }

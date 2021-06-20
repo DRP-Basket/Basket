@@ -56,7 +56,7 @@ class _CharityEventPageState extends State<CharityEventPage> {
           children: [
             StreamBuilder(
               stream: locator<FirebaseFirestoreInterface>()
-                  .getDonationEventSnapshot(uid, widget.donationID),
+                  .getDonationEventSnapshot(widget.donationID),
               builder: (BuildContext context,
                   AsyncSnapshot<DocumentSnapshot> snapshot) {
                 if (!snapshot.hasData) {
@@ -122,7 +122,7 @@ class _CharityEventPageState extends State<CharityEventPage> {
             ),
             StreamBuilder(
               stream: locator<FirebaseFirestoreInterface>()
-                  .getDonationEventSnapshot(uid, widget.donationID),
+                  .getDonationEventSnapshot(widget.donationID),
               builder: (BuildContext context,
                   AsyncSnapshot<DocumentSnapshot> snapshot) {
                 if (!snapshot.hasData) {

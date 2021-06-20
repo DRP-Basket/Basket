@@ -6,6 +6,7 @@ import 'package:drp_basket_app/locator.dart';
 import 'package:drp_basket_app/user_type.dart';
 import 'package:drp_basket_app/views/charity/donations/donor_page.dart';
 import 'package:drp_basket_app/views/general/donor.dart';
+import 'package:drp_basket_app/views/utilities/utilities.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -31,12 +32,12 @@ class _DonorsPageState extends State<DonorsPage> {
       stream: _donorsStream,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Container();
+          return loading();
         }
         if (snapshot.data.docs.isEmpty) {
           return Center(
             child: Text(
-              "No donors",
+              "No Donors Yet",
               style: TextStyle(
                 color: third_color,
                 fontSize: 24,
@@ -104,59 +105,73 @@ class _DonorsPageState extends State<DonorsPage> {
                     )))
       },
       child: Card(
-          shape: OutlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
-          child: Row(
-            children: [
-              Spacer(),
-              Expanded(
-                flex: 13,
-                child: Container(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 5),
-                    child: CircleAvatar(
-                      backgroundImage: donorModel.imageProvider,
-                      radius: 50,
-                    ),
+        elevation: 3,
+        shadowColor: Colors.green,
+        shape: OutlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
+        child: Row(
+          children: [
+            Spacer(),
+            Expanded(
+              flex: 13,
+              child: Container(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 5),
+                  child: CircleAvatar(
+                    backgroundImage: donorModel.imageProvider,
+                    radius: 50,
                   ),
                 ),
               ),
-              Spacer(
-                flex: 2,
-              ),
-              Expanded(
-                flex: 35,
-                child: Container(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        donorModel.name,
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(bottom: 2),
-                        child: Text(
-                          '${donorModel.address}',
+            ),
+            Spacer(
+              flex: 2,
+            ),
+            Expanded(
+              flex: 35,
+              child: Container(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          donorModel.name,
                           style: TextStyle(
-                            color: third_color,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ),
-                      Text(
-                        '${donorModel.contactNumber}',
+                        Padding(
+                          padding: EdgeInsets.only(
+                            right: 10,
+                          ),
+                          child: Icon(Icons.more_horiz_outlined),
+                        ),
+                      ],
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 2),
+                      child: Text(
+                        '${donorModel.address}',
                         style: TextStyle(
                           color: third_color,
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                    Text(
+                      '${donorModel.contactNumber}',
+                      style: TextStyle(
+                        color: third_color,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          )),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
