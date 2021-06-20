@@ -1,7 +1,6 @@
 // Page displaying all claim requests made
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:drp_basket_app/views/charity/charity_drawer.dart';
 import 'package:drp_basket_app/views/charity/utilities/utilities.dart';
 import 'package:drp_basket_app/views/donor/donations/donor_donation_form.dart';
 import 'package:drp_basket_app/views/donor/donor.dart';
@@ -109,5 +108,4 @@ class _ClaimRequestsState extends State<ClaimRequests> {
       },
     );
   }
-
 }

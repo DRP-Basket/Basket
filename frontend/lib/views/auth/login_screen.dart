@@ -3,7 +3,8 @@ import 'package:drp_basket_app/components/long_button.dart';
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:drp_basket_app/view_controllers/validator_controller.dart';
 import 'package:drp_basket_app/views/auth/auth_view_interface.dart';
-import 'package:drp_basket_app/views/receivers/home_screen.dart';
+import 'package:drp_basket_app/views/charity/events/charity_events_page.dart';
+import 'package:drp_basket_app/views/donor/donor_main.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -11,7 +12,6 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import '../../constants.dart';
 import '../../locator.dart';
 import '../../user_type.dart';
-import '../home_page.dart';
 import 'forgot_password_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -58,9 +58,13 @@ class _LoginScreenState extends State<LoginScreen>
     password = "";
     emailController.clear();
     passwordController.clear();
-    Navigator.pushNamed(context, HomePage.id);
-    // UserType userType = await locator<UserController>().checkUserType();
-    // userType == UserType.RECEIVER ? Navigator.pushNamed(context, ReceiverHomeScreen.id) : Navigator.pushNamed(context, HomePage.id);
+    // Navigator.pushNamed(context, HomePage.id);
+    UserType userType = await locator<UserController>().checkUserType();
+    userType == UserType.CHARITY
+        ? Navigator.pushNamedAndRemoveUntil(
+            context, CharityEventsPage.id, (route) => false)
+        : Navigator.pushNamedAndRemoveUntil(
+            context, DonorMain.id, (route) => false);
   }
 
   @override
@@ -76,6 +80,7 @@ class _LoginScreenState extends State<LoginScreen>
               "Try Again",
               style: TextStyle(color: Colors.white, fontSize: 20),
             ),
+            color: Colors.deepOrange,
             onPressed: () => Navigator.pop(context),
           ),
         ]).show();
@@ -84,11 +89,14 @@ class _LoginScreenState extends State<LoginScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       body: ModalProgressHUD(
         inAsyncCall: showSpinner,
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 50.0),
+          padding: EdgeInsets.only(
+            left: 24,
+            right: 24,
+            top: 100,
+          ),
           child: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -101,9 +109,6 @@ class _LoginScreenState extends State<LoginScreen>
                     child: Image.asset(LOGO_IMAGE_PATH),
                   ),
                 ),
-                SizedBox(
-                  height: 24.0,
-                ),
                 Form(
                   key: _formKey,
                   child: Column(
@@ -114,7 +119,7 @@ class _LoginScreenState extends State<LoginScreen>
                         controller: emailController,
                         validator: (value) =>
                             ValidatorController.validateEmail(value),
-                        borderColor: border_color,
+                        borderColor: secondary_color,
                         textColor: text_color,
                       ),
                       SizedBox(
@@ -126,7 +131,7 @@ class _LoginScreenState extends State<LoginScreen>
                         controller: passwordController,
                         validator: (value) =>
                             ValidatorController.validatePassword(value),
-                        borderColor: border_color,
+                        borderColor: secondary_color,
                         textColor: text_color,
                         obscureText: true,
                       ),
@@ -144,23 +149,26 @@ class _LoginScreenState extends State<LoginScreen>
                     ),
                   ),
                   child: Center(
-                    child: Text(FORGOT_PASSWORD_TEXT),
+                    child: Text(FORGOT_PASSWORD_TEXT,
+                        style: TextStyle(
+                          color: third_color,
+                        )),
                   ),
                 ),
                 SizedBox(
-                  height: 12.0,
+                  height: 20.0,
                 ),
                 LongButton(
                   text: LOGIN_TEXT,
                   onPressed: login,
                   backgroundColor: primary_color,
-                  textColor: text_color,
+                  textColor: Colors.white,
                 ),
                 LongButton(
                   text: BACK_TEXT,
                   onPressed: () => Navigator.pop(context),
                   backgroundColor: primary_color,
-                  textColor: text_color,
+                  textColor: Colors.white,
                 ),
               ],
             ),

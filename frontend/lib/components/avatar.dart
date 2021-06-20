@@ -17,6 +17,7 @@ class Avatar extends StatelessWidget {
         child: !uploaded
             ? CircleAvatar(
                 radius: 50.0,
+                backgroundColor: Colors.blue[200],
                 child: Icon(Icons.photo_camera),
               )
             : CircleAvatar(

@@ -32,42 +32,47 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Row(
-              children: <Widget>[
-                Hero(
-                  tag: LOGO_HERO_TAG,
-                  child: Padding(
-                    padding: EdgeInsets.only(right: 10),
+            Padding(
+              padding: EdgeInsets.only(
+                left: 15,
+                right: 20,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Hero(
+                    tag: LOGO_HERO_TAG,
                     child: Container(
                       child: Image.asset(LOGO_IMAGE_PATH),
-                      height: 60.0,
+                      height: 125.0,
                     ),
                   ),
-                ),
-                DefaultTextStyle(
-                  style: TextStyle(
-                    fontSize: 45.0,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.black,
+                  DefaultTextStyle(
+                    style: TextStyle(
+                      fontSize: 50.0,
+                      fontWeight: FontWeight.w900,
+                      color: third_color,
+                    ),
+                    child: Text(LOGO_NAME),
                   ),
-                  child: Text(LOGO_NAME),
-                ),
-              ],
+                ],
+              ),
             ),
             SizedBox(
-              height: 48.0,
+              height: 30.0,
             ),
             LongButton(
               text: LOGIN_TEXT,
               onPressed: () => Navigator.pushNamed(context, LoginScreen.id),
               backgroundColor: primary_color,
-              textColor: text_color,
+              textColor: Colors.white,
             ),
             LongButton(
               text: REGISTER_TEXT,
               onPressed: () => Navigator.pushNamed(context, RegisterScreen.id),
               backgroundColor: primary_color,
-              textColor: text_color,
+              textColor: Colors.white,
             ),
           ],
         ),

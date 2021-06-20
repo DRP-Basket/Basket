@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/constants.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:drp_basket_app/locator.dart';
+import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:drp_basket_app/views/charity/charity_donor.dart';
 import 'package:drp_basket_app/views/charity/donor_request_end.dart';
 import 'package:drp_basket_app/views/charity/utilities.dart';
@@ -20,10 +21,11 @@ class _DonorPageState extends State<DonorPage> with TickerProviderStateMixin {
   late TabController _tabController;
   late DonorModel donorModel;
   late List<dynamic> reqIDs;
-  bool canSendReq = false;
+  late bool canSendReq;
 
   @override
   Widget build(BuildContext context) {
+    canSendReq = false;
     _tabController = TabController(
       length: 2,
       vsync: this,
@@ -105,10 +107,10 @@ class _DonorPageState extends State<DonorPage> with TickerProviderStateMixin {
   Widget _getRequests(bool past) {
     final Stream<DocumentSnapshot> _requestsStream =
         locator<FirebaseFirestoreInterface>()
-            .getCollection("charities")
-            .doc("ex-charity")
-            .collection("donors")
+            .getCollection("donors")
             .doc(donorModel.uid)
+            .collection("charities")
+            .doc(locator<UserController>().curUser()!.uid)
             .snapshots();
     String query = past ? "past_requests" : "ongoing_requests";
 
@@ -116,23 +118,25 @@ class _DonorPageState extends State<DonorPage> with TickerProviderStateMixin {
       stream: _requestsStream,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Container();
-        }
-        if (snapshot.data.data()[query] == null) {
           return Center(
-            child: Text(
-              "No requests",
-              style: TextStyle(
-                color: third_color,
-                fontSize: 24,
-              ),
-            ),
+            child: CircularProgressIndicator(),
           );
+        }
+        reqIDs = [];
+        if (snapshot.data.data() == null ||
+            snapshot.data.data()[query] == null ||
+            snapshot.data.data()[query].isEmpty) {
+          canSendReq = true;
+          return _noRequestText();
         }
         List<Future> futures = [];
         snapshot.data.data()[query].forEach((id) {
+          reqIDs.add(id);
           futures.add(_getReqDetails(donorModel.uid, id));
         });
+        // Prevent send request before reqIDs initialised
+        canSendReq = true;
+
         return FutureBuilder(
           future: Future.wait(futures),
           builder:
@@ -142,19 +146,7 @@ class _DonorPageState extends State<DonorPage> with TickerProviderStateMixin {
                 child: CircularProgressIndicator(),
               );
             }
-            if (snapshot.data == null) {
-              return Center(
-                child: Text(
-                  "No requests",
-                  style: TextStyle(
-                    color: third_color,
-                    fontSize: 24,
-                  ),
-                ),
-              );
-            }
             List<Widget> children = [];
-            reqIDs = [];
             String sortValue = past ? "completion_time" : "create_time";
             snapshot.data!.sort((a, b) {
               Timestamp aTime = a.data()[sortValue];
@@ -162,26 +154,24 @@ class _DonorPageState extends State<DonorPage> with TickerProviderStateMixin {
               return bTime.compareTo(aTime);
             });
             snapshot.data!.forEach((req) {
-              reqIDs.add(req.id);
               children.add(_buildReqCard(req.id, req.data(), past));
             });
-            // Prevent send request before reqIDs initialised
-            canSendReq = true;
-            if (reqIDs.isEmpty) {
-              return Center(
-                child: Text(
-                  "No requests",
-                  style: TextStyle(
-                    color: third_color,
-                    fontSize: 24,
-                  ),
-                ),
-              );
-            }
             return ListView(children: children);
           },
         );
       },
+    );
+  }
+
+  Widget _noRequestText() {
+    return Center(
+      child: Text(
+        "No requests",
+        style: TextStyle(
+          color: third_color,
+          fontSize: 24,
+        ),
+      ),
     );
   }
 
@@ -367,16 +357,26 @@ class _DonorPageState extends State<DonorPage> with TickerProviderStateMixin {
         .doc(donorModel.uid)
         .collection("requests")
         .add({
-      "charity_uid": "egDsElPay1QgUDvSdnO7", //TODO: USE CHARITY ID
+      "charity_uid":
+          locator<UserController>().curUser()!.uid, //TODO: USE CHARITY ID
       "create_time": Timestamp.now(),
       "status": "pending"
     });
     reqIDs.add(newReq.id);
-    await locator<FirebaseFirestoreInterface>()
-        .getCollection("charities")
-        .doc("ex-charity")
-        .collection("donors")
+    CollectionReference colRef = locator<FirebaseFirestoreInterface>()
+        .getCollection("donors")
         .doc(donorModel.uid)
-        .update({"ongoing_requests": reqIDs});
+        .collection("charities");
+    var doc = await colRef.doc(locator<UserController>().curUser()!.uid).get();
+    // Set new document with charity ID if doesn't exist yet
+    if (doc.data() == null) {
+      await colRef
+          .doc(locator<UserController>().curUser()!.uid)
+          .set({"ongoing_requests": reqIDs});
+    } else {
+      await colRef
+          .doc(locator<UserController>().curUser()!.uid)
+          .update({"ongoing_requests": reqIDs});
+    }
   }
 }

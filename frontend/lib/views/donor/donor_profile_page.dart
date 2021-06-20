@@ -1,11 +1,12 @@
+import 'package:drp_basket_app/firebase_controllers/firebase_storage_interface.dart';
+import 'package:drp_basket_app/user_type.dart';
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:drp_basket_app/views/donor/donor_home_page.dart';
-import 'package:drp_basket_app/views/donor/rank.dart';
+import 'package:drp_basket_app/views/welcome_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../locator.dart';
-import '../home_page.dart';
 import 'donor_stats_screen.dart';
 
 class DonorProfilePage extends StatefulWidget {
@@ -43,6 +44,7 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
                     accountInfo('Email', donorInformationModel.email),
                     accountInfo(
                         'Contact Number', donorInformationModel.contactNumber),
+                    accountInfo('Address', donorInformationModel.address),
                     GestureDetector(
                       onTap: () =>
                           Navigator.pushNamed(context, DonorStatsPage.id),
@@ -59,12 +61,11 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
     );
   }
 
-  Future<ImageProvider> _getImage(
-      BuildContext context, DonorInformationModel donorInformationModel) async {
+  Future<ImageProvider> _getImage() async {
     String downloadUrl;
     try {
-      downloadUrl = await locator<UserController>()
-          .loadFromStorage(context, donorInformationModel.uid);
+      downloadUrl = await locator<FirebaseStorageInterface>()
+          .getImageUrl(UserType.DONOR, donorInformationModel.uid);
     } catch (err) {
       downloadUrl =
           "https://i.pinimg.com/originals/59/54/b4/5954b408c66525ad932faa693a647e3f.jpg";
@@ -85,7 +86,10 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
     return IconButton(
       onPressed: () {
         locator<UserController>().userSignOut();
-        Navigator.pushReplacementNamed(context, HomePage.id);
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => WelcomeScreen()),
+            (route) => false);
       },
       icon: Icon(Icons.logout),
     );
@@ -99,7 +103,7 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
       );
     }
     return FutureBuilder(
-      future: _getImage(context, donorInformationModel),
+      future: _getImage(),
       builder: (BuildContext context, AsyncSnapshot<ImageProvider> snapshot) {
         if (snapshot.connectionState == ConnectionState.done)
           return CircleAvatar(

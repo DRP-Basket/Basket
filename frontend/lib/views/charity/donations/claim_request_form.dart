@@ -8,8 +8,6 @@ import 'package:drp_basket_app/views/donor/donations/donor_donation_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
-import 'donations_main.dart';
-
 class ClaimRequestForm extends StatefulWidget {
   final Donation donation;
   const ClaimRequestForm(this.donation, {Key? key}) : super(key: key);
@@ -166,7 +164,7 @@ class ClaimRequest {
     );
   }
 
-    Widget showETA() {
+  Widget showETA() {
     return Card(
       child: ListTile(
         leading: Icon(Icons.watch_later_sharp),

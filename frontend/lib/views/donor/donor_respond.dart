@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/constants.dart';
-import 'package:drp_basket_app/firebase_controllers/firebase_auth_interface.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
 import 'package:drp_basket_app/locator.dart';
 import 'package:drp_basket_app/views/donor/donor_message.dart';
@@ -88,9 +87,9 @@ class _DonorRespondState extends State<DonorRespond> {
                     style: TextStyle(fontSize: 16)),
                 padding: EdgeInsets.only(top: 5),
               ),
-            if (requestModel.charityData["email_address"] != null)
+            if (requestModel.charityData["email"] != null)
               Container(
-                child: Text(requestModel.charityData["email_address"],
+                child: Text(requestModel.charityData["email"],
                     style: TextStyle(fontSize: 16)),
                 padding: EdgeInsets.only(top: 2.5),
               ),
@@ -170,14 +169,17 @@ class _DonorRespondState extends State<DonorRespond> {
         .collection("requests")
         .doc(requestModel.reqID);
     DocumentReference charityRef = locator<FirebaseFirestoreInterface>()
-        .getCollection("charities")
-        .doc("ex-charity")
-        .collection("donors")
-        .doc(locator<FirebaseAuthInterface>().curUser()!.uid);
+        .getCollection("donors")
+        .doc(requestModel.curUID)
+        .collection("charities")
+        .doc(requestModel.requestData["charity_uid"]);
 
     var charityData = await charityRef.get();
-    var charityMap = charityData.data() as Map<String, dynamic>;
-    List<dynamic> newReqIDs = charityMap["ongoing_requests"];
+    var charityMap = charityData.data() as Map<String, dynamic>?;
+    List<dynamic> newReqIDs =
+        charityMap == null || charityMap["ongoing_requests"] == null
+            ? []
+            : charityMap["ongoing_requests"];
     newReqIDs.remove(requestModel.reqID);
 
     Navigator.pop(context);

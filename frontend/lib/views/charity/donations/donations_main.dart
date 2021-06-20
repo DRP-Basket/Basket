@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 import '../../../locator.dart';
 import '../../home_page.dart';
-import '../charity_drawer.dart';
 import 'claim_requests.dart';
 import 'donations_page.dart';
 
@@ -17,7 +16,6 @@ class DonationsMain extends StatelessWidget {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        drawer: CharityDrawer(),
         appBar: AppBar(
             title: Text('Donations'),
             bottom: TabBar(

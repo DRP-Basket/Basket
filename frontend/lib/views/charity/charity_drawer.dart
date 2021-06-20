@@ -6,7 +6,6 @@ import 'package:drp_basket_app/views/home_page.dart';
 import 'package:flutter/material.dart';
 
 import 'contacts/charity_receivers.dart';
-import 'donations/donations_page.dart';
 import 'events/charity_events_page.dart';
 
 class CharityDrawer extends StatelessWidget {
@@ -39,8 +38,7 @@ class CharityDrawer extends StatelessWidget {
           ),
           ListTile(
             title: Text('Donations'),
-            onTap: () =>
-                Navigator.popAndPushNamed(context, DonationsMain.id),
+            onTap: () => Navigator.popAndPushNamed(context, DonationsMain.id),
           ),
           ListTile(
             title: Text('Sign Out'),
