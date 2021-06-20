@@ -41,8 +41,9 @@ class HomePage extends StatelessWidget {
           LongButton(
             text: "Donor",
             onPressed: () => {
-              locator<UserController>().testLogInWithEmailAndPassword().then(
-                  (value) =>
+              locator<UserController>()
+                  .testLogInDonorWithEmailAndPassword()
+                  .then((value) =>
                       Navigator.pushReplacementNamed(context, DonorMain.id))
             },
             backgroundColor: Colors.blueAccent,

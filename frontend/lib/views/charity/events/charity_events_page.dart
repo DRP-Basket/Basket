@@ -7,6 +7,7 @@ import 'package:drp_basket_app/views/charity/charity_profile_page.dart';
 import 'package:drp_basket_app/views/charity/receivers/charity_receiver_form.dart';
 import 'package:drp_basket_app/views/charity/receivers/charity_receivers.dart';
 import 'package:drp_basket_app/views/charity/requests/requests_page.dart';
+import 'package:drp_basket_app/views/utilities/utilities.dart';
 import 'package:drp_basket_app/views/welcome_page.dart';
 import 'package:drp_basket_app/views/charity/donations/donations_main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -34,7 +35,7 @@ class _CharityEventsPageState extends State<CharityEventsPage> {
   final List<String> _titles = [
     "Donation Events",
     "Receivers",
-    "",
+    "My Requests",
     "Donors",
     "Your Profile",
   ];
@@ -46,17 +47,10 @@ class _CharityEventsPageState extends State<CharityEventsPage> {
   @override
   void initState() {
     super.initState();
-    _widgets.add(_buildCharityEventsPage());
-    _widgets.add(ReceiversList());
-    _widgets.add(RequestsPage());
-    _widgets.add(DonationsMain());
-    _widgets.add(CharityProfilePage());
     curUser = locator<UserController>().curUser()!;
 
     locator<FirebaseFirestoreInterface>()
-        .getCollection("charities")
-        .doc(curUser.uid)
-        .get()
+        .charityFromID(curUser.uid)
         .then((value) {
       Map<String, dynamic> charityData = value.data();
       setState(() {
@@ -77,7 +71,7 @@ class _CharityEventsPageState extends State<CharityEventsPage> {
   void sendSMS(donationID, donationMap) async {
     String donationMessage = donationEventMsg(donationMap);
     bool success = await locator<SMSController>()
-        .sendSMS(donationID, msgContent: donationMessage);
+        .sendSMS(curUser.uid, donationID, msgContent: donationMessage);
     if (success) {
       Alert(
           context: context,
@@ -113,26 +107,29 @@ class _CharityEventsPageState extends State<CharityEventsPage> {
 
   @override
   Widget build(BuildContext context) {
+    _widgets.add(ReceiversList());
+    _widgets.add(RequestsPage());
+    _widgets.add(DonationsMain());
+    _widgets.add(CharityProfilePage());
     return Scaffold(
-      appBar: _currentIndex != 2
-          ? AppBar(
-              title: Text(_titles[_currentIndex]),
-              toolbarHeight: MediaQuery.of(context).size.height / 12,
-              actions: [
-                  IconButton(
-                    onPressed: () {
-                      locator<UserController>().userSignOut();
-                      Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => WelcomeScreen(),
-                          ),
-                          (route) => false);
-                    },
-                    icon: Icon(Icons.logout),
-                  )
-                ])
-          : null,
+      appBar: AppBar(
+        title: Text(_titles[_currentIndex]),
+        toolbarHeight: MediaQuery.of(context).size.height / 12,
+        actions: [
+          IconButton(
+            onPressed: () {
+              locator<UserController>().userSignOut();
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => WelcomeScreen(),
+                  ),
+                  (route) => false);
+            },
+            icon: Icon(Icons.logout),
+          )
+        ],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.grey[200],
@@ -173,7 +170,9 @@ class _CharityEventsPageState extends State<CharityEventsPage> {
       body: charityInformationModel != null
           ? Provider<CharityInformationModel>(
               create: (context) => charityInformationModel!,
-              child: _widgets[_currentIndex])
+              child: _currentIndex == 0
+                  ? _buildCharityEventsPage()
+                  : _widgets[_currentIndex - 1])
           : Center(
               child: CircularProgressIndicator(),
             ),
@@ -188,6 +187,7 @@ class _CharityEventsPageState extends State<CharityEventsPage> {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => CharityEventForm()));
           },
+          backgroundColor: primary_color,
           label: Text("Add Event"),
           icon: Icon(Icons.add),
         );
@@ -198,6 +198,7 @@ class _CharityEventsPageState extends State<CharityEventsPage> {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => ReceiverForm()));
           },
+          backgroundColor: primary_color,
           label: Text("Add Receiver"),
           icon: Icon(Icons.add),
         );
@@ -209,77 +210,96 @@ class _CharityEventsPageState extends State<CharityEventsPage> {
   }
 
   Widget _buildCharityEventsPage() {
-    return StreamBuilder(
-        stream: locator<FirebaseFirestoreInterface>().getDonationList(),
-        builder: (BuildContext ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot.hasError) {
-            return Text('Something went wrong');
-          }
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: CircularProgressIndicator(
-                backgroundColor: Colors.lightBlueAccent,
-              ),
-            );
-          }
-          if (!snapshot.hasData) {
-            return Container();
-          }
-          var donations = snapshot.data!.docs;
-          donations.sort((a, b) {
-            var aData = a.data() as Map<String, dynamic>;
-            var bData = b.data() as Map<String, dynamic>;
-            Timestamp aDate = aData["event_date_time"];
-            Timestamp bDate = bData["event_date_time"];
-            return bDate.compareTo(aDate);
-          });
-          return ListView(
-            children: donations.map((DocumentSnapshot ds) {
-              var donationID = ds.reference.id;
-              var donation = ds.data() as Map<String, dynamic>;
-              String name = donation['event_name'];
-              String location = donation['event_location'];
-              DateTime dateTime = donation['event_date_time'].toDate();
-              return GestureDetector(
-                onTap: () => {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => CharityEventPage(
-                              donationID: donationID, donationMap: donation)))
-                },
-                child: Card(
-                  child: Container(
-                    padding: EdgeInsets.all(20),
-                    child: Column(
-                      children: [
-                        Text(
-                          name,
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        ListTile(
-                          title: Text('Date And Time'),
-                          subtitle: Text(
-                              DateFormat.yMMMd().add_jm().format(dateTime)),
-                        ),
-                        ListTile(
-                          title: Text('Location'),
-                          subtitle: Text(location),
-                        ),
-                        ElevatedButton(
-                            child: Text('Notify Receivers'),
-                            onPressed: () => sendSMS(donationID, donation)),
-                      ],
+    return charityInformationModel != null
+        ? StreamBuilder(
+            stream: locator<FirebaseFirestoreInterface>()
+                .getDonationList(curUser.uid),
+            builder: (BuildContext ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
+              if (snapshot.hasError) {
+                return Text('Something went wrong');
+              }
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                  child: CircularProgressIndicator(
+                    backgroundColor: Colors.lightBlueAccent,
+                  ),
+                );
+              }
+              if (!snapshot.hasData) {
+                return Container();
+              }
+              var donations = snapshot.data!.docs;
+              if (donations.isEmpty) {
+                return Center(
+                  child: Text(
+                    "No Events",
+                    style: TextStyle(
+                      color: third_color,
+                      fontSize: 24,
                     ),
                   ),
-                ),
+                );
+              }
+              donations.sort((a, b) {
+                var aData = a.data() as Map<String, dynamic>;
+                var bData = b.data() as Map<String, dynamic>;
+                Timestamp aDate = aData["event_date_time"];
+                Timestamp bDate = bData["event_date_time"];
+                return bDate.compareTo(aDate);
+              });
+              return ListView(
+                children: donations.map((DocumentSnapshot ds) {
+                  var donationID = ds.reference.id;
+                  var donation = ds.data() as Map<String, dynamic>;
+                  String name = donation['event_name'];
+                  String location = donation['event_location'];
+                  DateTime dateTime = donation['event_date_time'].toDate();
+                  return GestureDetector(
+                    onTap: () => {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => CharityEventPage(
+                                  donationID: donationID,
+                                  donationMap: donation)))
+                    },
+                    child: Card(
+                      child: Container(
+                        padding: EdgeInsets.all(20),
+                        child: Column(
+                          children: [
+                            Text(
+                              name,
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            ListTile(
+                              title: Text('Date And Time'),
+                              subtitle: Text(
+                                  DateFormat.yMMMd().add_jm().format(dateTime)),
+                            ),
+                            ListTile(
+                              title: Text('Location'),
+                              subtitle: Text(location),
+                            ),
+                            ElevatedButton(
+                                style: ButtonStyle(
+                                  backgroundColor: MaterialStateProperty.all(
+                                      secondary_color),
+                                ),
+                                child: Text('Notify Receivers'),
+                                onPressed: () => sendSMS(donationID, donation)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
               );
-            }).toList(),
-          );
-        });
+            })
+        : loading();
   }
 }
 

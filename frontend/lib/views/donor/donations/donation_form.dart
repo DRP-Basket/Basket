@@ -55,10 +55,11 @@ class _DonationFormState extends State<DonationForm> {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-              '${request == null ? 'Adding' : 'Responding with'} new donation'),
-        ),
+        appBar: request != null
+            ? AppBar(
+                title: Text("Responding to Request"),
+              )
+            : null,
         body: _uploading
             ? Center(
                 child: CircularProgressIndicator(
@@ -232,6 +233,19 @@ class _DonationFormState extends State<DonationForm> {
                             onPressed: () async {
                               TimeOfDay? newTime = await showTimePicker(
                                 context: context,
+                                builder: (context, child) {
+                                  return Theme(
+                                    data: ThemeData.light().copyWith(
+                                      colorScheme: ColorScheme.fromSwatch(
+                                        primarySwatch: Colors.teal,
+                                        primaryColorDark: third_color,
+                                        accentColor: third_color,
+                                      ),
+                                      dialogBackgroundColor: Colors.white,
+                                    ),
+                                    child: child!,
+                                  );
+                                },
                                 initialTime: TimeOfDay.now(),
                               );
                               if (newTime != null) {
@@ -251,7 +265,7 @@ class _DonationFormState extends State<DonationForm> {
                           child: ElevatedButton(
                         onPressed: _confirmTap,
                         child: Text(
-                          "Confirm & Send",
+                          "Confirm & ${request != null ? "Send" : "Post"}",
                           style: TextStyle(fontSize: 20),
                         ),
                         style: ButtonStyle(
@@ -268,6 +282,11 @@ class _DonationFormState extends State<DonationForm> {
   }
 
   Future<void> _confirmTap() async {
+    _foodItemsIsEmpty = _foodItemsEditingController.text == "";
+    _portionNumberIsEmpty = _portionNumberEditingController.text == "";
+    if (_foodItemsIsEmpty || _portionNumberIsEmpty) {
+      return setState(() {});
+    }
     Donation donation = await Donation.addNewDonation(
       items: _foodItemsEditingController.text,
       portions: int.parse(_portionNumberEditingController.text),

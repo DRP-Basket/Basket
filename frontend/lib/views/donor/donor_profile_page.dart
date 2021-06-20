@@ -1,3 +1,4 @@
+import 'package:drp_basket_app/constants.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_storage_interface.dart';
 import 'package:drp_basket_app/user_type.dart';
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
@@ -50,9 +51,25 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
                     GestureDetector(
                       onTap: () =>
                           Navigator.pushNamed(context, DonorStatsPage.id),
-                      child: accountInfo(
-                        'Statistics',
-                        'More info',
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          side: BorderSide(
+                            color: Colors.grey,
+                          ),
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                        ),
+                        elevation: 3,
+                        shadowColor: third_color,
+                        child: ListTile(
+                          title: Text(
+                            'Statistics',
+                            style: TextStyle(
+                              color: third_color,
+                            ),
+                          ),
+                          subtitle: Text('Click for more info'),
+                          trailing: Icon(Icons.more_vert),
+                        ),
                       ),
                     ),
                   ],
@@ -79,7 +96,12 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
 
   Widget accountInfo(String category, String info) {
     return ListTile(
-      title: Text(category),
+      title: Text(
+        category,
+        style: TextStyle(
+          color: third_color,
+        ),
+      ),
       subtitle: Text(info),
     );
   }

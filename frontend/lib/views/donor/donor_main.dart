@@ -23,7 +23,7 @@ class DonorMain extends StatefulWidget {
 }
 
 class _DonorMainState extends State<DonorMain> {
-  int _currentIndex = 0;
+  int _currentIndex = 1;
 
   final List<Widget> _widgets = [
     DonationsMain(),

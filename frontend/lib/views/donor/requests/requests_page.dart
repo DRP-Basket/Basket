@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:drp_basket_app/constants.dart';
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:drp_basket_app/views/general/donation.dart';
 import 'package:drp_basket_app/views/general/request.dart';
@@ -40,6 +41,24 @@ class _RequestsPageState extends State<RequestsPage> {
               return loading();
             }
             var reqs = snapshot.data!.docs;
+            List<Widget> children = reqs.map(
+              (DocumentSnapshot ds) {
+                var reqID = ds.reference.id;
+                var req = ds.data() as Map<String, dynamic>;
+                return _requestTile(reqID, req[Request.CHARITY_ID]);
+              },
+            ).toList();
+            if (children.isEmpty) {
+              return Center(
+                child: Text(
+                  "No Requests",
+                  style: TextStyle(
+                    color: third_color,
+                    fontSize: 24,
+                  ),
+                ),
+              );
+            }
             return ListView(
               children: reqs.map(
                 (DocumentSnapshot ds) {

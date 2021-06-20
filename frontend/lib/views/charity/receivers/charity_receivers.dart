@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:drp_basket_app/constants.dart';
+import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
@@ -24,6 +26,7 @@ class _ReceiversListState extends State<ReceiversList> {
 
   String searchQuery = '';
   bool sortByLastClaimed = false;
+  final String uid = locator<UserController>().curUser()!.uid;
 
   @override
   void dispose() {
@@ -35,7 +38,7 @@ class _ReceiversListState extends State<ReceiversList> {
   Widget build(BuildContext context) {
     return StreamBuilder(
         stream: locator<FirebaseFirestoreInterface>()
-            .getContactList(sortByLastClaimed: sortByLastClaimed),
+            .getContactList(uid, sortByLastClaimed: sortByLastClaimed),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (!snapshot.hasData) {
             return Center(
@@ -45,6 +48,17 @@ class _ReceiversListState extends State<ReceiversList> {
             );
           } else {
             var receivers = snapshot.data!.docs;
+            if (receivers.isEmpty) {
+              return Center(
+                child: Text(
+                  "No Receivers",
+                  style: TextStyle(
+                    color: third_color,
+                    fontSize: 24,
+                  ),
+                ),
+              );
+            }
             return FloatingSearchBar(
               controller: controller,
               clearQueryOnClose: false,

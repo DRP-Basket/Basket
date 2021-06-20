@@ -26,7 +26,8 @@ class _DonorStatsPageState extends State<DonorStatsPage>
   void initDonation() async {
     // TODO when implemented login stuff, use user controller to get stats
     String userID = locator<UserController>().curUser()!.uid;
-    donations = await locator<FirebaseFirestoreInterface>().getDonationCount(userID);
+    donations =
+        await locator<FirebaseFirestoreInterface>().getDonationCount(userID);
     rank = getRank(donations);
     loading = false;
     progressPercent = getProgressPercent(rank, donations);

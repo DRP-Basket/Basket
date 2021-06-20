@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:drp_basket_app/views/utilities/utilities.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -22,6 +23,7 @@ class _ReceiverPageState extends State<ReceiverPage> {
   static DateFormat dateFormat = DateFormat('MMM d, y');
 
   final String id;
+  final String uid = locator<UserController>().curUser()!.uid;
 
   _ReceiverPageState(this.id);
 
@@ -75,7 +77,7 @@ class _ReceiverPageState extends State<ReceiverPage> {
           ),
           StreamBuilder(
             stream: locator<FirebaseFirestoreInterface>()
-                .donationsClaimed(receiverID),
+                .donationsClaimed(uid, receiverID),
             builder: (BuildContext ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
               if (!snapshot.hasData) {
                 return loading();
@@ -97,7 +99,7 @@ class _ReceiverPageState extends State<ReceiverPage> {
   // Displays info about a single donation claimed by the receiver (event name + date)
   Widget _donationClaimed(String id) {
     return StreamBuilder(
-      stream: locator<FirebaseFirestoreInterface>().getDonationEvent(id),
+      stream: locator<FirebaseFirestoreInterface>().getDonationEvent(uid, id),
       builder: (BuildContext ctx, AsyncSnapshot<DocumentSnapshot> snapshot) {
         if (!snapshot.hasData) {
           return Container();
@@ -123,7 +125,7 @@ class _ReceiverPageState extends State<ReceiverPage> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        stream: locator<FirebaseFirestoreInterface>().getReceiver(id),
+        stream: locator<FirebaseFirestoreInterface>().getReceiver(uid, id),
         builder: (BuildContext ctx, AsyncSnapshot<DocumentSnapshot> snapshot) {
           if (!snapshot.hasData) {
             return Center(

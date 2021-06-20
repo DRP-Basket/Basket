@@ -52,14 +52,14 @@ class UserController {
 
   final String _loginFailed = "Login Failed";
 
-  Future<void> testLogInWithEmailAndPassword() async {
+  Future<void> testLogInDonorWithEmailAndPassword() async {
     _currentUser = await _firebaseAuthController.loginWithEmailAndPassword(
-        "donor@basket.com", "basket123");
+        "test_donor@basket.com", "basket123");
   }
 
   Future<void> testLogInCharityWithEmailAndPassword() async {
     _currentUser = await _firebaseAuthController.loginWithEmailAndPassword(
-        "test2@basket.com", "basket123");
+        "greenhour@basket.com", "basket123");
   }
 
   void logInWithEmailAndPassword(

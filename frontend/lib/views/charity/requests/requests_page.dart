@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:drp_basket_app/constants.dart';
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:drp_basket_app/views/charity/requests/request_page.dart';
 import 'package:drp_basket_app/views/general/donation.dart';
@@ -30,30 +31,33 @@ class _RequestsPageState extends State<RequestsPage> {
         .collection('request_list')
         .snapshots();
 
-    return Scaffold(
-      appBar: AppBar(title: Text('My Requests'),),
-      body: StreamBuilder(
-        stream: reqStream,
-        builder: (BuildContext ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (!snapshot.hasData) {
-            return loading();
-          }
-          var reqs = snapshot.data!.docs;
-          return reqs.isEmpty
-              ? Center(
-                  child: Text('No Requests Made'),
-                )
-              : ListView(
-                  children: reqs.map(
-                    (DocumentSnapshot ds) {
-                      var reqID = ds.reference.id;
-                      var reqMap = ds.data() as Map<String, dynamic>;
-                      return _buildRequestTile(reqID, reqMap);
-                    },
-                  ).toList(),
-                );
-        },
-      ),
+    return StreamBuilder(
+      stream: reqStream,
+      builder: (BuildContext ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (!snapshot.hasData) {
+          return loading();
+        }
+        var reqs = snapshot.data!.docs;
+        return reqs.isEmpty
+            ? Center(
+                child: Text(
+                  'No Requests Made',
+                  style: TextStyle(
+                    color: third_color,
+                    fontSize: 24,
+                  ),
+                ),
+              )
+            : ListView(
+                children: reqs.map(
+                  (DocumentSnapshot ds) {
+                    var reqID = ds.reference.id;
+                    var reqMap = ds.data() as Map<String, dynamic>;
+                    return _buildRequestTile(reqID, reqMap);
+                  },
+                ).toList(),
+              );
+      },
     );
   }
 
@@ -88,11 +92,18 @@ class _RequestsPageState extends State<RequestsPage> {
           return _make(tileContent, req, donor);
         }
         return StreamBuilder(
-          stream: _store.collection('donors').doc(req.donorID).collection('donation_list').doc(requestMap[Request.DONATION_ID]).snapshots(),
-          builder: (BuildContext ctx, AsyncSnapshot<DocumentSnapshot> snapshot) {
+          stream: _store
+              .collection('donors')
+              .doc(req.donorID)
+              .collection('donation_list')
+              .doc(requestMap[Request.DONATION_ID])
+              .snapshots(),
+          builder:
+              (BuildContext ctx, AsyncSnapshot<DocumentSnapshot> snapshot) {
             if (!snapshot.hasData) return Container();
             var donMap = snapshot.data!.data() as Map<String, dynamic>;
-            Donation don = Donation.buildFromMap(requestMap[Request.DONATION_ID], donMap);
+            Donation don =
+                Donation.buildFromMap(requestMap[Request.DONATION_ID], donMap);
             req.donation = don;
             return _make(tileContent, req, donor);
           },

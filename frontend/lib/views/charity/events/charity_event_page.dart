@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:flutter/material.dart';
 
 import '../../../locator.dart';
@@ -20,6 +21,7 @@ class CharityEventPage extends StatefulWidget {
 }
 
 class _CharityEventPageState extends State<CharityEventPage> {
+  final String uid = locator<UserController>().curUser()!.uid;
   late String name;
   late String location;
   late DateTime dateTime;
@@ -54,7 +56,7 @@ class _CharityEventPageState extends State<CharityEventPage> {
           children: [
             StreamBuilder(
               stream: locator<FirebaseFirestoreInterface>()
-                  .getDonationEventSnapshot(widget.donationID),
+                  .getDonationEventSnapshot(uid, widget.donationID),
               builder: (BuildContext context,
                   AsyncSnapshot<DocumentSnapshot> snapshot) {
                 if (!snapshot.hasData) {
@@ -64,14 +66,16 @@ class _CharityEventPageState extends State<CharityEventPage> {
                     ),
                   );
                 } else {
-                  List confirmedList = (snapshot.data!.data() as Map<String, dynamic>)["confirmed"];
-                  List pendingList = (snapshot.data!.data() as Map<String, dynamic>)["pending"];
+                  List confirmedList = (snapshot.data!.data()
+                      as Map<String, dynamic>)["confirmed"];
+                  List pendingList = (snapshot.data!.data()
+                      as Map<String, dynamic>)["pending"];
                   if (pendingList.isEmpty) {
                     return Padding(
                       padding: EdgeInsets.all(50.0),
                       child: Center(
                         child: Text(
-                            "Please notify users by clicking on the notify button on the event's page",
+                          "Please notify users by clicking on the notify button on the event's page",
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -93,7 +97,11 @@ class _CharityEventPageState extends State<CharityEventPage> {
                       String name = receiver['name'];
                       String contact = receiver['contact'];
                       return GestureDetector(
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (ctx) => ReceiverPage(receiver["uid"]))),
+                        onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (ctx) =>
+                                    ReceiverPage(receiver["uid"]))),
                         child: Card(
                           child: Container(
                             padding: EdgeInsets.all(20),
@@ -114,7 +122,7 @@ class _CharityEventPageState extends State<CharityEventPage> {
             ),
             StreamBuilder(
               stream: locator<FirebaseFirestoreInterface>()
-                  .getDonationEventSnapshot(widget.donationID),
+                  .getDonationEventSnapshot(uid, widget.donationID),
               builder: (BuildContext context,
                   AsyncSnapshot<DocumentSnapshot> snapshot) {
                 if (!snapshot.hasData) {
@@ -124,13 +132,14 @@ class _CharityEventPageState extends State<CharityEventPage> {
                     ),
                   );
                 } else {
-                  List pendingList = (snapshot.data!.data() as Map<String, dynamic>)["pending"];
+                  List pendingList = (snapshot.data!.data()
+                      as Map<String, dynamic>)["pending"];
                   if (pendingList.isEmpty) {
                     return Padding(
                       padding: EdgeInsets.all(50.0),
                       child: Center(
                         child: Text(
-                            "Please notify users by clicking on the notify button on the event's page",
+                          "Please notify users by clicking on the notify button on the event's page",
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -141,7 +150,11 @@ class _CharityEventPageState extends State<CharityEventPage> {
                       String name = receiver['name'];
                       String contact = receiver['contact'];
                       return GestureDetector(
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (ctx) => ReceiverPage(receiver["uid"]))),
+                        onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (ctx) =>
+                                    ReceiverPage(receiver["uid"]))),
                         child: Card(
                           child: Container(
                             padding: EdgeInsets.all(20),

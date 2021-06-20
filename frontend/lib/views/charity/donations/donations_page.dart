@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:drp_basket_app/constants.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_storage_interface.dart';
 import 'package:drp_basket_app/user_type.dart';
 import 'package:drp_basket_app/views/general/donation.dart';
@@ -51,8 +52,13 @@ class _CharityDonationsPageState extends State<CharityDonationsPage> {
             var donations = snapshot.data!.docs;
             return donations.isEmpty
                 ? Center(
-                    child: Text('No Donations Currently'),
-                  )
+                    child: Text(
+                    'No Donations Currently',
+                    style: TextStyle(
+                      color: third_color,
+                      fontSize: 24,
+                    ),
+                  ))
                 : ListView(
                     children: donations.map(
                       (DocumentSnapshot ds) {

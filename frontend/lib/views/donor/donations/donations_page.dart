@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:drp_basket_app/constants.dart';
 import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:drp_basket_app/views/general/donation.dart';
-import 'package:drp_basket_app/views/donor/donations/donation_form.dart';
 import 'package:drp_basket_app/views/general/request.dart';
 import 'package:drp_basket_app/views/utilities/utilities.dart';
 import 'package:expandable/expandable.dart';
@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import '../../../locator.dart';
 import '../requests/request_page.dart';
 
-// Displays all donations made 
+// Displays all donations made
 
 class DonorDonationsPage extends StatefulWidget {
   const DonorDonationsPage({Key? key}) : super(key: key);
@@ -36,16 +36,28 @@ class _DonorDonationsPageState extends State<DonorDonationsPage> {
           return loading();
         }
         var donations = snapshot.data!.docs;
+        List<Widget> children = donations.map(
+          (DocumentSnapshot ds) {
+            var donationID = ds.reference.id;
+            var donationMap = ds.data() as Map<String, dynamic>;
+            var donation =
+                Donation.buildFromMap(donationID, donationMap); // TODO
+            return _displayDonation(donation);
+          },
+        ).toList();
+        if (children.isEmpty) {
+          return Center(
+            child: Text(
+              "Empty",
+              style: TextStyle(
+                color: third_color,
+                fontSize: 24,
+              ),
+            ),
+          );
+        }
         return ListView(
-          children: donations.map(
-            (DocumentSnapshot ds) {
-              var donationID = ds.reference.id;
-              var donationMap = ds.data() as Map<String, dynamic>;
-              var donation =
-                  Donation.buildFromMap(donationID, donationMap); // TODO
-              return _displayDonation(donation);
-            },
-          ).toList(),
+          children: children,
         );
       },
     );

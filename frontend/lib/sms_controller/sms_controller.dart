@@ -6,9 +6,9 @@ import 'package:drp_basket_app/locator.dart';
 import 'package:telephony/telephony.dart';
 
 class SMSController {
-
   final Telephony telephony = Telephony.instance;
-  final _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+  final _chars =
+      'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
   Random _rnd = Random();
 
   String getRedeemCode(int length) => String.fromCharCodes(Iterable.generate(
@@ -17,19 +17,25 @@ class SMSController {
   String getRedeemURL(String uid, String donationID) {
     String redeemCode = getRedeemCode(5);
     String url = "www.xxxxxx.com/redeem$redeemCode";
-    locator<FirebaseFirestoreInterface>().assignNewRedeemCode(redeemCode, uid, donationID);
+    locator<FirebaseFirestoreInterface>()
+        .assignNewRedeemCode(redeemCode, uid, donationID);
     return url;
   }
 
-  Future<bool> sendSMS(donationID, {msgContent = ''}) async {
+  Future<bool> sendSMS(String uid, String donationID, {msgContent = ''}) async {
     bool? permissionsGranted = await telephony.requestPhoneAndSmsPermissions;
     if (permissionsGranted!) {
-      List contacts = await locator<FirebaseFirestoreInterface>().getContactMap();
-      await locator<FirebaseFirestoreInterface>().addContactToPending(donationID, contacts);
+      List contacts =
+          await locator<FirebaseFirestoreInterface>().getContactMap(uid);
+      await locator<FirebaseFirestoreInterface>()
+          .addContactToPending(uid, donationID, contacts);
       for (DocumentSnapshot contactDS in contacts) {
         var contactInfo = (contactDS.data() as Map<String, dynamic>);
-        String redemptionLink = "Please click on the link ${getRedeemURL(contactDS.id, donationID)} when you collect your food.";
-        telephony.sendSms(to: contactInfo["contact"], message: msgContent + '\n' + redemptionLink);
+        String redemptionLink =
+            "Please click on the link ${getRedeemURL(contactDS.id, donationID)} when you collect your food.";
+        telephony.sendSms(
+            to: contactInfo["contact"],
+            message: msgContent + '\n' + redemptionLink);
       }
       return true;
     }
