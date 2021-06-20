@@ -77,12 +77,12 @@ class Donation {
       'collect_date': collectDate,
       'collect_time': collectTime,
       'charity_id': assignedCharityID,
-    }).then((donationRef) {
+    }).then((donationRef) async {
       // Save newly created donation id
       id = donationRef.id;
       // Add to general list for posting if available
       if (status == 'Available') {
-        _store.collection('available_donations').doc(id).set({
+        await _store.collection('available_donations').doc(id).set({
           'donor_id': donorID,
           'time_created': timeCreated,
         });
@@ -91,7 +91,7 @@ class Donation {
   }
 
   Future<void> fsUpdate(Map<String, dynamic> fields) async {
-    _store
+    await _store
         .collection('donors')
         .doc(donorID)
         .collection('donation_list')
@@ -213,7 +213,7 @@ class Donation {
       STATUS: 'Assigned',
       CHARITY_ID: charityID,
     });
-    _store.collection('available_donations').doc(id).delete();
+    await _store.collection('available_donations').doc(id).delete();
   }
 
 }
