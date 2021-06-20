@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/firebase_controllers/firebase_storage_interface.dart';
 import 'package:drp_basket_app/user_type.dart';
-import 'package:drp_basket_app/view_controllers/user_controller.dart';
 import 'package:drp_basket_app/views/general/donation.dart';
 import 'package:drp_basket_app/views/donor/statistics/rank.dart';
 import 'package:drp_basket_app/views/utilities/utilities.dart';
