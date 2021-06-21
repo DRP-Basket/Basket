@@ -1,9 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp_basket_app/constants.dart';
-import 'package:drp_basket_app/firebase_controllers/firebase_firestore_interface.dart';
-import 'package:drp_basket_app/locator.dart';
-import 'package:drp_basket_app/view_controllers/user_controller.dart';
-import 'package:drp_basket_app/views/charity/old/donor_request_end.dart';
 import 'package:drp_basket_app/views/charity/old/utilities.dart';
 import 'package:drp_basket_app/views/charity/requests/requests_page.dart';
 import 'package:drp_basket_app/views/general/donor.dart';
@@ -12,6 +7,7 @@ import 'package:drp_basket_app/views/utilities/utilities.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 import 'donations_page.dart';
 
@@ -30,6 +26,7 @@ class _DonorPageState extends State<DonorPage> with TickerProviderStateMixin {
   late List<dynamic> reqIDs;
   late bool canSendReq;
   int _index = 0;
+  bool _uploading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -45,50 +42,53 @@ class _DonorPageState extends State<DonorPage> with TickerProviderStateMixin {
       appBar: AppBar(
         title: Text(donorModel.name),
       ),
-      body: Container(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            DonorPageUtilities.introRow(donorModel),
-            Container(
-              decoration: BoxDecoration(
-                border: Border(
-                  top: BorderSide(color: Colors.grey, width: 0.25),
-                  bottom: BorderSide(color: Colors.grey, width: 0.25),
-                ),
-              ),
-              child: TabBar(
-                onTap: (val) => {_index = val},
-                controller: _tabController,
-                indicatorColor: secondary_color,
-                indicatorWeight: 3.5,
-                labelColor: third_color,
-                unselectedLabelColor: Colors.black,
-                tabs: [
-                  Tab(text: "Donations Available"),
-                  Tab(text: "Requests"),
-                ],
-              ),
-            ),
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
+      body: !_uploading
+          ? Container(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Changed here
-                  CharityDonationsPage(donorID: donorModel.uid),
-                  RequestsPage(donorID: donorModel.uid),
-                  // To here
+                  DonorPageUtilities.introRow(donorModel),
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border(
+                        top: BorderSide(color: Colors.grey, width: 0.25),
+                        bottom: BorderSide(color: Colors.grey, width: 0.25),
+                      ),
+                    ),
+                    child: TabBar(
+                      onTap: (val) => {_index = val},
+                      controller: _tabController,
+                      indicatorColor: secondary_color,
+                      indicatorWeight: 3.5,
+                      labelColor: third_color,
+                      unselectedLabelColor: Colors.black,
+                      tabs: [
+                        Tab(text: "Donations Available"),
+                        Tab(text: "Requests"),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: [
+                        // Changed here
+                        CharityDonationsPage(false, donorID: donorModel.uid),
+                        RequestsPage(donorID: donorModel.uid),
+                        // To here
+                      ],
+                    ),
+                  ),
                 ],
               ),
-            ),
-          ],
-        ),
-      ),
+            )
+          : loading(),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: secondary_color,
         onPressed: () => showDialog(
           context: context,
+          useRootNavigator: false,
           builder: (context) => AlertDialog(
             title: Text("Are you sure you want to send a donation request?"),
             actions: [
@@ -98,9 +98,17 @@ class _DonorPageState extends State<DonorPage> with TickerProviderStateMixin {
               ),
               TextButton(
                 onPressed: () async {
-                  await Request.sendRequest(donorID: donorModel.uid);
-                  ;
+                  setState(() {
+                    _uploading = true;
+                  });
                   Navigator.pop(context);
+                  await Request.sendRequest(donorID: donorModel.uid);
+                  await _requestSuccess();
+                  setState(() {
+                    _uploading = false;
+                    _index = 1;
+                    _tabController.index = 1;
+                  });
                 },
                 child: Text('OK'),
               ),
@@ -110,5 +118,25 @@ class _DonorPageState extends State<DonorPage> with TickerProviderStateMixin {
         label: Text("Send request"),
       ),
     );
+  }
+
+  Future<bool?> _requestSuccess() {
+    return Alert(
+        context: context,
+        title: "Success",
+        desc: "Request sent",
+        type: AlertType.success,
+        buttons: [
+          DialogButton(
+            child: Text(
+              "Okay",
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+            color: primary_color,
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ]).show();
   }
 }

@@ -15,18 +15,21 @@ import 'donation_page.dart';
 
 class CharityDonationsPage extends StatefulWidget {
   final String? donorID;
+  final bool displayPic;
 
-  CharityDonationsPage({Key? key, String? this.donorID}) : super(key: key);
+  CharityDonationsPage(this.displayPic, {Key? key, String? this.donorID})
+      : super(key: key);
 
   @override
   _CharityDonationsPageState createState() =>
-      _CharityDonationsPageState(donorID);
+      _CharityDonationsPageState(displayPic, donorID);
 }
 
 class _CharityDonationsPageState extends State<CharityDonationsPage> {
   final String? donorID;
+  final bool displayPic;
 
-  _CharityDonationsPageState(this.donorID);
+  _CharityDonationsPageState(this.displayPic, this.donorID);
 
   Future<Widget> _getImage(Donation donation) async {
     String downloadUrl = await locator<FirebaseStorageInterface>()
@@ -34,16 +37,16 @@ class _CharityDonationsPageState extends State<CharityDonationsPage> {
     return Container(
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
-        image: DecorationImage(
-          // image:
-          image: NetworkImage(downloadUrl),
-          colorFilter: new ColorFilter.mode(
-              Colors.black.withOpacity(0.3), BlendMode.dstATop),
-          fit: BoxFit.fitWidth,
-          alignment: Alignment.topCenter,
+        borderRadius: BorderRadius.all(Radius.circular(5)),
+        border: Border.all(
+          color: Colors.grey,
         ),
+        color: Colors.grey[200],
       ),
-      child: _donationTile(donation),
+      child: _donationTile(
+        donation,
+        NetworkImage(downloadUrl),
+      ),
     );
   }
 
@@ -93,7 +96,8 @@ class _CharityDonationsPageState extends State<CharityDonationsPage> {
                           .snapshots(),
                       builder: (BuildContext ctx,
                           AsyncSnapshot<DocumentSnapshot> snapshot) {
-                        if (!snapshot.hasData) return Container();
+                        if (!snapshot.hasData || snapshot.data!.data() == null)
+                          return Container();
                         var donation = Donation.buildFromMap(donationID,
                             snapshot.data!.data() as Map<String, dynamic>);
                         return GestureDetector(
@@ -127,16 +131,20 @@ class _CharityDonationsPageState extends State<CharityDonationsPage> {
     );
   }
 
-  Widget _donationTile(Donation donation) {
+  Widget _donationTile(Donation donation, ImageProvider image) {
     return Column(
       children: [
-        _donorInfo(donation.donorID),
-        donation.displaySummary(),
+        _donorInfo(donation, image),
+        Padding(
+          padding: EdgeInsets.only(top: 15),
+          child: donation.displayCollectBy(),
+        ),
       ],
     );
   }
 
-  Widget _donorInfo(String donorID) {
+  Widget _donorInfo(Donation donation, ImageProvider image) {
+    String donorID = donation.donorID;
     return StreamBuilder(
       stream: locator<FirebaseFirestoreInterface>().getDonor(donorID),
       builder: (BuildContext ctx, AsyncSnapshot<DocumentSnapshot> snapshot) {
@@ -144,31 +152,117 @@ class _CharityDonationsPageState extends State<CharityDonationsPage> {
           return Container();
         }
         var donor = snapshot.data!.data() as Map<String, dynamic>;
-        return Container(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ListTile(
-                title: Text(
-                  donor['name'],
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+        List<Widget> children = [];
+        if (displayPic) {
+          children.add(Expanded(
+            flex: 3,
+            child: Container(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 5),
+                child: CircleAvatar(
+                  backgroundImage: image,
+                  radius: 50,
                 ),
               ),
-              ListTile(
-                dense: true,
-                leading: Icon(Icons.home),
-                title: Text(donor['address']),
+            ),
+          ));
+        }
+        List<Widget> columnChildren = [];
+        if (displayPic) {
+          columnChildren.add(Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: 15,
+            ),
+            child: Padding(
+              padding: EdgeInsets.only(bottom: 5),
+              child: Row(
+                children: [
+                  Text(
+                    donor['name'],
+                    style: TextStyle(
+                      color: third_color,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
-              ListTile(
-                dense: true,
-                leading: Icon(Icons.star),
-                title: Text(rankString[getRank(donor['donation_count'])]!),
-              ),
-            ],
+            ),
+          ));
+        }
+        columnChildren.addAll([
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: 15,
+              vertical: 2.5,
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.home,
+                  color: Colors.blue[400],
+                ),
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: 15,
+                  ),
+                  child: Text(donor['address']),
+                ),
+              ],
+            ),
           ),
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: 15,
+              vertical: 2.5,
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.star,
+                  color: Colors.yellow[800],
+                ),
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: 15,
+                  ),
+                  child: Text(rankString[getRank(donor['donation_count'])]!
+                      .capitalize()),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: 15,
+              vertical: 2.5,
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.food_bank_outlined,
+                  color: Colors.red,
+                ),
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: 15,
+                  ),
+                  child: Text("${donation.portions} portions"),
+                ),
+              ],
+            ),
+          ),
+        ]);
+        children.addAll([
+          Expanded(
+            flex: 6,
+            child: Column(
+              children: columnChildren,
+            ),
+          ),
+        ]);
+        return Row(
+          children: children,
         );
       },
     );

@@ -105,9 +105,12 @@ class _DonorsPageState extends State<DonorsPage> {
                     )))
       },
       child: Card(
-        elevation: 3,
-        shadowColor: Colors.green,
-        shape: OutlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
+        elevation: 5,
+        shadowColor: Colors.grey[300],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+          side: BorderSide(color: Colors.grey),
+        ),
         child: Row(
           children: [
             Spacer(),

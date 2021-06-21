@@ -20,18 +20,19 @@ class Donation {
   static var curUser = locator<UserController>().curUser()!;
   var _store = FirebaseFirestore.instance;
 
-  Donation(
-      {required this.donorID,
-      required this.status,
-      required this.items,
-      required this.portions,
-      required this.timeCreated,
-      this.assignedCharityID,
-      this.options,
-      this.collectDate,
-      this.collectTime});
+  Donation({
+    required this.donorID,
+    required this.status,
+    required this.items,
+    required this.portions,
+    required this.timeCreated,
+    this.assignedCharityID,
+    this.options,
+    this.collectDate,
+    this.collectTime,
+  });
 
-  static Future<Donation> addNewDonation (
+  static Future<Donation> addNewDonation(
       {required String items,
       required int portions,
       String? options,
@@ -67,7 +68,11 @@ class Donation {
 
   Future<void> fsAddDonation() async {
     // Save donation in donor's donations collection
-    await _store.collection('donors').doc(donorID).collection('donation_list').add({
+    await _store
+        .collection('donors')
+        .doc(donorID)
+        .collection('donation_list')
+        .add({
       'donor_id': donorID,
       'status': status,
       'items': items,
@@ -124,11 +129,11 @@ class Donation {
           displayField('Items', items),
           displayField('Portions', portions.toString()),
           displayField('Collect before',
-              nullOrAlt(collectDate) + nullOrAlt(collectTime)),
+              nullOrAlt(collectTime) + " on " + nullOrAlt(collectDate)),
           displayField('Options', options),
-          (!showCharity || (assignedCharityID == null))
-              ? Container()
-              : getCharityName(),
+          // (!showCharity || (assignedCharityID == null))
+          //     ? Container()
+          //     : getCharityName(),
         ],
       ),
     );
@@ -138,31 +143,32 @@ class Donation {
     return Card(
       child: Column(
         children: [
+          displayField(
+              'Time posted',
+              formatDateTime(timeCreated,
+                  format: "hh:mm aa on yyyy-MM-dd (EEEE)")),
+          Divider(),
           displayField('Items', items),
           Divider(),
           displayField('Portions', portions.toString()),
           Divider(),
-          displayField('Date', nullOrAlt(collectDate)),
-          Divider(),
-          displayField('Collect by', nullOrAlt(collectTime)),
+          displayField('Collect by',
+              nullOrAlt(collectTime) + " on " + nullOrAlt(collectDate)),
           Divider(),
           displayField('Dietary options', options),
           Divider(),
-          ListTile(
-            leading: Icon(Icons.add),
-            title: Text('Time posted'),
-            subtitle: Text(formatDateTime(timeCreated)),
-          ),
         ],
       ),
     );
   }
 
-  Widget displaySummary() {
-    return Column(
+  Widget displayCollectBy() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text('$portions portions'),
-        Text('Collect by: ${nullOrAlt(collectDate)} ${nullOrAlt(collectTime)}'),
+        Text(
+          'Collect by ${nullOrAlt(collectTime)} on ${nullOrAlt(collectDate)}',
+        ),
       ],
     );
   }
@@ -208,6 +214,12 @@ class Donation {
     });
   }
 
+  Future<void> unsuccessful() async {
+    await fsUpdate({
+      STATUS: 'Unsuccessful',
+    });
+  }
+
   Future<void> assignToCharity(String charityID) async {
     await fsUpdate({
       STATUS: 'Assigned',
@@ -215,5 +227,4 @@ class Donation {
     });
     await _store.collection('available_donations').doc(id).delete();
   }
-
 }

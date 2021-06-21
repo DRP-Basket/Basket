@@ -3,6 +3,7 @@ import 'package:drp_basket_app/views/donor/donations/donation_form.dart';
 import 'package:drp_basket_app/views/general/request.dart';
 import 'package:drp_basket_app/views/utilities/utilities.dart';
 import 'package:flutter/material.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 import '../../../constants.dart';
 
@@ -22,30 +23,47 @@ class _RequestPageState extends State<RequestPage> {
   final Request request;
   final Map<String, dynamic> charity;
   final _store = FirebaseFirestore.instance;
+  bool _uploading = false;
 
   _RequestPageState(this.request, this.charity);
 
   @override
   Widget build(BuildContext context) {
+    List<Widget> children = [
+      request.showStatus(),
+      _showCharityName(),
+      request.showTimeCreated(),
+      _showCharityInfo(),
+    ];
+    children.addAll(_showDonationInfo());
+    if (request.closed != null && request.closed!) {
+      children.add(Padding(
+        padding: EdgeInsets.only(top: 15),
+        child: Text(
+          "Message",
+          style: TextStyle(
+            fontSize: 18,
+          ),
+        ),
+      ));
+      children.add(Text(request.message != null && request.message != ""
+          ? request.message!
+          : "N/A"));
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Request to Claim Donation',
+          'Request for Donation',
         ),
       ),
-      body: Container(
-        padding: EdgeInsets.all(20),
-        child: ListView(
-          children: [
-            request.showStatus(),
-            _showCharityName(),
-            request.showTimeCreated(),
-            _showCharityInfo(),
-            _showDonationInfo(),
-            request.endState() ? _closeButton() : Container(),
-          ],
-        ),
-      ),
+      body: !_uploading
+          ? Container(
+              padding: EdgeInsets.all(20),
+              child: ListView(
+                children: children,
+              ),
+            )
+          : loading(),
     );
   }
 
@@ -56,6 +74,7 @@ class _RequestPageState extends State<RequestPage> {
         charity['name'],
         textAlign: TextAlign.center,
         style: TextStyle(
+          color: third_color,
           fontSize: 48,
           fontWeight: FontWeight.bold,
         ),
@@ -72,19 +91,22 @@ class _RequestPageState extends State<RequestPage> {
           ),
           Divider(),
           ListTile(
-            leading: Icon(Icons.call),
+            leading: Icon(Icons.call, color: primary_color),
             title: Text('Contact Number'),
             subtitle: Text(
               charity['contact_number'],
             ),
           ),
           Divider(),
-          Padding(
-            padding: EdgeInsets.all(8),
-            child: ListTile(
-              leading: Icon(Icons.info_sharp),
-              title: Text('Description'),
-              subtitle: Text(charity['description']),
+          ListTile(
+            leading: Icon(Icons.info_sharp, color: Colors.blue[400]),
+            title: Padding(
+              padding: EdgeInsets.only(bottom: 5),
+              child: Text('Description'),
+            ),
+            subtitle: Padding(
+              padding: EdgeInsets.only(bottom: 5),
+              child: Text(charity['description']),
             ),
           ),
         ],
@@ -92,19 +114,31 @@ class _RequestPageState extends State<RequestPage> {
     );
   }
 
-  Widget _showDonationInfo() {
-    return Card(
-      child: Column(
-        children: [
-          ListTile(
-            leading: Icon(Icons.favorite_outlined),
-            title: Text('Your Donation'),
+  List<Widget> _showDonationInfo() {
+    List<Widget> children = [];
+    if (request.donation != null) {
+      children.add(
+        Card(
+          child: Column(
+            children: [
+              ListTile(
+                leading: Icon(
+                  Icons.favorite_outlined,
+                  color: Colors.red,
+                ),
+                title: Text('Your Donation'),
+              ),
+              Divider(),
+              _hasDonation(),
+            ],
           ),
-          Divider(),
-          request.donation == null ? _emptyDonation() : _hasDonation(),
-        ],
-      ),
-    );
+        ),
+      );
+    }
+    request.donation == null && !request.closed!
+        ? children.add(_emptyDonation())
+        : children.add(_getButtons());
+    return children;
   }
 
   Widget _hasDonation() {
@@ -113,31 +147,44 @@ class _RequestPageState extends State<RequestPage> {
         request.donation!.display(
           showCharity: false,
         ),
-        request.status == Request.POST_WAITING
-            ? Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _acceptButton(),
-                  _declineButton(),
-                ],
-              )
-            : Container(),
+        if (request.status == Request.POST_DECLINED) request.getMessage(),
       ],
     );
   }
 
+  Widget _getButtons() {
+    return request.status == Request.POST_WAITING
+        ? Padding(
+            padding: EdgeInsets.symmetric(vertical: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                request.status == Request.POST_WAITING
+                    ? _acceptButton()
+                    : _donateButton(),
+                _declineButton(),
+              ],
+            ),
+          )
+        : Container();
+  }
+
   Widget _emptyDonation() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        _donateButton(),
-        _declineButton(),
-      ],
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _donateButton(),
+          _declineButton(),
+        ],
+      ),
     );
   }
 
   Widget _acceptButton() {
     return actionButton(
+      fontSize: 21,
       icon: Icons.check,
       label: 'Accept',
       color: Colors.green,
@@ -149,21 +196,85 @@ class _RequestPageState extends State<RequestPage> {
   }
 
   Widget _declineButton() {
+    TextEditingController messageController = TextEditingController();
     return actionButton(
+      fontSize: 21,
       icon: Icons.cancel_outlined,
       label: 'Decline',
       color: Colors.red,
-      onPressed: () {
-        request.donorDecline();
-        Navigator.pop(context);
-      },
+      onPressed: () => showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Decline Request"),
+          content: TextField(
+            decoration: InputDecoration(
+              labelText: "Message (optional)",
+              filled: true,
+              fillColor: Colors.grey[250],
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(width: 0),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: secondary_color, width: 2.0),
+              ),
+              border: null,
+            ),
+            controller: messageController,
+            keyboardType: TextInputType.multiline,
+            maxLines: 3,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                setState(() {
+                  _uploading = true;
+                });
+                Navigator.pop(context);
+                await request.donorDecline(
+                  message: messageController.text,
+                );
+                await _declineSuccesss();
+                setState(() {
+                  _uploading = false;
+                });
+              },
+              child: Text('Confirm'),
+            ),
+          ],
+        ),
+      ),
     );
+  }
+
+  Future<bool?> _declineSuccesss() {
+    return Alert(
+      context: context,
+      title: "Request Declined",
+      buttons: [
+        DialogButton(
+          child: Text(
+            "Okay",
+            style: TextStyle(color: Colors.white, fontSize: 20),
+          ),
+          color: primary_color,
+          onPressed: () {
+            Navigator.pop(context);
+            Navigator.pop(context);
+          },
+        ),
+      ],
+    ).show();
   }
 
   Widget _donateButton() {
     return actionButton(
+      fontSize: 22,
       icon: Icons.volunteer_activism_sharp,
-      label: 'Make a Donation',
+      label: 'Donate',
       color: Colors.green,
       onPressed: () {
         Navigator.push(
@@ -174,15 +285,5 @@ class _RequestPageState extends State<RequestPage> {
         );
       },
     );
-  }
-
-  Widget _closeButton() {
-    return actionButton(
-        label: 'Close Request',
-        color: primary_color,
-        onPressed: () {
-          request.donorClose();
-          Navigator.pop(context);
-        });
   }
 }

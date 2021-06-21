@@ -47,17 +47,16 @@ class _DonorDonationsPageState extends State<DonorDonationsPage> {
           );
         }
         var donations = snapshot.data!.docs;
-        List<Widget> children = donations.map(
-          (DocumentSnapshot ds) {
-            var donationID = ds.reference.id;
-            var donationMap = ds.data() as Map<String, dynamic>;
-            var donation =
-                Donation.buildFromMap(donationID, donationMap); // TODO
-            return _displayDonation(donation);
-          },
-        ).toList();
         return ListView(
-          children: children,
+          children: donations.map(
+            (DocumentSnapshot ds) {
+              var donationID = ds.reference.id;
+              var donationMap = ds.data() as Map<String, dynamic>;
+              var donation =
+                  Donation.buildFromMap(donationID, donationMap); // TODO
+              return _displayDonation(donation);
+            },
+          ).toList(),
         );
       },
     );
@@ -68,35 +67,48 @@ class _DonorDonationsPageState extends State<DonorDonationsPage> {
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 5),
         child: ExpandablePanel(
-          header: Container(
-            padding: EdgeInsets.all(10),
-            child: Text(
-              donation.timeCreated.toString(),
-              style: TextStyle(
-                fontSize: 24,
+          header: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: EdgeInsets.only(top: 10, left: 15),
+                child: Text(
+                  formatDateTime(donation.timeCreated,
+                      format: 'd/MM/yy hh:mmaa'),
+                  style: TextStyle(
+                    fontSize: 24,
+                  ),
+                ),
               ),
-            ),
+              ListTile(
+                title: Text('Status'),
+                subtitle: Text(
+                  donation.status,
+                  style: _getStatusStyle(donation.status),
+                ),
+              ),
+            ],
           ),
-          collapsed: ListTile(
-            title: Text('Status'),
-            subtitle: Text(donation.status),
-          ),
+          collapsed: Container(),
           expanded: DefaultTabController(
             length: 2,
             child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                ListTile(
-                  title: Text('Status: ${donation.status}'),
+                Divider(
+                  thickness: 1,
                 ),
-                Divider(),
                 _getTabBars(),
-                Container(
-                  height: MediaQuery.of(context).size.height / 3,
-                  child: TabBarView(
-                    children: [
-                      donation.display(),
-                      _claimRequests(donation),
-                    ],
+                SingleChildScrollView(
+                  child: Container(
+                    height: MediaQuery.of(context).size.height * 0.375,
+                    child: TabBarView(
+                      children: [
+                        donation.display(),
+                        _claimRequests(donation),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -110,17 +122,17 @@ class _DonorDonationsPageState extends State<DonorDonationsPage> {
   Widget _getTabBars() {
     return Container(
       child: TabBar(
+        unselectedLabelColor: Colors.grey,
+        labelColor: Colors.blue[300],
         tabs: [
           Tab(
             icon: Icon(
               Icons.info_sharp,
-              color: Colors.grey,
             ),
           ),
           Tab(
             icon: Icon(
               Icons.mail_sharp,
-              color: Colors.grey,
             ),
           ),
         ],
@@ -185,23 +197,35 @@ class _DonorDonationsPageState extends State<DonorDonationsPage> {
             return GestureDetector(
               child: Column(
                 children: [
-                  ListTile(
-                    leading: req.getIconFromStatus(),
-                    title: Text(
-                      charity['name'],
-                      style: TextStyle(
-                        fontSize: 18,
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 5),
+                    child: ListTile(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        side: BorderSide(color: Colors.grey[300]!),
+                      ),
+                      leading: req.getIconFromStatus(),
+                      title: Text(
+                        charity['name'],
+                        style: TextStyle(
+                          fontSize: 18,
+                        ),
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                              "Sent at ${formatDateTime(req.timeCreated, format: 'hh:mmaa d/MM/yy')}"),
+                          Text(
+                            req.getStatusText(true),
+                          ),
+                        ],
+                      ),
+                      trailing: Icon(
+                        Icons.more_horiz_outlined,
                       ),
                     ),
-                    subtitle: Text(
-                      req.getStatusText(true),
-                    ),
-                    trailing: Text(
-                      formatDateTime(req.timeCreated,
-                          format: 'd/MM/yy hh:mm aa'),
-                    ),
                   ),
-                  Divider(),
                 ],
               ),
               onTap: () {
@@ -215,5 +239,17 @@ class _DonorDonationsPageState extends State<DonorDonationsPage> {
         );
       },
     );
+  }
+
+  TextStyle? _getStatusStyle(String status) {
+    Color? color;
+    if (status == "Available") {
+      color = secondary_color;
+    } else if (status == "Assigned") {
+      color = Colors.amber;
+    } else if (status == "Claimed") {
+      color = Colors.grey;
+    }
+    return color == null ? null : TextStyle(color: color);
   }
 }

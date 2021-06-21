@@ -47,6 +47,10 @@ class _ReceiversListState extends State<ReceiversList> {
           return Center(
             child: Text(
               'No Receivers Yet',
+              style: TextStyle(
+                color: third_color,
+                fontSize: 24,
+              ),
             ),
           );
         }

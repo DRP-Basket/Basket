@@ -14,14 +14,17 @@ class Request {
   Donation? donation;
   DateTime timeCreated;
   String status;
+  String? message;
+  bool? closed;
 
-  Request({
-    required this.charityID,
-    required this.donorID,
-    this.donation,
-    required this.timeCreated,
-    required this.status,
-  });
+  Request(
+      {required this.charityID,
+      required this.donorID,
+      this.donation,
+      required this.timeCreated,
+      required this.status,
+      this.message,
+      this.closed});
 
   static var curUser = locator<UserController>().curUser()!;
   var _store = FirebaseFirestore.instance;
@@ -36,13 +39,16 @@ class Request {
   static const PING_CHARITY_DECLINED = 'ping_charity_declined';
   static const POST_DECLINED = 'post_declined';
   static const PING_CLAIMED = 'ping_claimed';
+  static const PING_UNSUCCESSFUL = 'ping_unsuccessful';
   static const POST_CLAIMED = 'post_claimed';
+  static const POST_UNSUCCESSFUL = 'post_unsuccessful';
 
   // Firestore field names
   static const CHARITY_ID = 'charity_id';
   static const DONOR_ID = 'donor_id';
   static const DONATION_ID = 'donation_id';
   static const STATUS = 'status';
+  static const MESSAGE = 'message';
   static const TIME_CREATED = 'time_created';
   static const CLOSED = 'closed';
 
@@ -51,17 +57,19 @@ class Request {
       required Map<String, dynamic> req,
       Donation? donation}) {
     Request request = Request(
-      charityID: req[CHARITY_ID],
-      donorID: req[DONOR_ID],
-      donation: donation,
-      timeCreated: req[TIME_CREATED].toDate(),
-      status: req[STATUS],
-    );
+        charityID: req[CHARITY_ID],
+        donorID: req[DONOR_ID],
+        donation: donation,
+        timeCreated: req[TIME_CREATED].toDate(),
+        status: req[STATUS],
+        message: req[MESSAGE],
+        closed: req[CLOSED]);
     request.id = id;
     return request;
   }
 
-  static Future<Request> sendRequest({required String donorID, Donation? donation}) async {
+  static Future<Request> sendRequest(
+      {required String donorID, Donation? donation}) async {
     Request req = Request(
       charityID: curUser.uid,
       donorID: donorID,
@@ -71,6 +79,17 @@ class Request {
     );
     await req.fsSendRequest();
     return req;
+  }
+
+  Widget getMessage() {
+    return ListTile(
+      title: Text(
+        "Message",
+      ),
+      subtitle: Text(
+        message != null ? message! : "N/A",
+      ),
+    );
   }
 
   Future<void> fsSendRequest() async {
@@ -140,7 +159,7 @@ class Request {
     await addRequestToDonation(donation);
   }
 
-  Future<void> donorDecline() async {
+  Future<void> donorDecline({String? message}) async {
     String newStatus = '';
     switch (status) {
       case POST_WAITING:
@@ -154,7 +173,10 @@ class Request {
     }
     await fsUpdate({
       STATUS: newStatus,
+      MESSAGE: message,
+      CLOSED: true,
     });
+    await donorClose();
   }
 
   Future<void> donorAccept() async {
@@ -213,6 +235,24 @@ class Request {
         .addDonationCount(donorID, donation!.portions);
   }
 
+  Future<void> unsuccessfulClaim() async {
+    String newStatus = '';
+    switch (status) {
+      case POST_ACCEPTED:
+        newStatus = POST_UNSUCCESSFUL;
+        break;
+      case PING_ACCEPTED:
+        newStatus = PING_UNSUCCESSFUL;
+        break;
+      default:
+        assert(false);
+    }
+    await fsUpdate({
+      STATUS: newStatus,
+    });
+    await donation!.unsuccessful();
+  }
+
   Future<void> charityClose() async {
     await fsUpdate({
       CLOSED: true,
@@ -227,6 +267,8 @@ class Request {
       case PING_CHARITY_DECLINED:
       case PING_CLAIMED:
       case POST_CLAIMED:
+      case PING_UNSUCCESSFUL:
+      case POST_UNSUCCESSFUL:
         return true;
       default:
         return false;
@@ -243,7 +285,7 @@ class Request {
         return isDonor ? 'You declined the request' : 'Request was declined';
       case PING_ACCEPTED:
       case POST_ACCEPTED:
-        return 'Waiting for charity to claim donation';
+        return 'Waiting to claim donation';
       case PING_DONOR_WAITING:
         return 'Waiting for ${isDonor ? 'their' : 'your'} response';
       case PING_CHARITY_DECLINED:
@@ -253,6 +295,9 @@ class Request {
       case PING_CLAIMED:
       case POST_CLAIMED:
         return 'Donation claimed';
+      case POST_UNSUCCESSFUL:
+      case PING_UNSUCCESSFUL:
+        return 'Unsuccesful request';
       default:
         return 'Unknown';
     }
@@ -273,7 +318,10 @@ class Request {
   Widget showTimeCreated() {
     return Card(
       child: ListTile(
-        leading: Icon(Icons.send_sharp),
+        leading: Icon(
+          Icons.send_sharp,
+          color: Colors.amber,
+        ),
         title: Text('Sent at'),
         subtitle: Text(
           formatDateTime(timeCreated, format: 'd/MM/yy hh:mm aa'),
@@ -314,6 +362,8 @@ class Request {
       case PING_DONOR_DECLINED:
       case PING_CHARITY_DECLINED:
       case POST_DECLINED:
+      case PING_UNSUCCESSFUL:
+      case POST_UNSUCCESSFUL:
         return Icon(
           Icons.cancel_outlined,
           color: Colors.red,

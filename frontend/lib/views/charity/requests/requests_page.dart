@@ -89,8 +89,12 @@ class _RequestsPageState extends State<RequestsPage> {
         var donorMap = snapshot.data!.data() as Map<String, dynamic>;
         Donor donor = Donor.buildFromMap(req.donorID, donorMap);
         Widget tileContent = Card(
-          shadowColor: Colors.grey,
-          elevation: 3,
+          elevation: 5,
+          shadowColor: Colors.grey[300],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+            side: BorderSide(color: Colors.grey),
+          ),
           child: ListTile(
             leading: req.getIconFromStatus(),
             title: Padding(

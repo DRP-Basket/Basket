@@ -45,7 +45,7 @@ class DonationsMain extends StatelessWidget {
             Expanded(
               child: TabBarView(
                 children: [
-                  CharityDonationsPage(),
+                  CharityDonationsPage(true),
                   DonorsPage(),
                 ],
               ),

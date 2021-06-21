@@ -56,6 +56,13 @@ class _RequestsPageState extends State<RequestsPage> {
             );
           }
           var reqs = snapshot.data!.docs;
+          reqs.sort((a, b) {
+            var aData = a.data() as Map<String, dynamic>;
+            var bData = b.data() as Map<String, dynamic>;
+            Timestamp aDate = aData["time_created"];
+            Timestamp bDate = bData["time_created"];
+            return bDate.compareTo(aDate);
+          });
           return ListView(
             children: reqs.map(
               (DocumentSnapshot ds) {
@@ -92,19 +99,38 @@ class _RequestsPageState extends State<RequestsPage> {
             }
             var charity = snapshot.data!.data() as Map<String, dynamic>;
             Widget tileContent = Card(
+              elevation: 5,
+              shadowColor: Colors.grey[300],
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                side: BorderSide(color: Colors.grey),
+              ),
               child: ListTile(
                 leading: req.getIconFromStatus(),
-                title: Text(
-                  charity['name'],
-                  style: TextStyle(
-                    fontSize: 18,
+                title: Padding(
+                  padding: EdgeInsets.only(
+                    bottom: 5,
+                  ),
+                  child: Text(
+                    charity['name'],
+                    style: TextStyle(
+                      fontSize: 18,
+                    ),
                   ),
                 ),
-                subtitle: Text(
-                  req.getStatusText(true),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                        "Sent at ${formatDateTime(req.timeCreated, format: 'hh:mmaa d/MM/yy')}"),
+                    Text(
+                      req.getStatusText(true),
+                    ),
+                  ],
                 ),
-                trailing: Text(formatDateTime(req.timeCreated,
-                    format: 'd/MM/yy hh:mm aa')),
+                trailing: Icon(
+                  Icons.more_horiz_outlined,
+                ),
               ),
             );
             if (reqMap[Request.DONATION_ID] == null) {

@@ -2,10 +2,11 @@ import 'package:drp_basket_app/views/general/donor.dart';
 import 'package:drp_basket_app/views/general/request.dart';
 import 'package:drp_basket_app/views/utilities/utilities.dart';
 import 'package:flutter/material.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 import '../../../constants.dart';
 
-// Page displaying info about a specific request 
+// Page displaying info about a specific request
 
 class RequestPage extends StatefulWidget {
   final Request request;
@@ -20,6 +21,7 @@ class RequestPage extends StatefulWidget {
 class _RequestPageState extends State<RequestPage> {
   final Request request;
   final Donor donor;
+  bool _uploading = false;
 
   _RequestPageState(this.request, this.donor);
 
@@ -31,23 +33,30 @@ class _RequestPageState extends State<RequestPage> {
           'Request to Claim Donation',
         ),
       ),
-      body: Container(
-        padding: EdgeInsets.all(20),
-        child: ListView(
-          children: [
-            request.showStatus(isDonor: false),
-            _showDonorName(),
-            request.showTimeCreated(),
-            _showContactNumber(),
-            _showAddress(),
-            request.donation == null
-                ? Container()
-                : request.donation!.display(),
-            _actionByStatus(),
-            request.endState() ? _closeButton() : Container(),
-          ],
-        ),
-      ),
+      body: _uploading
+          ? loading()
+          : Container(
+              padding: EdgeInsets.all(20),
+              child: ListView(
+                children: [
+                  request.showStatus(isDonor: false),
+                  _showDonorName(),
+                  request.showTimeCreated(),
+                  _showContactNumber(),
+                  _showAddress(),
+                  request.donation == null
+                      ? Container()
+                      : Card(child: request.donation!.display()),
+                  request.status != Request.POST_DECLINED
+                      ? Container()
+                      : request.getMessage(),
+                  _actionByStatus(),
+                  request.closed == null || !request.closed!
+                      ? (request.endState() ? _closeButton() : Container())
+                      : Container(),
+                ],
+              ),
+            ),
     );
   }
 
@@ -55,7 +64,10 @@ class _RequestPageState extends State<RequestPage> {
     switch (request.status) {
       case Request.PING_ACCEPTED:
       case Request.POST_ACCEPTED:
-        return _claimButton();
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: _getClaimButtons(),
+        );
       case Request.PING_DONOR_WAITING:
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -66,7 +78,7 @@ class _RequestPageState extends State<RequestPage> {
         );
       case Request.PING_CLAIMED:
       case Request.POST_CLAIMED:
-        // return _rateButton();
+      // return _rateButton();
       default:
         return Container();
     }
@@ -74,25 +86,97 @@ class _RequestPageState extends State<RequestPage> {
 
   Widget _closeButton() {
     return actionButton(
-      label: 'Close Request', 
-      color: primary_color, 
-      onPressed: () {
-        request.charityClose();
-        Navigator.pop(context);
-      }
+        label: 'Close Request',
+        color: Colors.deepOrange[800]!,
+        onPressed: () {
+          request.charityClose();
+          Navigator.pop(context);
+        });
+  }
+
+  List<Widget> _getClaimButtons() {
+    return [
+      Expanded(
+        flex: 4,
+        child: actionButton(
+          icon: Icons.check,
+          label: 'Successful',
+          color: Colors.green,
+          onPressed: () {
+            request.claimed();
+            request.charityClose();
+            request.donorClose();
+            Navigator.pop(context);
+          },
+        ),
+      ),
+      Spacer(),
+      Expanded(
+        flex: 4,
+        child: actionButton(
+          icon: Icons.error_outline,
+          label: 'Unsuccessful',
+          color: Colors.red,
+          onPressed: () {
+            request.unsuccessfulClaim();
+            request.charityClose();
+            request.donorClose();
+            Navigator.pop(context);
+          },
+        ),
+      ),
+    ];
+  }
+
+  Future<dynamic> _getConfirmation(bool successful) async {
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("This request is ${successful ? "" : "un"}successful"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              setState(() {
+                _uploading = true;
+              });
+              Navigator.pop(context);
+              if (successful) {
+                await request.claimed();
+              } else {
+                await request.unsuccessfulClaim();
+              }
+              await request.charityClose();
+              await request.donorClose();
+              await _requestSuccess();
+              setState(() {
+                _uploading = false;
+              });
+            },
+            child: Text('OK'),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _claimButton() {
-    return actionButton(
-      icon: Icons.check,
-      label: 'Claim',
-      color: Colors.green,
-      onPressed: () {
-        request.claimed();
-        Navigator.pop(context);
-      },
-    );
+  Future<bool?> _requestSuccess() {
+    return Alert(context: context, title: "Status updated", buttons: [
+      DialogButton(
+        child: Text(
+          "Okay",
+          style: TextStyle(color: Colors.white, fontSize: 20),
+        ),
+        color: primary_color,
+        onPressed: () {
+          Navigator.pop(context);
+          Navigator.pop(context);
+        },
+      ),
+    ]).show();
   }
 
   Widget _rateButton() {
@@ -125,6 +209,8 @@ class _RequestPageState extends State<RequestPage> {
       color: Colors.red,
       onPressed: () {
         request.charityDecline();
+        request.charityClose();
+        request.donorClose();
         Navigator.pop(context);
       },
     );
@@ -137,8 +223,9 @@ class _RequestPageState extends State<RequestPage> {
         donor.name,
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontSize: 48,
+          fontSize: 40,
           fontWeight: FontWeight.bold,
+          color: third_color,
         ),
       ),
     );
@@ -147,7 +234,7 @@ class _RequestPageState extends State<RequestPage> {
   Widget _showContactNumber() {
     return Card(
       child: ListTile(
-        leading: Icon(Icons.call),
+        leading: Icon(Icons.call, color: primary_color),
         title: Text('Contact Number'),
         subtitle: Text(
           donor.contactNumber,
@@ -159,7 +246,7 @@ class _RequestPageState extends State<RequestPage> {
   Widget _showAddress() {
     return Card(
       child: ListTile(
-        leading: Icon(Icons.home),
+        leading: Icon(Icons.home, color: Colors.blue[400]),
         title: Text('Address'),
         subtitle: Text(
           donor.address,

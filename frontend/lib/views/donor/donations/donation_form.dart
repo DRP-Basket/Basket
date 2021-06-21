@@ -1,8 +1,8 @@
-import 'package:drp_basket_app/views/donor/donor_main.dart';
 import 'package:drp_basket_app/views/general/request.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 import '../../../constants.dart';
 import '../../general/donation.dart';
@@ -263,7 +263,7 @@ class _DonationFormState extends State<DonationForm> {
                       ),
                       child: Center(
                           child: ElevatedButton(
-                        onPressed: _confirmTap,
+                        onPressed: () => _postTap(),
                         child: Text(
                           "Confirm & ${request != null ? "Send" : "Post"}",
                           style: TextStyle(fontSize: 20),
@@ -281,12 +281,38 @@ class _DonationFormState extends State<DonationForm> {
     );
   }
 
-  Future<void> _confirmTap() async {
+  Future<void> _postTap() async {
     _foodItemsIsEmpty = _foodItemsEditingController.text == "";
     _portionNumberIsEmpty = _portionNumberEditingController.text == "";
     if (_foodItemsIsEmpty || _portionNumberIsEmpty) {
       return setState(() {});
     }
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Are you sure?"),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'Cancel'),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              await _confirmTap();
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _confirmTap() async {
+    setState(() {
+      _uploading = true;
+    });
+    Navigator.pop(context);
+
     Donation donation = await Donation.addNewDonation(
       items: _foodItemsEditingController.text,
       portions: int.parse(_portionNumberEditingController.text),
@@ -296,6 +322,35 @@ class _DonationFormState extends State<DonationForm> {
       charityID: request?.charityID,
     );
     request?.respond(donation);
-    Navigator.popUntil(context, ModalRoute.withName(DonorMain.id));
+
+    _foodItemsEditingController.clear();
+    _portionNumberEditingController.clear();
+    _dietaryOptionsEditingController.clear();
+
+    setState(() {
+      _uploading = false;
+    });
+
+    Alert(
+        context: context,
+        title: "Successful",
+        desc: "Donation has been posted",
+        type: AlertType.success,
+        buttons: [
+          DialogButton(
+            child: Text(
+              "Okay",
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+            color: primary_color,
+            onPressed: () {
+              Navigator.pop(context);
+              if (request != null) {
+                Navigator.pop(context);
+                Navigator.pop(context);
+              }
+            },
+          ),
+        ]).show();
   }
 }

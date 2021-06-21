@@ -54,12 +54,12 @@ class UserController {
 
   Future<void> testLogInDonorWithEmailAndPassword() async {
     _currentUser = await _firebaseAuthController.loginWithEmailAndPassword(
-        "test_donor@basket.com", "basket123");
+        "business@basket.com", "basket123");
   }
 
   Future<void> testLogInCharityWithEmailAndPassword() async {
     _currentUser = await _firebaseAuthController.loginWithEmailAndPassword(
-        "greenhour@basket.com", "basket123");
+        "charity@basket.com", "basket123");
   }
 
   void logInWithEmailAndPassword(
