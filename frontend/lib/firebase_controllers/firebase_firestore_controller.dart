@@ -91,11 +91,11 @@ class FirebaseFirestoreController implements FirebaseFirestoreInterface {
   }
 
   Future<void> assignNewRedeemCode(
-      String redeemCode, String uid, String donationID) {
+      String redeemCode, String uid, String donationID, String donorID) {
     return _fireStore
         .collection(REDEEM)
         .doc(redeemCode)
-        .set({"user": uid, "donation_event": donationID});
+        .set({"user": uid, "donation_event": donationID, "donor": donorID});
   }
 
   Stream<Object> getContactList({bool sortByLastClaimed: false}) {

@@ -85,7 +85,7 @@ class _ReceiverPageState extends State<ReceiverPage> {
               if (!snapshot.hasData) {
                 return Center(
                   child: Text(
-                    'No Receivers Yet',
+                    'No Donations Claimed Yet',
                     style: TextStyle(
                       fontSize: 36,
                     ),
@@ -111,6 +111,9 @@ class _ReceiverPageState extends State<ReceiverPage> {
     return StreamBuilder(
       stream: locator<FirebaseFirestoreInterface>().getDonationEvent(uid, id),
       builder: (BuildContext ctx, AsyncSnapshot<DocumentSnapshot> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return loading();
+        }
         if (!snapshot.hasData) {
           return Container();
         } else {

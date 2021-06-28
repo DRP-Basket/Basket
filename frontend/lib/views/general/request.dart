@@ -87,7 +87,7 @@ class Request {
         "Message",
       ),
       subtitle: Text(
-        message != null ? message! : "N/A",
+        (message != null && message != "") ? message! : "N/A",
       ),
     );
   }
@@ -215,7 +215,7 @@ class Request {
     // TODO : canceled status
   }
 
-  Future<void> claimed() async {
+  Future<void> claimed(String message) async {
     String newStatus = '';
     switch (status) {
       case POST_ACCEPTED:
@@ -229,13 +229,14 @@ class Request {
     }
     await fsUpdate({
       STATUS: newStatus,
+      MESSAGE: message,
     });
     await donation!.claimed();
     locator<FirebaseFirestoreInterface>()
         .addDonationCount(donorID, donation!.portions);
   }
 
-  Future<void> unsuccessfulClaim() async {
+  Future<void> unsuccessfulClaim(String message) async {
     String newStatus = '';
     switch (status) {
       case POST_ACCEPTED:
@@ -249,8 +250,9 @@ class Request {
     }
     await fsUpdate({
       STATUS: newStatus,
+      MESSAGE: message,
     });
-    await donation!.unsuccessful();
+    // await donation!.unsuccessful();
   }
 
   Future<void> charityClose() async {

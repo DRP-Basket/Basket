@@ -19,7 +19,7 @@ class FirebaseFirestoreInterface {
 
   charityFromID(String id) {}
 
-  assignNewRedeemCode(String redeemCode, String uid, String donationID) {}
+  assignNewRedeemCode(String redeemCode, String uid, String donationID, String donorID) {}
 
   getContactList({bool sortByLastClaimed: false}) {}
 

@@ -24,6 +24,7 @@ class Basket extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: LOGO_NAME,
       theme: ThemeData(
           primaryColor: primary_color,

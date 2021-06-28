@@ -47,9 +47,7 @@ class _RequestPageState extends State<RequestPage> {
                   request.donation == null
                       ? Container()
                       : Card(child: request.donation!.display()),
-                  request.status != Request.POST_DECLINED
-                      ? Container()
-                      : request.getMessage(),
+                  !request.endState() ? Container() : request.getMessage(),
                   _actionByStatus(),
                   request.closed == null || !request.closed!
                       ? (request.endState() ? _closeButton() : Container())
@@ -102,12 +100,7 @@ class _RequestPageState extends State<RequestPage> {
           icon: Icons.check,
           label: 'Successful',
           color: Colors.green,
-          onPressed: () {
-            request.claimed();
-            request.charityClose();
-            request.donorClose();
-            Navigator.pop(context);
-          },
+          onPressed: () => _getConfirmation(true),
         ),
       ),
       Spacer(),
@@ -117,22 +110,35 @@ class _RequestPageState extends State<RequestPage> {
           icon: Icons.error_outline,
           label: 'Unsuccessful',
           color: Colors.red,
-          onPressed: () {
-            request.unsuccessfulClaim();
-            request.charityClose();
-            request.donorClose();
-            Navigator.pop(context);
-          },
+          onPressed: ()  => _getConfirmation(false),
         ),
       ),
     ];
   }
 
   Future<dynamic> _getConfirmation(bool successful) async {
+    TextEditingController messageController = TextEditingController();
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text("This request is ${successful ? "" : "un"}successful"),
+        content: TextField(
+          decoration: InputDecoration(
+            labelText: "Message (optional)",
+            filled: true,
+            fillColor: Colors.grey[250],
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(width: 0),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: secondary_color, width: 2.0),
+            ),
+            border: null,
+          ),
+          controller: messageController,
+          keyboardType: TextInputType.multiline,
+          maxLines: 3,
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -145,9 +151,9 @@ class _RequestPageState extends State<RequestPage> {
               });
               Navigator.pop(context);
               if (successful) {
-                await request.claimed();
+                await request.claimed(messageController.text);
               } else {
-                await request.unsuccessfulClaim();
+                await request.unsuccessfulClaim(messageController.text);
               }
               await request.charityClose();
               await request.donorClose();

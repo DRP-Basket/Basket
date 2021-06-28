@@ -37,15 +37,15 @@ Rank? nextRank(Rank rank) {
 }
 
 const Map<Rank, String> rankString = {
-  Rank.BRONZE: "bronze",
-  Rank.SILVER: "silver",
-  Rank.GOLD: "gold",
-  Rank.PLATINUM: "platinum",
-  Rank.EMERALD: "emerald",
-  Rank.DIAMOND: "diamond",
-  Rank.MASTER: "master",
-  Rank.GRANDMASTER: "grandmaster",
-  Rank.CHALLENGER: "challenger",
+  Rank.BRONZE: "Bronze",
+  Rank.SILVER: "Silver",
+  Rank.GOLD: "Gold",
+  Rank.PLATINUM: "Platinum",
+  Rank.EMERALD: "Emerald",
+  Rank.DIAMOND: "Diamond",
+  Rank.MASTER: "Master",
+  Rank.GRANDMASTER: "Grandmaster",
+  Rank.CHALLENGER: "Challenger",
 };
 
 String getImagePath(Rank rank) {
